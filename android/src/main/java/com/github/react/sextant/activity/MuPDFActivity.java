@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -41,6 +40,9 @@ import com.artifex.mupdfdemo.OutlineItem;
 import com.artifex.mupdfdemo.ReaderView;
 import com.artifex.mupdfdemo.SearchTask;
 import com.artifex.mupdfdemo.SearchTaskResult;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.github.react.sextant.MyListener;
+import com.github.react.sextant.RCTMuPdfModule;
 import com.lonelypluto.pdflibrary.utils.SharedPreferencesUtil;
 import com.github.react.sextant.R;
 import com.github.react.sextant.core.SelfMuPDFReaderView;
@@ -50,6 +52,7 @@ import com.github.react.sextant.util.ParseNoteXml;
 import java.util.concurrent.Executor;
 
 import com.facebook.react.ReactActivity;
+
 
 /**
  * @Description: MuPDF已有功能
@@ -95,12 +98,17 @@ public class MuPDFActivity extends ReactActivity {
     private SearchTask mSearchTask;// 搜索线程
     private boolean mLinkHighlight = false;// 是否高亮显示
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mupdf);
 
+        context = this;
+
         initView();
+
     }
 
     /**
@@ -222,20 +230,34 @@ public class MuPDFActivity extends ReactActivity {
 
         ParseNoteXml parseNoteXml = new ParseNoteXml(MuPDFActivity.this);
 
-        // 手动添加批注
-        PointF[][] p=new PointF[2][];
-        PointF [] points=new PointF[2];
-        PointF [] points2=new PointF[2];
+//        // 手动添加批注
+//        PointF[][] p=new PointF[2][];
+//        PointF [] points=new PointF[2];
+//        PointF [] points2=new PointF[2];
+//
+//        points[0]=new PointF(d(397.97363), d(511.98438));
+//        points[1]=new PointF(d(426.18015), d(511.98438));
+//        points2[0]=new PointF(d(429.18015), d(511.98438));
+//        points2[1]=new PointF(d(448.22455), d(511.98438));
+//
+//        p[0] = points;
+//        p[1] = points2;
+//
+//        muPDFCore.addInkAnnotation(0, p,hextoRGB("#000000"),10);
 
-        points[0]=new PointF(d(397.97363), d(211.98438));
-        points[1]=new PointF(d(426.18015), d(211.98438));
-        points2[0]=new PointF(d(429.18015), d(211.98438));
-        points2[1]=new PointF(d(448.22455), d(211.98438));
 
-        p[0] = points;
-        p[1] = points2;
+        RCTMuPdfModule.setUpListener(new MyListener() {
+            @Override
+            public void onEvent(String s) {
 
-        muPDFCore.addInkAnnotation(0, p,hextoRGB("#000000"),1);
+                muPDFReaderView.touch_start(d(429.18015),d(511.98438));
+                muPDFReaderView.touch_move(d(448.22455),d(511.98438));
+                muPDFReaderView.touch_move(d(447.22455),d(511.98438));
+                muPDFReaderView.touch_move(d(446.22455),d(511.98438));
+                muPDFReaderView.touch_move(d(440.22455),d(511.98438));
+                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private float d(double data){

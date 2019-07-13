@@ -2,11 +2,7 @@
           package="com.github.react.sextant">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application>
-        <activity
-            android:name=".activity.MuPDFActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.OutlineActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".activity.MuPDFActivity"/>
+        <activity android:name=".activity.OutlineActivity"/>
     </application>
 </manifest>

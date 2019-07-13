@@ -252,7 +252,7 @@ public class SelfMuPDFReaderView extends ReaderView {
 
 	private static final float TOUCH_TOLERANCE = 2;
 
-	private void touch_start(float x, float y) {
+	public void touch_start(float x, float y) {
 
 		MuPDFView pageView = (MuPDFView)getDisplayedView();
 		if (pageView != null)
@@ -264,7 +264,7 @@ public class SelfMuPDFReaderView extends ReaderView {
 		Log.i("批注start","x:"+x+",y:"+y);
 	}
 
-	private void touch_move(float x, float y) {
+	public void touch_move(float x, float y) {
 
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
