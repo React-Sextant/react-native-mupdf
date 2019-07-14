@@ -24,6 +24,7 @@ def _compileSdkVersion = _ext.has('compileSdkVersion') ? _ext.compileSdkVersion 
 def _buildToolsVersion = _ext.has('buildToolsVersion') ? _ext.buildToolsVersion : '27.0.3'
 def _minSdkVersion = _ext.has('minSdkVersion') ? _ext.minSdkVersion : 17
 def _targetSdkVersion = _ext.has('targetSdkVersion') ? _ext.targetSdkVersion : 26
+def _supportLibVersion = _ext.has('targetSdkVersion') ? _ext.supportLibVersion : '28.0.0'
 
 android {
     compileSdkVersion _compileSdkVersion
@@ -42,11 +43,19 @@ android {
         pickFirst 'lib/armeabi-v7a/libmupdf_java.so'
         pickFirst 'lib/x86/libmupdf_java.so'
     }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 }
 
 dependencies {
     implementation "com.facebook.react:react-native:${_reactNativeVersion}"
-    implementation 'com.lonelypluto:pdf-viewer:1.0.6'
+    implementation "com.android.support:recyclerview-v7:${_supportLibVersion}"
+//    implementation 'com.lonelypluto:pdf-viewer:1.0.6'
+    implementation(name:'droidText.0.5', ext:'jar')
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'dom4j:dom4j:1.6.1'
 }

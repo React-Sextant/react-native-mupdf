@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.AllPDFActivity">
+    tools:context=".activity.MuPDFActivity">
 
-    <com.github.react.sextant.core.SelfMuPDFReaderView
+    <com.artifex.mupdfdemo.MuPDFReaderView
         android:id="@+id/mu_pdf_mupdfreaderview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

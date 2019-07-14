@@ -18,6 +18,20 @@ react-native link react-native-mupdf
  - targetSdkVersion = 22    `is best`
  - supportLibVersion = "28.0.0" `is best`
 
+#### android/app/build.gradle
+Local reference AAR/JAR
+```
+android{
+    ...
+    
+    repositories {
+        flatDir {
+            dirs project(':react-native-mupdf').file('libs')
+        }
+    }
+}
+```
+
 ## Usage
 ```jsx harmony
 import {startPDFActivity} from 'react-native-mupdf'

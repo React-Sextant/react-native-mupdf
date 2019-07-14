@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,6 +32,7 @@ import com.artifex.mupdfdemo.Hit;
 import com.artifex.mupdfdemo.MuPDFAlert;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
+import com.artifex.mupdfdemo.MuPDFReaderView;
 import com.artifex.mupdfdemo.MuPDFReaderViewListener;
 import com.artifex.mupdfdemo.MuPDFView;
 import com.artifex.mupdfdemo.OutlineActivityData;
@@ -40,19 +40,16 @@ import com.artifex.mupdfdemo.OutlineItem;
 import com.artifex.mupdfdemo.ReaderView;
 import com.artifex.mupdfdemo.SearchTask;
 import com.artifex.mupdfdemo.SearchTaskResult;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.github.react.sextant.MyListener;
 import com.github.react.sextant.RCTMuPdfModule;
-import com.lonelypluto.pdflibrary.utils.SharedPreferencesUtil;
+import com.github.react.sextant.util.SharedPreferencesUtil;
 import com.github.react.sextant.R;
-import com.github.react.sextant.core.SelfMuPDFReaderView;
 import com.github.react.sextant.util.GsonReadArray;
 import com.github.react.sextant.util.ParseNoteXml;
 
 import java.util.concurrent.Executor;
 
 import com.facebook.react.ReactActivity;
-
 
 /**
  * @Description: MuPDF已有功能
@@ -68,7 +65,7 @@ public class MuPDFActivity extends ReactActivity {
     private AlertDialog.Builder mAlertBuilder;// 弹出框
 
     private MuPDFCore muPDFCore;// 加载mupdf.so文件
-    private SelfMuPDFReaderView muPDFReaderView;// 显示pdf的view
+    private MuPDFReaderView muPDFReaderView;// 显示pdf的view
 
     private boolean mAlertsActive = false;
     private AsyncTask<Void, Void, MuPDFAlert> mAlertTask;
@@ -117,7 +114,7 @@ public class MuPDFActivity extends ReactActivity {
     private void initView() {
         SharedPreferencesUtil.init(getApplication());
 
-        muPDFReaderView = (SelfMuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
+        muPDFReaderView = (MuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
 
         initToolsView();
         createPDF();
@@ -158,8 +155,8 @@ public class MuPDFActivity extends ReactActivity {
         // 判断如果core为空，提示不能打开文件
         if (muPDFCore == null) {
             AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle(com.lonelypluto.pdflibrary.R.string.cannot_open_document);
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(com.lonelypluto.pdflibrary.R.string.dismiss),
+            alert.setTitle(R.string.cannot_open_document);
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dismiss),
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -250,12 +247,12 @@ public class MuPDFActivity extends ReactActivity {
             @Override
             public void onEvent(String s) {
 
-                muPDFReaderView.touch_start(d(429.18015),d(511.98438));
-                muPDFReaderView.touch_move(d(448.22455),d(511.98438));
-                muPDFReaderView.touch_move(d(447.22455),d(511.98438));
-                muPDFReaderView.touch_move(d(446.22455),d(511.98438));
-                muPDFReaderView.touch_move(d(440.22455),d(511.98438));
-                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
+//                muPDFReaderView.touch_start(d(429.18015),d(511.98438));
+//                muPDFReaderView.touch_move(d(448.22455),d(511.98438));
+//                muPDFReaderView.touch_move(d(447.22455),d(511.98438));
+//                muPDFReaderView.touch_move(d(446.22455),d(511.98438));
+//                muPDFReaderView.touch_move(d(440.22455),d(511.98438));
+//                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -617,9 +614,9 @@ public class MuPDFActivity extends ReactActivity {
         mTopBarMode = TopBarMode.Accept;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         mAcceptMode = AcceptMode.CopyText;
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Selecting);
-        mAnnotTypeText.setText(getString(com.lonelypluto.pdflibrary.R.string.copy_text));
-        showInfo(getString(com.lonelypluto.pdflibrary.R.string.select_text));
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Selecting);
+        mAnnotTypeText.setText(getString(R.string.copy_text));
+        showInfo(getString(R.string.select_text));
     }
 
     /**
@@ -675,9 +672,9 @@ public class MuPDFActivity extends ReactActivity {
         mTopBarMode = TopBarMode.Accept;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         mAcceptMode = AcceptMode.Highlight;
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Selecting);
-        mAnnotTypeText.setText(com.lonelypluto.pdflibrary.R.string.pdf_tools_highlight);
-        showInfo(getString(com.lonelypluto.pdflibrary.R.string.select_text));
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Selecting);
+        mAnnotTypeText.setText(R.string.pdf_tools_highlight);
+        showInfo(getString(R.string.select_text));
     }
 
     /**
@@ -688,9 +685,9 @@ public class MuPDFActivity extends ReactActivity {
         mTopBarMode = TopBarMode.Accept;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         mAcceptMode = AcceptMode.Underline;
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Selecting);
-        mAnnotTypeText.setText(com.lonelypluto.pdflibrary.R.string.pdf_tools_underline);
-        showInfo(getString(com.lonelypluto.pdflibrary.R.string.select_text));
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Selecting);
+        mAnnotTypeText.setText(R.string.pdf_tools_underline);
+        showInfo(getString(R.string.select_text));
     }
 
     /**
@@ -701,9 +698,9 @@ public class MuPDFActivity extends ReactActivity {
         mTopBarMode = TopBarMode.Accept;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         mAcceptMode = AcceptMode.StrikeOut;
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Selecting);
-        mAnnotTypeText.setText(com.lonelypluto.pdflibrary.R.string.pdf_tools_strike_out);
-        showInfo(getString(com.lonelypluto.pdflibrary.R.string.select_text));
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Selecting);
+        mAnnotTypeText.setText(R.string.pdf_tools_strike_out);
+        showInfo(getString(R.string.select_text));
     }
 
     /**
@@ -714,9 +711,9 @@ public class MuPDFActivity extends ReactActivity {
         mTopBarMode = TopBarMode.Accept;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         mAcceptMode = AcceptMode.Ink;
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Drawing);
-        mAnnotTypeText.setText(com.lonelypluto.pdflibrary.R.string.pdf_tools_ink);
-        showInfo(getString(com.lonelypluto.pdflibrary.R.string.pdf_tools_draw_annotation));
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Drawing);
+        mAnnotTypeText.setText(R.string.pdf_tools_ink);
+        showInfo(getString(R.string.pdf_tools_draw_annotation));
     }
 
     /**
@@ -753,7 +750,7 @@ public class MuPDFActivity extends ReactActivity {
             pageView.deselectText();
             pageView.cancelDraw();
         }
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Viewing);
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Viewing);
         switch (mAcceptMode) {
             case CopyText:
                 mTopBarMode = TopBarMode.Main;
@@ -777,7 +774,7 @@ public class MuPDFActivity extends ReactActivity {
                 if (pageView != null)
                     success = pageView.copySelection();
                 mTopBarMode = TopBarMode.Main;
-                showInfo(success ? getString(com.lonelypluto.pdflibrary.R.string.copied_to_clipboard) : getString(com.lonelypluto.pdflibrary.R.string.no_text_selected));
+                showInfo(success ? getString(R.string.copied_to_clipboard) : getString(R.string.no_text_selected));
                 break;
             case Highlight:
                 // 高亮
@@ -786,7 +783,7 @@ public class MuPDFActivity extends ReactActivity {
                 }
                 mTopBarMode = TopBarMode.Annot;
                 if (!success) {
-                    showInfo(getString(com.lonelypluto.pdflibrary.R.string.no_text_selected));
+                    showInfo(getString(R.string.no_text_selected));
                 }
                 break;
             case Underline:
@@ -794,7 +791,7 @@ public class MuPDFActivity extends ReactActivity {
                     success = pageView.markupSelection(Annotation.Type.UNDERLINE);
                 mTopBarMode = TopBarMode.Annot;
                 if (!success)
-                    showInfo(getString(com.lonelypluto.pdflibrary.R.string.no_text_selected));
+                    showInfo(getString(R.string.no_text_selected));
                 break;
 
             case StrikeOut:
@@ -802,7 +799,7 @@ public class MuPDFActivity extends ReactActivity {
                     success = pageView.markupSelection(Annotation.Type.STRIKEOUT);
                 mTopBarMode = TopBarMode.Annot;
                 if (!success)
-                    showInfo(getString(com.lonelypluto.pdflibrary.R.string.no_text_selected));
+                    showInfo(getString(R.string.no_text_selected));
                 break;
 
             case Ink:
@@ -810,11 +807,11 @@ public class MuPDFActivity extends ReactActivity {
                     success = pageView.saveDraw();
                 mTopBarMode = TopBarMode.Annot;
                 if (!success)
-                    showInfo(getString(com.lonelypluto.pdflibrary.R.string.nothing_to_save));
+                    showInfo(getString(R.string.nothing_to_save));
                 break;
         }
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-        muPDFReaderView.setMode(SelfMuPDFReaderView.Mode.Viewing);
+        muPDFReaderView.setMode(MuPDFReaderView.Mode.Viewing);
     }
 
     /**
@@ -858,10 +855,10 @@ public class MuPDFActivity extends ReactActivity {
     private void showInfo(String message) {
 
         LayoutInflater inflater = getLayoutInflater();
-        View toastLayout = inflater.inflate(com.lonelypluto.pdflibrary.R.layout.toast,
-                (ViewGroup) findViewById(com.lonelypluto.pdflibrary.R.id.toast_root_view));
+        View toastLayout = inflater.inflate(R.layout.toast,
+                (ViewGroup) findViewById(R.id.toast_root_view));
 
-        TextView header = (TextView) toastLayout.findViewById(com.lonelypluto.pdflibrary.R.id.toast_message);
+        TextView header = (TextView) toastLayout.findViewById(R.id.toast_message);
         header.setText(message);
 
         Toast toast = new Toast(getApplicationContext());
@@ -950,19 +947,19 @@ public class MuPDFActivity extends ReactActivity {
                 }
                 switch (result.buttonGroupType) {
                     case OkCancel:
-                        mAlertDialog.setButton(AlertDialog.BUTTON2, getString(com.lonelypluto.pdflibrary.R.string.cancel), listener);
+                        mAlertDialog.setButton(AlertDialog.BUTTON2, getString(R.string.cancel), listener);
                         pressed[1] = MuPDFAlert.ButtonPressed.Cancel;
                     case Ok:
-                        mAlertDialog.setButton(AlertDialog.BUTTON1, getString(com.lonelypluto.pdflibrary.R.string.okay), listener);
+                        mAlertDialog.setButton(AlertDialog.BUTTON1, getString(R.string.okay), listener);
                         pressed[0] = MuPDFAlert.ButtonPressed.Ok;
                         break;
                     case YesNoCancel:
-                        mAlertDialog.setButton(AlertDialog.BUTTON3, getString(com.lonelypluto.pdflibrary.R.string.cancel), listener);
+                        mAlertDialog.setButton(AlertDialog.BUTTON3, getString(R.string.cancel), listener);
                         pressed[2] = MuPDFAlert.ButtonPressed.Cancel;
                     case YesNo:
-                        mAlertDialog.setButton(AlertDialog.BUTTON1, getString(com.lonelypluto.pdflibrary.R.string.yes), listener);
+                        mAlertDialog.setButton(AlertDialog.BUTTON1, getString(R.string.yes), listener);
                         pressed[0] = MuPDFAlert.ButtonPressed.Yes;
-                        mAlertDialog.setButton(AlertDialog.BUTTON2, getString(com.lonelypluto.pdflibrary.R.string.no), listener);
+                        mAlertDialog.setButton(AlertDialog.BUTTON2, getString(R.string.no), listener);
                         pressed[1] = MuPDFAlert.ButtonPressed.No;
                         break;
                 }
@@ -1056,10 +1053,10 @@ public class MuPDFActivity extends ReactActivity {
                 }
             };
             AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle(com.lonelypluto.pdflibrary.R.string.dialog_title);
-            alert.setMessage(getString(com.lonelypluto.pdflibrary.R.string.document_has_changes_save_them));
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(com.lonelypluto.pdflibrary.R.string.yes), listener);
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(com.lonelypluto.pdflibrary.R.string.no), listener);
+            alert.setTitle(R.string.dialog_title);
+            alert.setMessage(getString(R.string.document_has_changes_save_them));
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
+            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
             alert.show();
         } else {
             finish();
