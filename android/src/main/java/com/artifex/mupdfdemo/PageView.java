@@ -92,16 +92,16 @@ class TextSelector {
 }
 
 public abstract class PageView extends ViewGroup {
-    private static final float ITEM_SELECT_BOX_WIDTH = 4.0f;// 选中时边框的宽
+    private static final float ITEM_SELECT_BOX_WIDTH = 2.0f;// 选中时边框的宽
 
     private static final int HIGHLIGHT_COLOR = 0x80ff5722;// 选中文字时的颜色
     private int LINK_COLOR = 0x80ff5722;// 超链接颜色
 //    private static final int BOX_COLOR = 0xFF4444FF;
     private static final int BOX_COLOR = 0xFF696969;// 选中时边框的颜色
 //    private static final int INK_COLOR = 0xFF000000;// 绘制时画笔颜色
-    private int INK_COLOR = 0xFF000000;// 绘制时画笔颜色
+    private int INK_COLOR = 0xFFF00000;// 绘制时画笔颜色
 //    private static final float INK_THICKNESS = 10.0f;// 绘制时画笔宽
-    private float INK_THICKNESS = 10.0f;// 绘制时画笔宽
+    private float INK_THICKNESS = 8.0f;// 绘制时画笔宽
     private float current_scale;
 
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;

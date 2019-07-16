@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 import java.util.ArrayList;
 
@@ -347,9 +348,14 @@ public class MuPDFCore {
 //		addInkAnnotationInternal(arcs);
 //	}
 
+	/**
+	 * UN-DO：LUOKUN
+	 * **/
 	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
 		gotoPage(page);
 		Log.e("zyw", "color = " + color[0] + " " + color[1] + " " + color[2]);
+
+		RCTMuPdfModule.sendInkAnnotationEvent(arcs, color, inkThickness);
 		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
 	}
 

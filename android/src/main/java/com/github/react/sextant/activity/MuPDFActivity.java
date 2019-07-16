@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,12 +45,17 @@ import com.github.react.sextant.MyListener;
 import com.github.react.sextant.RCTMuPdfModule;
 import com.github.react.sextant.util.SharedPreferencesUtil;
 import com.github.react.sextant.R;
-import com.github.react.sextant.util.GsonReadArray;
-import com.github.react.sextant.util.ParseNoteXml;
 
 import java.util.concurrent.Executor;
 
 import com.facebook.react.ReactActivity;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.json.JSONArray;
+
 
 /**
  * @Description: MuPDF已有功能
@@ -218,48 +224,33 @@ public class MuPDFActivity extends ReactActivity {
         setListener();
 
 
-//        Log.i("luokun打印",new JsonParser().parse(sb).getAsJsonArray().get(0).getAsJsonObject().get("annotationIndex").getAsString());
-
-        String sb = "[{\"lastSyncTime\":null,\"annotationIndex\":\"2\",\"context\":\"<Comments><Comment PageNum=\\\"2\\\" Type=\\\"13\\\" Color=\\\"200,255,0,0\\\" LineWidth=\\\"9.0\\\" LineStyle=\\\"0\\\" ScaleW=\\\"0\\\" ScaleH=\\\"0\\\" SelTextPos=\\\"0,0\\\" User=\\\"\\\" Time=\\\"2019-07-12 17:49:35\\\" NoteID=\\\"2\\\" NoteRotate=\\\"0\\\" Lable=\\\"\\\" SelText=\\\"\\\" RegionNote=\\\"Note\\\" Zoom=\\\"1.3445379\\\" PicPath=\\\"\\\" PutText=\\\"\\\" canMove=\\\"1\\\"><![CDATA[<Point><X>109.31091</X><Y>342.8455</Y></Point><Point><X>109.31091</X><Y>349.47238</Y></Point><Point><X>109.31091</X><Y>352.1435</Y></Point><Point><X>109.31091</X><Y>357.46216</Y></Point><Point><X>109.31091</X><Y>361.50607</Y></Point><Point><X>109.31091</X><Y>365.84354</Y></Point><Point><X>109.31091</X><Y>368.295</Y></Point><Point><X>109.31091</X><Y>370.3439</Y></Point><Point><X>-1</X><Y>-1</Y></Point>]]></Comment></Comments>\",\"id\":3,\"type\":null,\"pageNum\":\"2\",\"serverId\":\"-1\",\"bookId\":\"9771f1ec-949d-11e9-b799-00163e0ccf3e\"},{\"lastSyncTime\":null,\"annotationIndex\":\"1\",\"context\":\"<Comments><Comment PageNum=\\\"1\\\" Type=\\\"13\\\" Color=\\\"200,255,0,0\\\" LineWidth=\\\"9.0\\\" LineStyle=\\\"0\\\" ScaleW=\\\"0\\\" ScaleH=\\\"0\\\" SelTextPos=\\\"0,0\\\" User=\\\"\\\" Time=\\\"2019-07-12 17:49:26\\\" NoteID=\\\"1\\\" NoteRotate=\\\"0\\\" Lable=\\\"\\\" SelText=\\\"\\\" RegionNote=\\\"Note\\\" Zoom=\\\"1.3445379\\\" PicPath=\\\"\\\" PutText=\\\"\\\" canMove=\\\"1\\\"><![CDATA[<Point><X>117.50015</X><Y>414.22806</Y></Point><Point><X>125.46291</X><Y>414.22806</Y></Point><Point><X>141.77338</X><Y>414.22806</Y></Point><Point><X>163.00243</X><Y>414.22806</Y></Point><Point><X>182.4363</X><Y>414.22806</Y></Point><Point><X>195.00014</X><Y>414.22806</Y></Point><Point><X>206.19333</X><Y>414.22806</Y></Point><Point><X>212.65366</X><Y>413.50174</Y></Point><Point><X>215.65637</X><Y>413.50174</Y></Point><Point><X>217.52324</X><Y>413.50174</Y></Point><Point><X>221.61789</X><Y>411.2792</Y></Point><Point><X>223.75412</X><Y>412.02005</Y></Point><Point><X>225.33052</X><Y>412.02005</Y></Point><Point><X>225.34027</X><Y>410.5093</Y></Point><Point><X>-1</X><Y>-1</Y></Point>]]></Comment></Comments>\",\"id\":2,\"type\":null,\"pageNum\":\"1\",\"serverId\":\"-1\",\"bookId\":\"9771f1ec-949d-11e9-b799-00163e0ccf3e\"}]";
-
-        GsonReadArray gsonReadArray = new GsonReadArray();
-        gsonReadArray.stringToArray(sb);
-
-        ParseNoteXml parseNoteXml = new ParseNoteXml(MuPDFActivity.this);
-
-//        // 手动添加批注
-//        PointF[][] p=new PointF[2][];
-//        PointF [] points=new PointF[2];
-//        PointF [] points2=new PointF[2];
-//
-//        points[0]=new PointF(d(397.97363), d(511.98438));
-//        points[1]=new PointF(d(426.18015), d(511.98438));
-//        points2[0]=new PointF(d(429.18015), d(511.98438));
-//        points2[1]=new PointF(d(448.22455), d(511.98438));
-//
-//        p[0] = points;
-//        p[1] = points2;
-//
-//        muPDFCore.addInkAnnotation(0, p,hextoRGB("#000000"),10);
-
 
         RCTMuPdfModule.setUpListener(new MyListener() {
             @Override
-            public void onEvent(String s) {
+            public void onEvent(String str) {
+                try {
+                    JsonParser jsonParser = new JsonParser();
+                    JsonArray jsonArray = (JsonArray) jsonParser.parse(str);
 
-//                muPDFReaderView.touch_start(d(429.18015),d(511.98438));
-//                muPDFReaderView.touch_move(d(448.22455),d(511.98438));
-//                muPDFReaderView.touch_move(d(447.22455),d(511.98438));
-//                muPDFReaderView.touch_move(d(446.22455),d(511.98438));
-//                muPDFReaderView.touch_move(d(440.22455),d(511.98438));
-//                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
+                    PointF[][] p=new PointF[jsonArray.size()][];
+                    for(int i=0;i<jsonArray.size();i++){
+                        JsonArray two = jsonArray.get(i).getAsJsonArray();
+                        PointF [] points=new PointF[two.size()];
+                        for(int j=0;j<two.size();j++){
+                            points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                        }
+                        p[i] = points;
+                    }
+
+                    muPDFCore.addInkAnnotation(0, p,hextoRGB("#FFF000"),10);
+                } catch (Exception e) {
+                    Log.e(TAG,e.getMessage());
+                }
+
+//                String str = "[[[329.89133,344.4689],[335.44113,344.4689],[371.7052,344.4689],[455.74136,344.4689],[553.6387,344.4689],[637.2348,344.4689],[702.06415,344.4689],[740.54706,346.2933],[744.60077,345.76285]],[[323.25986,451.76285],[327.23874,451.76285],[361.0182,451.76285],[425.02542,451.76285],[500.32416,451.76285],[568.6351,451.76285],[615.2415,451.76285],[638.7428,451.76285],[657.2645,451.76285],[663.3205,451.76285]],[[410.73056,218.59392],[406.80673,241.90407],[399.10037,311.78046],[384.1832,418.34082],[380.25815,507.49063],[380.25815,565.0536],[380.25815,594.84235],[382.91074,598.8585]],[[584.28094,189.45428],[584.28094,208.11119],[584.28094,247.16573],[584.28094,324.6578],[584.28094,423.58777],[584.28094,509.67847],[584.28094,559.38916],[584.28094,585.8688],[585.9821,589.97424]]]";
+
             }
         });
-    }
-
-    private float d(double data){
-        float f = (float)data;
-        return f;
     }
 
     /**
