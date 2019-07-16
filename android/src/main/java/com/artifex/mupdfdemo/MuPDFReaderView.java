@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 import com.github.react.sextant.constants.SPConsts;
 import com.github.react.sextant.util.SharedPreferencesUtil;
 
@@ -132,10 +133,13 @@ public class MuPDFReaderView extends ReaderView {
 	}
 
 	//单击屏幕翻页触发的方法
+	/**
+	 * UN-DO:LUOKUN 单机事件
+	 * **/
 	public boolean onSingleTapUp(MotionEvent e) {
 		LinkInfo link;
 
-		if (mMode == Mode.Viewing && !tapDisabled) {
+		if (mMode == Mode.Viewing && !tapDisabled && !RCTMuPdfModule.OpenMode.equals("被控方")) {
 			MuPDFView pageView = (MuPDFView) getDisplayedView();
 			Hit item = pageView.passClickEvent(e.getX(), e.getY());
 			onHit(item);
@@ -178,6 +182,9 @@ public class MuPDFReaderView extends ReaderView {
 
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                             float distanceY) {
+		if(RCTMuPdfModule.OpenMode.equals("被控方")){
+			return false;
+		}
 		MuPDFView pageView = (MuPDFView)getDisplayedView();
 		switch (mMode) {
 		case Viewing:
@@ -197,6 +204,9 @@ public class MuPDFReaderView extends ReaderView {
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                            float velocityY) {
+		if(RCTMuPdfModule.OpenMode.equals("被控方")){
+			return false;
+		}
 		switch (mMode) {
 		case Viewing:
 			return super.onFling(e1, e2, velocityX, velocityY);
@@ -303,6 +313,8 @@ public class MuPDFReaderView extends ReaderView {
 		}
         checkMuPDFReaderViewListener();
 		listener.onMoveToChild(i);
+
+		RCTMuPdfModule.sendPageChangeEvent(i);
 	}
 
 	@Override

@@ -35,4 +35,16 @@ android{
 ## Usage
 ```jsx harmony
 import {startPDFActivity} from 'react-native-mupdf'
+
+startPDFActivity({
+    OpenMode:"",
+    Uri:""
+})
 ```
+
+### startPDFActivity
+
+|Options|Description|Example|
+|----|----|----|
+|OpenMode|打开模式String|"日常",主控方","被控方"||
+|Uri|文件路径String|/0/Download/pdf_t1.pdf|

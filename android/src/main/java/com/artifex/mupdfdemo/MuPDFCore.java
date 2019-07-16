@@ -343,19 +343,10 @@ public class MuPDFCore {
 		addMarkupAnnotationInternal(quadPoints, type.ordinal());
 	}
 
-//	public synchronized void addInkAnnotation(int page, PointF[][] arcs) {
-//		gotoPage(page);
-//		addInkAnnotationInternal(arcs);
-//	}
 
-	/**
-	 * UN-DO：LUOKUN
-	 * **/
 	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
 		gotoPage(page);
-		Log.e("zyw", "color = " + color[0] + " " + color[1] + " " + color[2]);
-
-		RCTMuPdfModule.sendInkAnnotationEvent(arcs, color, inkThickness);
+		RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
 		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
 	}
 

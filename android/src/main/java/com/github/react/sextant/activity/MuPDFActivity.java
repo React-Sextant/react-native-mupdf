@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -30,6 +32,11 @@ import android.widget.ViewAnimator;
 
 import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.Hit;
+import com.artifex.mupdfdemo.LinkInfo;
+import com.artifex.mupdfdemo.LinkInfoExternal;
+import com.artifex.mupdfdemo.LinkInfoInternal;
+import com.artifex.mupdfdemo.LinkInfoRemote;
+import com.artifex.mupdfdemo.LinkInfoVisitor;
 import com.artifex.mupdfdemo.MuPDFAlert;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
@@ -41,8 +48,8 @@ import com.artifex.mupdfdemo.OutlineItem;
 import com.artifex.mupdfdemo.ReaderView;
 import com.artifex.mupdfdemo.SearchTask;
 import com.artifex.mupdfdemo.SearchTaskResult;
-import com.github.react.sextant.MyListener;
 import com.github.react.sextant.RCTMuPdfModule;
+import com.github.react.sextant.MyListener;
 import com.github.react.sextant.util.SharedPreferencesUtil;
 import com.github.react.sextant.R;
 
@@ -51,10 +58,6 @@ import java.util.concurrent.Executor;
 import com.facebook.react.ReactActivity;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.json.JSONArray;
 
 
 /**
@@ -122,8 +125,18 @@ public class MuPDFActivity extends ReactActivity {
 
         muPDFReaderView = (MuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
 
+        Intent intent = getIntent();
+        String openMode = intent.getStringExtra("OpenMode");
+
         initToolsView();
-        createPDF();
+        if(!openMode.equals("被控方")){
+            createPDF();
+        }else {
+            hideButtons();
+            createSimplePDF();
+        }
+
+
     }
 
     /**
@@ -224,10 +237,61 @@ public class MuPDFActivity extends ReactActivity {
         setListener();
 
 
-
         RCTMuPdfModule.setUpListener(new MyListener() {
             @Override
             public void onEvent(String str) {
+            }
+        });
+    }
+
+    private void createSimplePDF(){
+        mAlertBuilder  = new AlertDialog.Builder(this);
+
+        // 通过MuPDFCore打开pdf文件
+        muPDFCore = openFile(filePath);
+        // 搜索设为空
+        SearchTaskResult.set(null);
+        // 判断如果core为空，提示不能打开文件
+        if (muPDFCore == null) {
+            AlertDialog alert = mAlertBuilder.create();
+            alert.setTitle(R.string.cannot_open_document);
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dismiss),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+            alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            });
+            alert.show();
+            return;
+        }
+        // 显示
+        muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, muPDFCore));
+        // Set up the page slider
+        int smax = Math.max(muPDFCore.countPages() - 1, 1);
+        mPageSliderRes = ((10 + smax - 1) / smax) * 2;
+
+        //监听来自js的数据
+        RCTMuPdfModule.setUpListener(new MyListener() {
+            @Override
+            public void onEvent(String str) {
+                // 更新页面
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        muPDFReaderView.setDisplayedViewIndex(10);
+
+                    }
+                });
+                //更新批注
                 try {
                     JsonParser jsonParser = new JsonParser();
                     JsonArray jsonArray = (JsonArray) jsonParser.parse(str);
@@ -242,39 +306,14 @@ public class MuPDFActivity extends ReactActivity {
                         p[i] = points;
                     }
 
-                    muPDFCore.addInkAnnotation(0, p,hextoRGB("#FFF000"),10);
+                    muPDFCore.addInkAnnotation(0, p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
                 } catch (Exception e) {
                     Log.e(TAG,e.getMessage());
                 }
-
-//                String str = "[[[329.89133,344.4689],[335.44113,344.4689],[371.7052,344.4689],[455.74136,344.4689],[553.6387,344.4689],[637.2348,344.4689],[702.06415,344.4689],[740.54706,346.2933],[744.60077,345.76285]],[[323.25986,451.76285],[327.23874,451.76285],[361.0182,451.76285],[425.02542,451.76285],[500.32416,451.76285],[568.6351,451.76285],[615.2415,451.76285],[638.7428,451.76285],[657.2645,451.76285],[663.3205,451.76285]],[[410.73056,218.59392],[406.80673,241.90407],[399.10037,311.78046],[384.1832,418.34082],[380.25815,507.49063],[380.25815,565.0536],[380.25815,594.84235],[382.91074,598.8585]],[[584.28094,189.45428],[584.28094,208.11119],[584.28094,247.16573],[584.28094,324.6578],[584.28094,423.58777],[584.28094,509.67847],[584.28094,559.38916],[584.28094,585.8688],[585.9821,589.97424]]]";
-
             }
         });
     }
 
-    /**
-     * Color RGB
-     *
-     * @arguments float color[]
-     * @use color[0], color[1], color[2]
-     * **/
-    private float[] map(float[]rgb) {
-        float[] result = new float[3];
-        result[0] = rgb[0] / 255;
-        result[1] = rgb[1] / 255;
-        result[2] = rgb[2] / 255;
-        return result;
-    }
-
-    public float[] hextoRGB(String hex) {
-
-        float[] rgbcolor = new float[3];
-        rgbcolor[0] = Integer.valueOf( hex.substring( 1, 3 ), 16 );
-        rgbcolor[1] = Integer.valueOf( hex.substring( 3, 5 ), 16 );
-        rgbcolor[2] = Integer.valueOf( hex.substring( 5, 7 ), 16 );
-        return map(rgbcolor);
-    }
 
     /**
      * 打开文件

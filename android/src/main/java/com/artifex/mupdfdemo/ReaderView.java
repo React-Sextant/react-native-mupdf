@@ -15,6 +15,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;

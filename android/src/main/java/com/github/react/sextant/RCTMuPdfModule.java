@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.ReadableMap;
 
 import com.github.react.sextant.activity.MuPDFActivity;
 
@@ -15,14 +16,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private final  int REQUEST_ECODE_SCAN=1498710037;
     private static ReactApplicationContext mContext;
 
-    Intent intent = new Intent();
+    public static String OpenMode = "";
 
     public RCTMuPdfModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -53,14 +51,21 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startPDFActivity(){
+    public void startPDFActivity(ReadableMap options){
 
         Activity currentActivity = getCurrentActivity();
-
-        intent.setClass(currentActivity,MuPDFActivity.class);
+        Intent intent = new Intent(currentActivity.getApplicationContext(), MuPDFActivity.class);
+        if (options.hasKey("OpenMode")) {
+            intent.putExtra("OpenMode", options.getString("OpenMode"));
+            OpenMode = options.getString("OpenMode");
+        }
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
 
+
+    /**
+     * 主动关闭当前页面并返回RN页面
+     * **/
     @ReactMethod
     public void finishPDFActivity(){
 
@@ -71,20 +76,20 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
     }
 
-    private static MyListener  myListener;
-    public static void setUpListener(MyListener Listener) {
-        myListener = Listener;
-    }
+    /**
+     * 从JavaScript发送数据给Native
+     * **/
+    private static MyListener myListener;
+    public static void setUpListener(MyListener Listener) { myListener = Listener; }
     @ReactMethod
-    public void sendData(){
-        myListener.onEvent("asd");
-
+    public void sendData(String str){
+        myListener.onEvent(str);
     }
 
     /**
      * 将保存当前批注事件传递给JavaScript
      * **/
-    public static void sendInkAnnotationEvent(PointF[][] arcs,float color[], float inkThickness){
+    public static void sendInkAnnotationEvent(int page, PointF[][] arcs,float color[], float inkThickness){
 
         String path = "";
         for(int i=0;i<arcs.length;i++){
@@ -106,6 +111,14 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Ink_Annotation", "["+path+"]");
+    }
+
+    /**
+     * 将当前页面改变事件发送给JavaScript
+     * **/
+    public static void sendPageChangeEvent(int page){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Page_Change", page);
     }
 
     @Override

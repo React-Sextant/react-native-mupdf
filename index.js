@@ -1,15 +1,15 @@
 import {NativeModules} from 'react-native';
 
 const { RNMuPdfModule } = NativeModules;
-console.log(NativeModules)
+
 module.exports = {
-    startPDFActivity(){
-        RNMuPdfModule.startPDFActivity()
+    startPDFActivity(args){
+        RNMuPdfModule.startPDFActivity(args)
     },
     finishPDFActivity(){
         RNMuPdfModule.finishPDFActivity()
     },
-    sendData(){
-        RNMuPdfModule.sendData()
-    }
+    sendData(args){
+        RNMuPdfModule.sendData(args)
+    },
 };
