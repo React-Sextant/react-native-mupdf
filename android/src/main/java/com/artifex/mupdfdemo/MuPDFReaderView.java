@@ -314,6 +314,9 @@ public class MuPDFReaderView extends ReaderView {
         checkMuPDFReaderViewListener();
 		listener.onMoveToChild(i);
 
+		/**
+		 * @ReactMethod 发送页面改变事件
+		 * **/
 		RCTMuPdfModule.sendPageChangeEvent(i);
 	}
 

@@ -121,6 +121,14 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                 .emit("MUPDF_Page_Change", page);
     }
 
+    /**
+     * 将删除批注事件发送给Javascript
+     * **/
+    public static void sendDeleteSelectedAnnotationEvent(int page){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Delete_Annotation", page);
+    }
+
     @Override
     public String getName() {
         return "RNMuPdfModule";

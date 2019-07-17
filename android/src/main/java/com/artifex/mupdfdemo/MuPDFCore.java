@@ -346,6 +346,9 @@ public class MuPDFCore {
 
 	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
 		gotoPage(page);
+		/**
+		 * @ReactMethod 发送批注事件
+		 * **/
 		RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
 		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
 	}

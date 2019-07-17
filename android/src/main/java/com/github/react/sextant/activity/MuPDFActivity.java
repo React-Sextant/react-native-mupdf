@@ -40,6 +40,7 @@ import com.artifex.mupdfdemo.LinkInfoVisitor;
 import com.artifex.mupdfdemo.MuPDFAlert;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
+import com.artifex.mupdfdemo.MuPDFPageView;
 import com.artifex.mupdfdemo.MuPDFReaderView;
 import com.artifex.mupdfdemo.MuPDFReaderViewListener;
 import com.artifex.mupdfdemo.MuPDFView;
@@ -237,12 +238,16 @@ public class MuPDFActivity extends ReactActivity {
         setListener();
 
 
+        /**
+         * @ReactMethod 主控方监听MyListener
+         * **/
         RCTMuPdfModule.setUpListener(new MyListener() {
             @Override
             public void onEvent(String str) {
             }
         });
     }
+
 
     private void createSimplePDF(){
         mAlertBuilder  = new AlertDialog.Builder(this);
@@ -277,10 +282,20 @@ public class MuPDFActivity extends ReactActivity {
         int smax = Math.max(muPDFCore.countPages() - 1, 1);
         mPageSliderRes = ((10 + smax - 1) / smax) * 2;
 
-        //监听来自js的数据
+        /**
+         * 监听来自js的数据
+         * @ReactMethod 被控方监听MyListener
+         * **/
         RCTMuPdfModule.setUpListener(new MyListener() {
             @Override
             public void onEvent(String str) {
+                // 删除批注
+                MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
+                if (pageView != null){
+                    MuPDFPageView.mSelectedAnnotationIndex = 1;
+                    pageView.deleteSelectedAnnotation();
+                }
+
                 // 更新页面
                 runOnUiThread(new Runnable() {
 
@@ -291,6 +306,7 @@ public class MuPDFActivity extends ReactActivity {
 
                     }
                 });
+
                 //更新批注
                 try {
                     JsonParser jsonParser = new JsonParser();

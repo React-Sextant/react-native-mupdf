@@ -19,6 +19,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 import java.util.ArrayList;
 
@@ -92,7 +93,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<Void,Void, PassClickResult> mPassClick;
 	private RectF mWidgetAreas[];
 	private Annotation mAnnotations[];
-	private int mSelectedAnnotationIndex = -1;
+	public static int mSelectedAnnotationIndex = -1;
 	private AsyncTask<Void,Void,RectF[]> mLoadWidgetAreas;
 	private AsyncTask<Void,Void,Annotation[]> mLoadAnnotations;
 	private AlertDialog.Builder mTextEntryBuilder;
@@ -509,6 +510,10 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			mSelectedAnnotationIndex = -1;
 			setItemSelectBox(null);
+
+			if(RCTMuPdfModule.OpenMode.equals("主控方")){
+				RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(mSelectedAnnotationIndex);
+			}
 		}
 	}
 
