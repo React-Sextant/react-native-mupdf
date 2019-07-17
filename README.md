@@ -42,9 +42,30 @@ startPDFActivity({
 })
 ```
 
-### startPDFActivity
+### startPDFActivity 打开PDF
 
 |Options|Description|Example|
 |----|----|----|
 |OpenMode|打开模式String|"日常",主控方","被控方"||
-|Uri|文件路径String|/0/Download/pdf_t1.pdf|
+|Uri|文件路径String|/storage/emulated/0/Download/pdf_t1.pdf|
+
+### finishPDFActivity 主动关闭当前页面并回到RN页
+
+```jsx harmony
+finishPDFActivity()
+```
+
+### sendData JavaScript发送数据到Native层
+
+|Type|Description|Example|
+|----|----|----|
+|"add_annotation"|新增批注事件|`{type:"add_annotation",path:PointF[][],page:0}`|
+|"delete_annotation"|删除批注事件|`{type:"delete_annotation", mSelectedAnnotationIndex:-1}`|
+|"update_page"|更新页面事件|`{type:"update_page",page:0}`|
+
+监听来自Native层的事件
+```jsx harmony
+DeviceEventEmitter.addListener('MUPDF_Event_Manager', (msg) => {
+    sendData(msg)
+});
+```

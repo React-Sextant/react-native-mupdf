@@ -59,6 +59,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             intent.putExtra("OpenMode", options.getString("OpenMode"));
             OpenMode = options.getString("OpenMode");
         }
+        if(options.hasKey("Uri")){
+            intent.putExtra("Uri", options.getString("Uri"));
+        }
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
 
@@ -110,7 +113,13 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
 
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("MUPDF_Ink_Annotation", "["+path+"]");
+                .emit("MUPDF_Event_Manager",
+                    "{" +
+                                "type:'add_annotation', " +
+                                "path:["+path+"],"+
+                                "page:"+page+
+                         "}"
+                );
     }
 
     /**
@@ -118,15 +127,25 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
      * **/
     public static void sendPageChangeEvent(int page){
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("MUPDF_Page_Change", page);
+                .emit("MUPDF_Event_Manager",
+                    "{" +
+                                "type:'update_page', " +
+                                "page:"+page+
+                         "}"
+                );
     }
 
     /**
      * 将删除批注事件发送给Javascript
      * **/
-    public static void sendDeleteSelectedAnnotationEvent(int page){
+    public static void sendDeleteSelectedAnnotationEvent(int index){
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("MUPDF_Delete_Annotation", page);
+                .emit("MUPDF_Event_Manager",
+                    "{" +
+                                "type:'delete_annotation', " +
+                                "mSelectedAnnotationIndex:"+index+
+                         "}"
+                );
     }
 
     @Override

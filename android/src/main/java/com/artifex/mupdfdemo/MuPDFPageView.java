@@ -511,6 +511,9 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mSelectedAnnotationIndex = -1;
 			setItemSelectBox(null);
 
+			/**
+			 * @ReactMethod 发送删除批注事件
+			 * **/
 			if(RCTMuPdfModule.OpenMode.equals("主控方")){
 				RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(mSelectedAnnotationIndex);
 			}

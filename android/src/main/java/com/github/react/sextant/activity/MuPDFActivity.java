@@ -58,6 +58,7 @@ import java.util.concurrent.Executor;
 
 import com.facebook.react.ReactActivity;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 
@@ -70,7 +71,7 @@ public class MuPDFActivity extends ReactActivity {
     private static final String TAG = MuPDFActivity.class.getSimpleName();
 
     private final int OUTLINE_REQUEST = 0;// 目录回调
-    private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t1.pdf"; // 文件路径
+    private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t2.pdf"; // 文件路径
 
     private AlertDialog.Builder mAlertBuilder;// 弹出框
 
@@ -128,6 +129,7 @@ public class MuPDFActivity extends ReactActivity {
 
         Intent intent = getIntent();
         String openMode = intent.getStringExtra("OpenMode");
+        filePath = intent.getStringExtra("Uri");
 
         initToolsView();
         if(!openMode.equals("被控方")){
@@ -289,43 +291,69 @@ public class MuPDFActivity extends ReactActivity {
         RCTMuPdfModule.setUpListener(new MyListener() {
             @Override
             public void onEvent(String str) {
-                // 删除批注
-                MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
-                if (pageView != null){
-                    MuPDFPageView.mSelectedAnnotationIndex = 1;
-                    pageView.deleteSelectedAnnotation();
-                }
-
-                // 更新页面
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        muPDFReaderView.setDisplayedViewIndex(10);
-
-                    }
-                });
-
-                //更新批注
-                try {
+                try{
                     JsonParser jsonParser = new JsonParser();
-                    JsonArray jsonArray = (JsonArray) jsonParser.parse(str);
+                    JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+                    switch (jsonObject.get("type").getAsString()){
 
-                    PointF[][] p=new PointF[jsonArray.size()][];
-                    for(int i=0;i<jsonArray.size();i++){
-                        JsonArray two = jsonArray.get(i).getAsJsonArray();
-                        PointF [] points=new PointF[two.size()];
-                        for(int j=0;j<two.size();j++){
-                            points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
-                        }
-                        p[i] = points;
+                        /**
+                         * 更新批注
+                         *
+                         * @key type: "add_annotation"
+                         * @key path: PointF[][]
+                         * @key page: int
+                         * **/
+                        case "add_annotation":
+                            JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
+                            PointF[][] p=new PointF[jsonArray.size()][];
+                            for(int i=0;i<jsonArray.size();i++){
+                                JsonArray two = jsonArray.get(i).getAsJsonArray();
+                                PointF [] points=new PointF[two.size()];
+                                for(int j=0;j<two.size();j++){
+                                    points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                                }
+                                p[i] = points;
+                            }
+
+                            muPDFCore.addInkAnnotation(jsonObject.get("page").getAsInt(), p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
+                            break;
+                        /**
+                         * 删除批注
+                         *
+                         * @key type: "delete_annotation"
+                         * @key mSelectedAnnotationIndex: int
+                         * **/
+                        case "delete_annotation":
+                            MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
+                            if (pageView != null){
+                                MuPDFPageView.mSelectedAnnotationIndex = jsonObject.get("mSelectedAnnotationIndex").getAsInt();
+                                pageView.deleteSelectedAnnotation();
+                            }
+                            break;
+                        /**
+                         * 更新页面
+                         *
+                         * @key type: "update_page"
+                         * @key page: int
+                         * **/
+                        case "update_page":
+                            final int page = jsonObject.get("page").getAsInt();
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+
+                                    muPDFReaderView.setDisplayedViewIndex(page);
+
+                                }
+                            });
+                            break;
                     }
 
-                    muPDFCore.addInkAnnotation(0, p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
-                } catch (Exception e) {
-                    Log.e(TAG,e.getMessage());
+                }catch (Exception e) {
+                    Log.e(TAG,e.toString());
                 }
+
             }
         });
     }
