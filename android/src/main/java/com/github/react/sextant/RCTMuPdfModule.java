@@ -1,5 +1,6 @@
 package com.github.react.sextant;
 
+import com.artifex.mupdfdemo.Annotation;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -98,17 +99,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         for(int i=0;i<arcs.length;i++){
             String xy = "";
             for(int j=0;j<arcs[i].length;j++){
-                if(xy.equals("")){
-                    xy+="["+arcs[i][j].x+","+arcs[i][j].y+"]";
-                }else {
-                    xy+=",["+arcs[i][j].x+","+arcs[i][j].y+"]";
-                }
+                xy+="["+arcs[i][j].x+","+arcs[i][j].y+"],";
             }
-            if(path.equals("")){
-                path+="["+xy+"]";
-            }else {
-                path+=",["+xy+"]";
-            }
+            path+="["+xy+"],";
         }
 
 
@@ -119,6 +112,25 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                                 "path:["+path+"],"+
                                 "page:"+page+
                          "}"
+                );
+    }
+
+    /**
+     * 将保存下划线/高亮事件传递给JavaScript
+     * **/
+    public static void sendMarkupAnnotationEvent(int page, PointF[] quadPoints, Annotation.Type type){
+        String path = "";
+        for(int i=0;i<quadPoints.length;i++){
+            path+="["+quadPoints[i].x+","+quadPoints[i].y+"],";
+        }
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                    "{" +
+                                "type:'add_markup_annotation', " +
+                                "path:["+path+"],"+
+                                "page:"+page + "," +
+                                "annotation_type: '" + type + "'" +
+                          "}"
                 );
     }
 
@@ -138,12 +150,13 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     /**
      * 将删除批注事件发送给Javascript
      * **/
-    public static void sendDeleteSelectedAnnotationEvent(int index){
+    public static void sendDeleteSelectedAnnotationEvent(int page, int annot_index){
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                     "{" +
                                 "type:'delete_annotation', " +
-                                "mSelectedAnnotationIndex:"+index+
+                                "page:"+page + "," +
+                                "annot_index:"+annot_index +
                          "}"
                 );
     }

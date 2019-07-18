@@ -341,21 +341,35 @@ public class MuPDFCore {
 	public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
 		gotoPage(page);
 		addMarkupAnnotationInternal(quadPoints, type.ordinal());
+		/**
+		 * @ReactMethod 发送标注事件
+		 * **/
+		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+			RCTMuPdfModule.sendMarkupAnnotationEvent(page, quadPoints, type);
+		}
 	}
 
 
 	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
 		gotoPage(page);
+		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
 		/**
 		 * @ReactMethod 发送批注事件
 		 * **/
-		RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
-		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
+		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+			RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
+		}
 	}
 
 	public synchronized void deleteAnnotation(int page, int annot_index) {
 		gotoPage(page);
 		deleteAnnotationInternal(annot_index);
+		/**
+		 * @ReactMethod 发送删除批注事件
+		 * **/
+		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+			RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(page,annot_index);
+		}
 	}
 
 	public synchronized boolean hasOutline() {

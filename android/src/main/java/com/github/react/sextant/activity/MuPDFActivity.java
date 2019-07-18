@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -32,15 +30,9 @@ import android.widget.ViewAnimator;
 
 import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.Hit;
-import com.artifex.mupdfdemo.LinkInfo;
-import com.artifex.mupdfdemo.LinkInfoExternal;
-import com.artifex.mupdfdemo.LinkInfoInternal;
-import com.artifex.mupdfdemo.LinkInfoRemote;
-import com.artifex.mupdfdemo.LinkInfoVisitor;
 import com.artifex.mupdfdemo.MuPDFAlert;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
-import com.artifex.mupdfdemo.MuPDFPageView;
 import com.artifex.mupdfdemo.MuPDFReaderView;
 import com.artifex.mupdfdemo.MuPDFReaderViewListener;
 import com.artifex.mupdfdemo.MuPDFView;
@@ -106,14 +98,12 @@ public class MuPDFActivity extends ReactActivity {
     private SearchTask mSearchTask;// 搜索线程
     private boolean mLinkHighlight = false;// 是否高亮显示
 
-    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mupdf);
 
-        context = this;
 
         initView();
 
@@ -128,18 +118,11 @@ public class MuPDFActivity extends ReactActivity {
         muPDFReaderView = (MuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
 
         Intent intent = getIntent();
-        String openMode = intent.getStringExtra("OpenMode");
         filePath = intent.getStringExtra("Uri");
 
         initToolsView();
-        if(!openMode.equals("被控方")){
-            createPDF();
-        }else {
-            hideButtons();
-            createSimplePDF();
-        }
 
-
+        createPDF();
     }
 
     /**
@@ -196,166 +179,153 @@ public class MuPDFActivity extends ReactActivity {
         }
         // 显示
         muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, muPDFCore));
-        // Set up the page slider
-        int smax = Math.max(muPDFCore.countPages() - 1, 1);
-        mPageSliderRes = ((10 + smax - 1) / smax) * 2;
-
-        // 创建搜索任务
-        mSearchTask = new SearchTask(this, muPDFCore) {
-            @Override
-            protected void onTextFound(SearchTaskResult result) {
-                SearchTaskResult.set(result);
-                // Ask the ReaderView to move to the resulting page
-                muPDFReaderView.setDisplayedViewIndex(result.pageNumber);
-                // Make the ReaderView act on the change to SearchTaskResult
-                // via overridden onChildSetup method.
-                muPDFReaderView.resetupChildren();
-            }
-        };
-
-        // Search invoking buttons are disabled while there is no text specified
-        mSearchBack.setEnabled(false);
-        mSearchFwd.setEnabled(false);
-        mSearchBack.setColorFilter(Color.argb(0xFF, 250, 250, 250));
-        mSearchFwd.setColorFilter(Color.argb(0xFF, 250, 250, 250));
-
-        // 判断如果pdf文件有目录
-        if (muPDFCore.hasOutline()) {
-            // 点击目录按钮跳转到目录页
-            mOutlineButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    OutlineItem outline[] = muPDFCore.getOutline();
-                    if (outline != null) {
-                        OutlineActivityData.get().items = outline;
-                        Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
-                        startActivityForResult(intent, OUTLINE_REQUEST);
-                    }
-                }
-            });
-        } else {
-            mOutlineButton.setVisibility(View.GONE);
-        }
-
-        // 设置监听事件
-        setListener();
 
 
-        /**
-         * @ReactMethod 主控方监听MyListener
-         * **/
-        RCTMuPdfModule.setUpListener(new MyListener() {
-            @Override
-            public void onEvent(String str) {
-            }
-        });
-    }
-
-
-    private void createSimplePDF(){
-        mAlertBuilder  = new AlertDialog.Builder(this);
-
-        // 通过MuPDFCore打开pdf文件
-        muPDFCore = openFile(filePath);
-        // 搜索设为空
-        SearchTaskResult.set(null);
-        // 判断如果core为空，提示不能打开文件
-        if (muPDFCore == null) {
-            AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle(R.string.cannot_open_document);
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dismiss),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    });
-            alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
+        if(RCTMuPdfModule.OpenMode.equals("被控方")){
+            /**
+             * @ReactMethod 被控方监听MyListener
+             * **/
+            RCTMuPdfModule.setUpListener(new MyListener() {
                 @Override
-                public void onCancel(DialogInterface dialog) {
-                    finish();
-                }
-            });
-            alert.show();
-            return;
-        }
-        // 显示
-        muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, muPDFCore));
-        // Set up the page slider
-        int smax = Math.max(muPDFCore.countPages() - 1, 1);
-        mPageSliderRes = ((10 + smax - 1) / smax) * 2;
+                public void onEvent(String str) {
+                    try{
+                        MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
+                        JsonParser jsonParser = new JsonParser();
+                        JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+                        switch (jsonObject.get("type").getAsString()){
 
-        /**
-         * 监听来自js的数据
-         * @ReactMethod 被控方监听MyListener
-         * **/
-        RCTMuPdfModule.setUpListener(new MyListener() {
-            @Override
-            public void onEvent(String str) {
-                try{
-                    JsonParser jsonParser = new JsonParser();
-                    JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
-                    switch (jsonObject.get("type").getAsString()){
-
-                        /**
-                         * 更新批注
-                         *
-                         * @key type: "add_annotation"
-                         * @key path: PointF[][]
-                         * @key page: int
-                         * **/
-                        case "add_annotation":
-                            JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
-                            PointF[][] p=new PointF[jsonArray.size()][];
-                            for(int i=0;i<jsonArray.size();i++){
-                                JsonArray two = jsonArray.get(i).getAsJsonArray();
-                                PointF [] points=new PointF[two.size()];
-                                for(int j=0;j<two.size();j++){
-                                    points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                            /**
+                             * 更新批注
+                             *
+                             * @key type: "add_annotation"
+                             * @key path: PointF[][]
+                             * @key page: int
+                             * **/
+                            case "add_annotation":
+                                JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
+                                PointF[][] p=new PointF[jsonArray.size()][];
+                                for(int i=0;i<jsonArray.size();i++){
+                                    JsonArray two = jsonArray.get(i).getAsJsonArray();
+                                    PointF [] points=new PointF[two.size()];
+                                    for(int j=0;j<two.size();j++){
+                                        points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                                    }
+                                    p[i] = points;
                                 }
-                                p[i] = points;
-                            }
 
-                            muPDFCore.addInkAnnotation(jsonObject.get("page").getAsInt(), p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
-                            break;
-                        /**
-                         * 删除批注
-                         *
-                         * @key type: "delete_annotation"
-                         * @key mSelectedAnnotationIndex: int
-                         * **/
-                        case "delete_annotation":
-                            MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
-                            if (pageView != null){
-                                MuPDFPageView.mSelectedAnnotationIndex = jsonObject.get("mSelectedAnnotationIndex").getAsInt();
-                                pageView.deleteSelectedAnnotation();
-                            }
-                            break;
-                        /**
-                         * 更新页面
-                         *
-                         * @key type: "update_page"
-                         * @key page: int
-                         * **/
-                        case "update_page":
-                            final int page = jsonObject.get("page").getAsInt();
-                            runOnUiThread(new Runnable() {
+                                if (pageView != null){
+                                    pageView.saveDraw(jsonObject.get("page").getAsInt(), p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
+                                }
+                                break;
+                            /**
+                             * 更新标注
+                             *
+                             * @key type: "add_markup_annotation"
+                             * @key path: PointF[]
+                             * @key page: int
+                             * @key annotation_type (enum)String
+                             * **/
+                            case "add_markup_annotation":
+                                JsonArray jsonArray2 = jsonObject.get("path").getAsJsonArray();
+                                PointF[] p2=new PointF[jsonArray2.size()];
+                                for(int i=0;i<jsonArray2.size();i++){
+                                    System.out.println(new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat()));
+                                    p2[i] = new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat());
+                                }
+                                if (pageView != null){
+                                    switch (jsonObject.get("annotation_type").getAsString()){
+                                        case "UNDERLINE":
+                                            pageView.markupSelection(p2, Annotation.Type.UNDERLINE);
+                                        break;
+                                        case "HIGHLIGHT":
+                                            pageView.markupSelection(p2, Annotation.Type.HIGHLIGHT);
+                                        break;
+                                    }
 
-                                @Override
-                                public void run() {
-
-                                    muPDFReaderView.setDisplayedViewIndex(page);
 
                                 }
-                            });
-                            break;
+                                break;
+                            /**
+                             * 删除批注
+                             *
+                             * @key type: "delete_annotation"
+                             * @key annot_index: int
+                             * **/
+                            case "delete_annotation":
+                                if (pageView != null){
+                                    pageView.deleteSelectedAnnotation(jsonObject.get("annot_index").getAsInt(),jsonObject.get("page").getAsInt());
+                                }
+                                break;
+                            /**
+                             * 更新页面
+                             *
+                             * @key type: "update_page"
+                             * @key page: int
+                             * **/
+                            case "update_page":
+                                final int page = jsonObject.get("page").getAsInt();
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+
+                                        muPDFReaderView.setDisplayedViewIndex(page);
+
+                                    }
+                                });
+                                break;
+                        }
+
+                    }catch (Exception e) {
+                        Log.e(TAG,e.toString());
                     }
 
-                }catch (Exception e) {
-                    Log.e(TAG,e.toString());
                 }
+            });
+        }else{
+            // Set up the page slider
+            int smax = Math.max(muPDFCore.countPages() - 1, 1);
+            mPageSliderRes = ((10 + smax - 1) / smax) * 2;
 
+            // 创建搜索任务
+            mSearchTask = new SearchTask(this, muPDFCore) {
+                @Override
+                protected void onTextFound(SearchTaskResult result) {
+                    SearchTaskResult.set(result);
+                    // Ask the ReaderView to move to the resulting page
+                    muPDFReaderView.setDisplayedViewIndex(result.pageNumber);
+                    // Make the ReaderView act on the change to SearchTaskResult
+                    // via overridden onChildSetup method.
+                    muPDFReaderView.resetupChildren();
+                }
+            };
+
+            // Search invoking buttons are disabled while there is no text specified
+            mSearchBack.setEnabled(false);
+            mSearchFwd.setEnabled(false);
+            mSearchBack.setColorFilter(Color.argb(0xFF, 250, 250, 250));
+            mSearchFwd.setColorFilter(Color.argb(0xFF, 250, 250, 250));
+
+            // 判断如果pdf文件有目录
+            if (muPDFCore.hasOutline()) {
+                // 点击目录按钮跳转到目录页
+                mOutlineButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        OutlineItem outline[] = muPDFCore.getOutline();
+                        if (outline != null) {
+                            OutlineActivityData.get().items = outline;
+                            Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+                            startActivityForResult(intent, OUTLINE_REQUEST);
+                        }
+                    }
+                });
+            } else {
+                mOutlineButton.setVisibility(View.GONE);
             }
-        });
+
+            // 设置监听事件
+            setListener();
+        }
     }
 
 

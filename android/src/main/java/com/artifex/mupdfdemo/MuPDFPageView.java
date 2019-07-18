@@ -93,7 +93,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<Void,Void, PassClickResult> mPassClick;
 	private RectF mWidgetAreas[];
 	private Annotation mAnnotations[];
-	public static int mSelectedAnnotationIndex = -1;
+	private int mSelectedAnnotationIndex = -1;
 	private AsyncTask<Void,Void,RectF[]> mLoadWidgetAreas;
 	private AsyncTask<Void,Void,Annotation[]> mLoadAnnotations;
 	private AlertDialog.Builder mTextEntryBuilder;
@@ -108,7 +108,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<String,Void,Boolean> mSetWidgetText;
 	private AsyncTask<String,Void,Void> mSetWidgetChoice;
 	private AsyncTask<PointF[],Void,Void> mAddStrikeOut;
-//	private AsyncTask<PointF[][],Void,Void> mAddInk;
 	private AsyncTask<Object,Void,Void> mAddInk;
 	private AsyncTask<Integer,Void,Void> mDeleteAnnotation;
 	private AsyncTask<Void,Void,String> mCheckSignature;
@@ -439,6 +438,9 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
+	/**
+	 * 下划线添加确认
+	 * **/
 	public boolean markupSelection(final Annotation.Type type) {
 		final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
 		processSelectedText(new TextProcessor() {
@@ -487,6 +489,29 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
+	public boolean markupSelection(PointF[] quadPoints, final Annotation.Type type) {
+
+		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
+			@Override
+			protected Void doInBackground(PointF[]... params) {
+				addMarkup(params[0], type);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				loadAnnotations();
+				update();
+			}
+		};
+
+		mAddStrikeOut.execute(quadPoints);
+
+		deselectText();
+
+		return true;
+	}
+
 	public void deleteSelectedAnnotation() {
 		if (mSelectedAnnotationIndex != -1) {
 			if (mDeleteAnnotation != null)
@@ -510,14 +535,13 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			mSelectedAnnotationIndex = -1;
 			setItemSelectBox(null);
-
-			/**
-			 * @ReactMethod 发送删除批注事件
-			 * **/
-			if(RCTMuPdfModule.OpenMode.equals("主控方")){
-				RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(mSelectedAnnotationIndex);
-			}
 		}
+	}
+
+	public void deleteSelectedAnnotation(int page, int annot_index){
+		mPageNumber = page;
+		mSelectedAnnotationIndex = 	annot_index;
+		deleteSelectedAnnotation();
 	}
 
 	public void deselectAnnotation() {
@@ -535,20 +559,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mAddInk.cancel(true);
 			mAddInk = null;
 		}
-//		mAddInk = new AsyncTask<PointF[][],Void,Void>() {
-//			@Override
-//			protected Void doInBackground(PointF[][]... params) {
-//				mCore.addInkAnnotation(mPageNumber, params[0]);
-//				return null;
-//			}
-//
-//			@Override
-//			protected void onPostExecute(Void result) {
-//				loadAnnotations();
-//				update();
-//			}
-//
-//		};
 
 		/**
 		 * 保存当前操作的所有批注
@@ -568,9 +578,38 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 		};
 
-//		mAddInk.execute(getDraw());
 		mAddInk.execute(getDraw(), getColor(), getInkThickness());
 		cancelDraw();
+
+		return true;
+	}
+
+	public boolean saveDraw(int page, PointF[][] arcs, float color[], float inkThickness) {
+
+		if (arcs == null)
+			return false;
+
+		if (mAddInk != null) {
+			mAddInk.cancel(true);
+			mAddInk = null;
+		}
+
+		mAddInk = new AsyncTask<Object,Void,Void>() {
+			@Override
+			protected Void doInBackground(Object... params) {
+				mCore.addInkAnnotation(mPageNumber, (PointF[][])params[0], (float[])params[1], (float)params[2]);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				loadAnnotations();
+				update();
+			}
+
+		};
+
+		mAddInk.execute(arcs, color, inkThickness);
 
 		return true;
 	}
@@ -624,6 +663,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	@Override
 	protected void addMarkup(PointF[] quadPoints, Annotation.Type type) {
+		System.out.println("LUOKUN addMarkup："+quadPoints+"type: "+type);
 		mCore.addMarkupAnnotation(mPageNumber, quadPoints, type);
 	}
 
