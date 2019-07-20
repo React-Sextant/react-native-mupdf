@@ -317,7 +317,9 @@ public class MuPDFReaderView extends ReaderView {
 		/**
 		 * @ReactMethod 发送页面改变事件
 		 * **/
-		RCTMuPdfModule.sendPageChangeEvent(i);
+		if(!RCTMuPdfModule.OpenMode.equals("被控方")){
+			RCTMuPdfModule.sendPageChangeEvent(i);
+		}
 	}
 
 	@Override

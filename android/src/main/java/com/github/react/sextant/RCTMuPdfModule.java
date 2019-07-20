@@ -35,6 +35,13 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
             if (requestCode == REQUEST_ECODE_SCAN) {
+                /**
+                 * 将结束同屏事件传递给JavaScript
+                 * **/
+                if(OpenMode.equals("主控方")){
+                    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit("MUPDF_Event_Manager", "{\"type\":\"end\"}");
+                }
 
             }
         }
@@ -99,18 +106,26 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         for(int i=0;i<arcs.length;i++){
             String xy = "";
             for(int j=0;j<arcs[i].length;j++){
-                xy+="["+arcs[i][j].x+","+arcs[i][j].y+"],";
+                if(xy.equals("")){
+                    xy+="["+arcs[i][j].x+","+arcs[i][j].y+"]";
+                }else {
+                    xy+=",["+arcs[i][j].x+","+arcs[i][j].y+"]";
+                }
             }
-            path+="["+xy+"],";
+            if(path.equals("")){
+                path+="["+xy+"]";
+            }else {
+                path+=",["+xy+"]";
+            }
         }
 
 
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                     "{" +
-                                "type:'add_annotation', " +
-                                "path:["+path+"],"+
-                                "page:"+page+
+                                "\"type\":\"add_annotation\", " +
+                                "\"path\":["+path+"],"+
+                                "\"page\":"+page+
                          "}"
                 );
     }
@@ -121,15 +136,19 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     public static void sendMarkupAnnotationEvent(int page, PointF[] quadPoints, Annotation.Type type){
         String path = "";
         for(int i=0;i<quadPoints.length;i++){
-            path+="["+quadPoints[i].x+","+quadPoints[i].y+"],";
+            if(path.equals("")){
+                path+="["+quadPoints[i].x+","+quadPoints[i].y+"]";
+            }else {
+                path+=",["+quadPoints[i].x+","+quadPoints[i].y+"]";
+            }
         }
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                     "{" +
-                                "type:'add_markup_annotation', " +
-                                "path:["+path+"],"+
-                                "page:"+page + "," +
-                                "annotation_type: '" + type + "'" +
+                                "\"type\":\"add_markup_annotation\", " +
+                                "\"path\":["+path+"],"+
+                                "\"page\":"+page + "," +
+                                "\"annotation_type\": \"" + type + "\"" +
                           "}"
                 );
     }
@@ -141,8 +160,8 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                     "{" +
-                                "type:'update_page', " +
-                                "page:"+page+
+                                "\"type\":\"update_page\", " +
+                                "\"page\":"+page+
                          "}"
                 );
     }
@@ -154,9 +173,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                     "{" +
-                                "type:'delete_annotation', " +
-                                "page:"+page + "," +
-                                "annot_index:"+annot_index +
+                                "\"type\":\"delete_annotation\", " +
+                                "\"page\":"+page + "," +
+                                "\"annot_index\":"+annot_index +
                          "}"
                 );
     }

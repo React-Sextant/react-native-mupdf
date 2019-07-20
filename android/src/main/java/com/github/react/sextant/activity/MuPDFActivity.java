@@ -21,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -89,6 +90,8 @@ public class MuPDFActivity extends ReactActivity {
     // tools 底部布局
     private TextView mPageNumberView;// 页数
     private SeekBar mPageSlider;// 底部拖动条
+    // 同屏
+    private Button mSameScreenEnd; // 结束同屏
 
     private int mPageSliderRes;// 拖动条的个数
     private boolean mButtonsVisible;// 是否显示工具栏
@@ -145,6 +148,8 @@ public class MuPDFActivity extends ReactActivity {
         mPageNumberView = (TextView) findViewById(R.id.pageNumber);
         mPageSlider = (SeekBar) findViewById(R.id.pageSlider);
 
+        mSameScreenEnd = (Button) findViewById(R.id.same_screen_end);
+
         mTopBarSwitcher.setVisibility(View.INVISIBLE);
         mPageNumberView.setVisibility(View.INVISIBLE);
         mPageSlider.setVisibility(View.INVISIBLE);
@@ -179,7 +184,12 @@ public class MuPDFActivity extends ReactActivity {
         }
         // 显示
         muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, muPDFCore));
-
+        // 设置结束同屏的点击事件
+        mSameScreenEnd.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         if(RCTMuPdfModule.OpenMode.equals("被控方")){
             /**
@@ -192,6 +202,26 @@ public class MuPDFActivity extends ReactActivity {
                         MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+
+                        /**
+                         * 更新页面
+                         *
+                         * @key type: "update_page"
+                         * @key page: int
+                         * **/
+                        if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
+                            final int page = jsonObject.get("page").getAsInt();
+
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+
+                                    muPDFReaderView.setDisplayedViewIndex(page);
+
+                                }
+                            });
+                        }
                         switch (jsonObject.get("type").getAsString()){
 
                             /**
@@ -229,7 +259,6 @@ public class MuPDFActivity extends ReactActivity {
                                 JsonArray jsonArray2 = jsonObject.get("path").getAsJsonArray();
                                 PointF[] p2=new PointF[jsonArray2.size()];
                                 for(int i=0;i<jsonArray2.size();i++){
-                                    System.out.println(new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat()));
                                     p2[i] = new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat());
                                 }
                                 if (pageView != null){
@@ -250,30 +279,32 @@ public class MuPDFActivity extends ReactActivity {
                              *
                              * @key type: "delete_annotation"
                              * @key annot_index: int
+                             * @key page int
                              * **/
                             case "delete_annotation":
                                 if (pageView != null){
                                     pageView.deleteSelectedAnnotation(jsonObject.get("annot_index").getAsInt(),jsonObject.get("page").getAsInt());
                                 }
                                 break;
-                            /**
-                             * 更新页面
-                             *
-                             * @key type: "update_page"
-                             * @key page: int
-                             * **/
-                            case "update_page":
-                                final int page = jsonObject.get("page").getAsInt();
-                                runOnUiThread(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-
-                                        muPDFReaderView.setDisplayedViewIndex(page);
-
-                                    }
-                                });
-                                break;
+//                            /**
+//                             * 更新页面
+//                             *
+//                             * @key type: "update_page"
+//                             * @key page: int
+//                             * **/
+//                            case "update_page":
+//                                final int page = jsonObject.get("page").getAsInt();
+//
+//                                runOnUiThread(new Runnable() {
+//
+//                                    @Override
+//                                    public void run() {
+//
+//                                        muPDFReaderView.setDisplayedViewIndex(page);
+//
+//                                    }
+//                                });
+//                                break;
                         }
 
                     }catch (Exception e) {
@@ -1087,24 +1118,24 @@ public class MuPDFActivity extends ReactActivity {
 
     @Override
     public void onBackPressed() {
-        if (muPDFCore != null && muPDFCore.hasChanges()) {
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == AlertDialog.BUTTON_POSITIVE) {
-                        muPDFCore.save();
-                    }
-                    finish();
-                }
-            };
-            AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle(R.string.dialog_title);
-            alert.setMessage(getString(R.string.document_has_changes_save_them));
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
-            alert.show();
-        } else {
-            finish();
-        }
+//        if (muPDFCore != null && muPDFCore.hasChanges()) {
+//            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    if (which == AlertDialog.BUTTON_POSITIVE) {
+//                        muPDFCore.save();
+//                    }
+//                    finish();
+//                }
+//            };
+//            AlertDialog alert = mAlertBuilder.create();
+//            alert.setTitle(R.string.dialog_title);
+//            alert.setMessage(getString(R.string.document_has_changes_save_them));
+//            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
+//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
+//            alert.show();
+//        } else {
+//            finish();
+//        }
     }
 
     /**
