@@ -19,7 +19,7 @@ public interface MuPDFView {
 	 * @return
 	 */
 	boolean markupSelection(Annotation.Type type);
-	boolean markupSelection(PointF[] quadPoints, Annotation.Type type);
+	boolean markupSelection(int page, PointF[] quadPoints, Annotation.Type type);
 	void deleteSelectedAnnotation();
 	void deleteSelectedAnnotation(int page, int index);
 	void setSearchBoxes(RectF searchBoxes[]);

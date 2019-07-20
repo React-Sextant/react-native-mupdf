@@ -264,10 +264,10 @@ public class MuPDFActivity extends ReactActivity {
                                 if (pageView != null){
                                     switch (jsonObject.get("annotation_type").getAsString()){
                                         case "UNDERLINE":
-                                            pageView.markupSelection(p2, Annotation.Type.UNDERLINE);
+                                            pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.UNDERLINE);
                                         break;
                                         case "HIGHLIGHT":
-                                            pageView.markupSelection(p2, Annotation.Type.HIGHLIGHT);
+                                            pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.HIGHLIGHT);
                                         break;
                                     }
 
@@ -283,28 +283,9 @@ public class MuPDFActivity extends ReactActivity {
                              * **/
                             case "delete_annotation":
                                 if (pageView != null){
-                                    pageView.deleteSelectedAnnotation(jsonObject.get("annot_index").getAsInt(),jsonObject.get("page").getAsInt());
+                                    pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
                                 }
                                 break;
-//                            /**
-//                             * 更新页面
-//                             *
-//                             * @key type: "update_page"
-//                             * @key page: int
-//                             * **/
-//                            case "update_page":
-//                                final int page = jsonObject.get("page").getAsInt();
-//
-//                                runOnUiThread(new Runnable() {
-//
-//                                    @Override
-//                                    public void run() {
-//
-//                                        muPDFReaderView.setDisplayedViewIndex(page);
-//
-//                                    }
-//                                });
-//                                break;
                         }
 
                     }catch (Exception e) {
@@ -314,6 +295,15 @@ public class MuPDFActivity extends ReactActivity {
                 }
             });
         }else{
+            /**
+             * @ReactMethod 主控方监听MyListener
+             * **/
+            RCTMuPdfModule.setUpListener(new MyListener() {
+                @Override
+                public void onEvent(String str) {
+
+                }
+            });
             // Set up the page slider
             int smax = Math.max(muPDFCore.countPages() - 1, 1);
             mPageSliderRes = ((10 + smax - 1) / smax) * 2;

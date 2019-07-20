@@ -489,12 +489,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
-	public boolean markupSelection(PointF[] quadPoints, final Annotation.Type type) {
+	public boolean markupSelection(final int page, final PointF[] quadPoints, final Annotation.Type type) {
 
 		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
 			@Override
 			protected Void doInBackground(PointF[]... params) {
-				addMarkup(params[0], type);
+				mCore.addMarkupAnnotation(page, quadPoints, type);
 				return null;
 			}
 
@@ -538,10 +538,26 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		}
 	}
 
-	public void deleteSelectedAnnotation(int page, int annot_index){
-		mPageNumber = page;
-		mSelectedAnnotationIndex = 	annot_index;
-		deleteSelectedAnnotation();
+	public void deleteSelectedAnnotation(final int page, final int annot_index){
+		if (annot_index != -1) {
+			if (mDeleteAnnotation != null)
+				mDeleteAnnotation.cancel(true);
+			mDeleteAnnotation = new AsyncTask<Integer,Void,Void>() {
+				@Override
+				protected Void doInBackground(Integer... params) {
+					mCore.deleteAnnotation(page, params[0]);
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void result) {
+					loadAnnotations();
+					update();
+				}
+			};
+
+			mDeleteAnnotation.execute(annot_index);
+		}
 	}
 
 	public void deselectAnnotation() {
@@ -584,7 +600,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
-	public boolean saveDraw(int page, PointF[][] arcs, float color[], float inkThickness) {
+	public boolean saveDraw(final int page, PointF[][] arcs, float color[], float inkThickness) {
 
 		if (arcs == null)
 			return false;
@@ -597,7 +613,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		mAddInk = new AsyncTask<Object,Void,Void>() {
 			@Override
 			protected Void doInBackground(Object... params) {
-				mCore.addInkAnnotation(mPageNumber, (PointF[][])params[0], (float[])params[1], (float)params[2]);
+				mCore.addInkAnnotation(page, (PointF[][])params[0], (float[])params[1], (float)params[2]);
 				return null;
 			}
 
@@ -663,7 +679,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	@Override
 	protected void addMarkup(PointF[] quadPoints, Annotation.Type type) {
-		System.out.println("LUOKUN addMarkup："+quadPoints+"type: "+type);
 		mCore.addMarkupAnnotation(mPageNumber, quadPoints, type);
 	}
 
