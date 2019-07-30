@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.github.react.sextant.R;
 import com.github.react.sextant.RCTMuPdfModule;
+import com.github.react.sextant.constants.RCTEnum;
 
 import java.util.ArrayList;
 
@@ -230,6 +231,12 @@ public class MuPDFCore {
                                       MuPDFCore.Cookie cookie) {
 		gotoPage(page);
 		drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+		/**
+		 * @ReactMethod 发送页面改变事件
+		 * **/
+		if(!RCTMuPdfModule.OpenMode.equals("被控方")){
+			RCTMuPdfModule.sendPageChangeEvent(page);
+		}
 	}
 
 	public synchronized void updatePage(Bitmap bm, int page,
@@ -338,36 +345,36 @@ public class MuPDFCore {
 		return lns.toArray(new TextWord[lns.size()][]);
 	}
 
-	public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
+	public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type, RCTEnum rctEnum) {
 		gotoPage(page);
 		addMarkupAnnotationInternal(quadPoints, type.ordinal());
 		/**
-		 * @ReactMethod 发送标注事件
+		 * @ReactMethod 主动发送标注事件
 		 * **/
-		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+		if(rctEnum == RCTEnum.RCT_ACTIVE){
 			RCTMuPdfModule.sendMarkupAnnotationEvent(page, quadPoints, type);
 		}
 	}
 
 
-	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
+	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness, RCTEnum rctEnum) {
 		gotoPage(page);
 		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
 		/**
 		 * @ReactMethod 发送批注事件
 		 * **/
-		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+		if(rctEnum == RCTEnum.RCT_ACTIVE){
 			RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
 		}
 	}
 
-	public synchronized void deleteAnnotation(int page, int annot_index) {
+	public synchronized void deleteAnnotation(int page, int annot_index, RCTEnum rctEnum) {
 		gotoPage(page);
 		deleteAnnotationInternal(annot_index);
 		/**
 		 * @ReactMethod 发送删除批注事件
 		 * **/
-		if(RCTMuPdfModule.OpenMode.equals("主控方")){
+		if(rctEnum == RCTEnum.RCT_ACTIVE){
 			RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(page,annot_index);
 		}
 	}

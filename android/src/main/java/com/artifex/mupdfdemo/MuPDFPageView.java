@@ -20,6 +20,7 @@ import android.widget.EditText;
 
 import com.github.react.sextant.R;
 import com.github.react.sextant.RCTMuPdfModule;
+import com.github.react.sextant.constants.RCTEnum;
 
 import java.util.ArrayList;
 
@@ -494,7 +495,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
 			@Override
 			protected Void doInBackground(PointF[]... params) {
-				mCore.addMarkupAnnotation(page, quadPoints, type);
+				mCore.addMarkupAnnotation(page, quadPoints, type, RCTEnum.RCT_PASSIVE);
 				return null;
 			}
 
@@ -520,7 +521,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mDeleteAnnotation = new AsyncTask<Integer,Void,Void>() {
 				@Override
 				protected Void doInBackground(Integer... params) {
-					mCore.deleteAnnotation(mPageNumber, params[0]);
+					mCore.deleteAnnotation(mPageNumber, params[0], RCTEnum.RCT_ACTIVE);
 					return null;
 				}
 
@@ -545,7 +546,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mDeleteAnnotation = new AsyncTask<Integer,Void,Void>() {
 				@Override
 				protected Void doInBackground(Integer... params) {
-					mCore.deleteAnnotation(page, params[0]);
+					mCore.deleteAnnotation(page, params[0], RCTEnum.RCT_PASSIVE);
 					return null;
 				}
 
@@ -582,7 +583,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		mAddInk = new AsyncTask<Object,Void,Void>() {
 			@Override
 			protected Void doInBackground(Object... params) {
-				mCore.addInkAnnotation(mPageNumber, (PointF[][])params[0], (float[])params[1], (float)params[2]);
+				mCore.addInkAnnotation(mPageNumber, (PointF[][])params[0], (float[])params[1], (float)params[2], RCTEnum.RCT_ACTIVE);
 				return null;
 			}
 
@@ -613,7 +614,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		mAddInk = new AsyncTask<Object,Void,Void>() {
 			@Override
 			protected Void doInBackground(Object... params) {
-				mCore.addInkAnnotation(page, (PointF[][])params[0], (float[])params[1], (float)params[2]);
+				mCore.addInkAnnotation(page, (PointF[][])params[0], (float[])params[1], (float)params[2], RCTEnum.RCT_PASSIVE);
 				return null;
 			}
 
@@ -679,7 +680,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	@Override
 	protected void addMarkup(PointF[] quadPoints, Annotation.Type type) {
-		mCore.addMarkupAnnotation(mPageNumber, quadPoints, type);
+		mCore.addMarkupAnnotation(mPageNumber, quadPoints, type, RCTEnum.RCT_ACTIVE);
 	}
 
 	private void loadAnnotations() {

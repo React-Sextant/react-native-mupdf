@@ -33,6 +33,7 @@ android{
 ```
 
 ## Usage
+See the detail in [./demo/app.js](https://github.com/React-Sextant/react-native-mupdf/tree/master/demo/app.js)
 ```jsx harmony
 import {startPDFActivity} from 'react-native-mupdf'
 
@@ -48,6 +49,7 @@ startPDFActivity({
 |----|----|----|
 |OpenMode|打开模式String|"日常","主控方","被控方"||
 |Uri|文件路径String|/storage/emulated/0/Download/pdf_t1.pdf|
+|Page|默认进入页|Number 0|
 
 ### finishPDFActivity 主动关闭当前页面并回到RN页
 

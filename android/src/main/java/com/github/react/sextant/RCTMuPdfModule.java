@@ -70,6 +70,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         if(options.hasKey("Uri")){
             intent.putExtra("Uri", options.getString("Uri"));
         }
+        if(options.hasKey("Page")){
+            intent.putExtra("Page", options.getInt("Page"));
+        }
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
 
@@ -94,7 +97,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     public static void setUpListener(MyListener Listener) { myListener = Listener; }
     @ReactMethod
     public void sendData(String str){
-        myListener.onEvent(str);
+        if(!OpenMode.equals("主控方")){
+            myListener.onEvent(str);
+        }
     }
 
     /**

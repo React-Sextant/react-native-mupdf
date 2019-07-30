@@ -66,6 +66,9 @@ public class MuPDFActivity extends ReactActivity {
     private final int OUTLINE_REQUEST = 0;// 目录回调
     private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t2.pdf"; // 文件路径
 
+    private int mRCTPage;// 默认进入页码
+
+
     private AlertDialog.Builder mAlertBuilder;// 弹出框
 
     private MuPDFCore muPDFCore;// 加载mupdf.so文件
@@ -122,6 +125,7 @@ public class MuPDFActivity extends ReactActivity {
 
         Intent intent = getIntent();
         filePath = intent.getStringExtra("Uri");
+        mRCTPage = intent.getIntExtra("Page", 0);
 
         initToolsView();
 
@@ -190,120 +194,114 @@ public class MuPDFActivity extends ReactActivity {
                 finish();
             }
         });
+        // 设置默认进入页
+        muPDFReaderView.setDisplayedViewIndex(mRCTPage);
 
-        if(RCTMuPdfModule.OpenMode.equals("被控方")){
-            /**
-             * @ReactMethod 被控方监听MyListener
-             * **/
-            RCTMuPdfModule.setUpListener(new MyListener() {
-                @Override
-                public void onEvent(String str) {
-                    try{
-                        MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
-                        JsonParser jsonParser = new JsonParser();
-                        JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+
+        /**
+         * @ReactMethod 监听MyListener
+         * **/
+        RCTMuPdfModule.setUpListener(new MyListener() {
+            @Override
+            public void onEvent(String str) {
+                try{
+                    MuPDFView pageView = (MuPDFView) muPDFReaderView.getDisplayedView();
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+
+                    /**
+                     * 更新页面
+                     *
+                     * @key type: "update_page"
+                     * @key page: int
+                     * **/
+                    if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
+                        final int page = jsonObject.get("page").getAsInt();
+
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                muPDFReaderView.setDisplayedViewIndex(page);
+
+                            }
+                        });
+                    }
+                    switch (jsonObject.get("type").getAsString()){
 
                         /**
-                         * 更新页面
+                         * 更新批注
                          *
-                         * @key type: "update_page"
+                         * @key type: "add_annotation"
+                         * @key path: PointF[][]
                          * @key page: int
                          * **/
-                        if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
-                            final int page = jsonObject.get("page").getAsInt();
-
-                            runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-
-                                    muPDFReaderView.setDisplayedViewIndex(page);
-
+                        case "add_annotation":
+                            JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
+                            PointF[][] p=new PointF[jsonArray.size()][];
+                            for(int i=0;i<jsonArray.size();i++){
+                                JsonArray two = jsonArray.get(i).getAsJsonArray();
+                                PointF [] points=new PointF[two.size()];
+                                for(int j=0;j<two.size();j++){
+                                    points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
                                 }
-                            });
-                        }
-                        switch (jsonObject.get("type").getAsString()){
+                                p[i] = points;
+                            }
 
-                            /**
-                             * 更新批注
-                             *
-                             * @key type: "add_annotation"
-                             * @key path: PointF[][]
-                             * @key page: int
-                             * **/
-                            case "add_annotation":
-                                JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
-                                PointF[][] p=new PointF[jsonArray.size()][];
-                                for(int i=0;i<jsonArray.size();i++){
-                                    JsonArray two = jsonArray.get(i).getAsJsonArray();
-                                    PointF [] points=new PointF[two.size()];
-                                    for(int j=0;j<two.size();j++){
-                                        points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
-                                    }
-                                    p[i] = points;
+                            if (pageView != null){
+                                pageView.saveDraw(jsonObject.get("page").getAsInt(), p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
+                            }
+                            break;
+                        /**
+                         * 更新标注
+                         *
+                         * @key type: "add_markup_annotation"
+                         * @key path: PointF[]
+                         * @key page: int
+                         * @key annotation_type (enum)String
+                         * **/
+                        case "add_markup_annotation":
+                            JsonArray jsonArray2 = jsonObject.get("path").getAsJsonArray();
+                            PointF[] p2=new PointF[jsonArray2.size()];
+                            for(int i=0;i<jsonArray2.size();i++){
+                                p2[i] = new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat());
+                            }
+                            if (pageView != null){
+                                switch (jsonObject.get("annotation_type").getAsString()){
+                                    case "UNDERLINE":
+                                        pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.UNDERLINE);
+                                    break;
+                                    case "HIGHLIGHT":
+                                        pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.HIGHLIGHT);
+                                    break;
                                 }
 
-                                if (pageView != null){
-                                    pageView.saveDraw(jsonObject.get("page").getAsInt(), p,SharedPreferencesUtil.hextoRGB("#FF0000"),4);
-                                }
-                                break;
-                            /**
-                             * 更新标注
-                             *
-                             * @key type: "add_markup_annotation"
-                             * @key path: PointF[]
-                             * @key page: int
-                             * @key annotation_type (enum)String
-                             * **/
-                            case "add_markup_annotation":
-                                JsonArray jsonArray2 = jsonObject.get("path").getAsJsonArray();
-                                PointF[] p2=new PointF[jsonArray2.size()];
-                                for(int i=0;i<jsonArray2.size();i++){
-                                    p2[i] = new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat());
-                                }
-                                if (pageView != null){
-                                    switch (jsonObject.get("annotation_type").getAsString()){
-                                        case "UNDERLINE":
-                                            pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.UNDERLINE);
-                                        break;
-                                        case "HIGHLIGHT":
-                                            pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.HIGHLIGHT);
-                                        break;
-                                    }
 
-
-                                }
-                                break;
-                            /**
-                             * 删除批注
-                             *
-                             * @key type: "delete_annotation"
-                             * @key annot_index: int
-                             * @key page int
-                             * **/
-                            case "delete_annotation":
-                                if (pageView != null){
-                                    pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
-                                }
-                                break;
-                        }
-
-                    }catch (Exception e) {
-                        Log.e(TAG,e.toString());
+                            }
+                            break;
+                        /**
+                         * 删除批注
+                         *
+                         * @key type: "delete_annotation"
+                         * @key annot_index: int
+                         * @key page int
+                         * **/
+                        case "delete_annotation":
+                            if (pageView != null){
+                                pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
+                            }
+                            break;
                     }
 
+                }catch (Exception e) {
+                    Log.e(TAG,e.toString());
                 }
-            });
-        }else{
-            /**
-             * @ReactMethod 主控方监听MyListener
-             * **/
-            RCTMuPdfModule.setUpListener(new MyListener() {
-                @Override
-                public void onEvent(String str) {
 
-                }
-            });
+            }
+        });
+
+        if(!RCTMuPdfModule.OpenMode.equals("被控方")){
             // Set up the page slider
             int smax = Math.max(muPDFCore.countPages() - 1, 1);
             mPageSliderRes = ((10 + smax - 1) / smax) * 2;
