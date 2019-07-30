@@ -54,13 +54,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 
 /**
  * @Description: MuPDF已有功能
  * @author: ZhangYW
  * @time: 2019/3/11 15:56
  */
-public class MuPDFActivity extends ReactActivity {
+public class MuPDFActivity extends ReactActivity implements Thread.UncaughtExceptionHandler{
     private static final String TAG = MuPDFActivity.class.getSimpleName();
 
     private final int OUTLINE_REQUEST = 0;// 目录回调
@@ -538,6 +540,19 @@ public class MuPDFActivity extends ReactActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 异常捕获
+     * **/
+    @Override
+    public void uncaughtException(final Thread thread, final Throwable throwable) {
+        new Thread() {
+            @Override
+            public void run() {
+                RCTMuPdfModule.mPromise.reject(throwable.getMessage());
+            }
+        }.start();
     }
 
     /**

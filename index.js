@@ -4,7 +4,14 @@ const { RNMuPdfModule } = NativeModules;
 
 module.exports = {
     startPDFActivity(args){
-        RNMuPdfModule.startPDFActivity(args)
+        return new Promise((resolve,reject) => {
+            RNMuPdfModule.startPDFActivity(args).then(res=>{
+                resolve(res)
+            }).catch(err=>{
+                reject(err)
+            })
+        })
+
     },
     finishPDFActivity(){
         RNMuPdfModule.finishPDFActivity()

@@ -7,7 +7,11 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
+
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 
 import com.github.react.sextant.activity.MuPDFActivity;
 
@@ -19,6 +23,7 @@ import android.graphics.PointF;
 
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private final  int REQUEST_ECODE_SCAN=1498710037;
+    public static Promise mPromise;
     private static ReactApplicationContext mContext;
 
     public static String OpenMode = "";
@@ -35,14 +40,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
             if (requestCode == REQUEST_ECODE_SCAN) {
-                /**
-                 * 将结束同屏事件传递给JavaScript
-                 * **/
-                if(OpenMode.equals("主控方")){
-                    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                            .emit("MUPDF_Event_Manager", "{\"type\":\"end\"}");
-                }
-
+                WritableMap map = Arguments.createMap();
+                map.putString("OpenMode",OpenMode);
+                mPromise.resolve(map);
             }
         }
     };
@@ -59,7 +59,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startPDFActivity(ReadableMap options){
+    public void startPDFActivity(ReadableMap options,Promise promise){
 
         Activity currentActivity = getCurrentActivity();
         Intent intent = new Intent(currentActivity.getApplicationContext(), MuPDFActivity.class);
@@ -74,6 +74,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             intent.putExtra("Page", options.getInt("Page"));
         }
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
+        mPromise = promise;
     }
 
 

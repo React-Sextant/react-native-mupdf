@@ -60,18 +60,22 @@ export default class App extends Component {
             OpenMode:"日常",
             // OpenMode:"主控方",
             Uri:"/storage/emulated/0/Download/pdf_t1.pdf",
-            Page:2
+            Page:0
+        }).then(res=>{
+            console.log('res',res)
+        }).catch(err=>{
+            console.log('err',err)
         });
     };
 
     render() {
         return (
             <View style={{flex:1,justifyContent: 'center'}}>
-    <Button
-        title={"launch"}
-        onPress={this.go}
-        />
-        </View>
-    );
+                <Button
+                    title={"launch"}
+                    onPress={this.go}
+                />
+            </View>
+        );
     }
 }
