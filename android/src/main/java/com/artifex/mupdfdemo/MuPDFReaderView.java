@@ -305,6 +305,7 @@ public class MuPDFReaderView extends ReaderView {
 		});
 	}
 
+	public static int mPageCore = 0;
 	protected void onMoveToChild(int i) {
 		if (SearchTaskResult.get() != null
 				&& SearchTaskResult.get().pageNumber != i) {
@@ -313,6 +314,8 @@ public class MuPDFReaderView extends ReaderView {
 		}
         checkMuPDFReaderViewListener();
 		listener.onMoveToChild(i);
+		mPageCore = i;
+
 	}
 
 	@Override

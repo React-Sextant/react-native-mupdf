@@ -224,6 +224,7 @@ public class MuPDFCore {
 		globals = 0;
 	}
 
+	private int mPgaeOnce = -1;
 	public synchronized void drawPage(Bitmap bm, int page,
                                       int pageW, int pageH,
                                       int patchX, int patchY,
@@ -234,8 +235,9 @@ public class MuPDFCore {
 		/**
 		 * @ReactMethod 发送页面改变事件
 		 * **/
-		if(!RCTMuPdfModule.OpenMode.equals("被控方")){
-			RCTMuPdfModule.sendPageChangeEvent(page);
+		if(!RCTMuPdfModule.OpenMode.equals("被控方")&&mPgaeOnce!=MuPDFReaderView.mPageCore){
+			mPgaeOnce = MuPDFReaderView.mPageCore;
+			RCTMuPdfModule.sendPageChangeEvent(MuPDFReaderView.mPageCore);
 		}
 	}
 

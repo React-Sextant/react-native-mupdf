@@ -211,27 +211,29 @@ public class MuPDFActivity extends ReactActivity implements Thread.UncaughtExcep
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
 
-                    /**
-                     * 更新页面
-                     *
-                     * @key type: "update_page"
-                     * @key page: int
-                     * **/
-                    if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
-                        final int page = jsonObject.get("page").getAsInt();
-
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-
-                                muPDFReaderView.setDisplayedViewIndex(page);
-
-                            }
-                        });
-                    }
                     switch (jsonObject.get("type").getAsString()){
 
+                        /**
+                         * 更新页面
+                         *
+                         * @key type: "update_page"
+                         * @key page: int
+                         * **/
+                        case "update_page":
+                            if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
+                                final int page = jsonObject.get("page").getAsInt();
+
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+
+                                        muPDFReaderView.setDisplayedViewIndex(page);
+
+                                    }
+                                });
+                            }
+                            break;
                         /**
                          * 更新批注
                          *
