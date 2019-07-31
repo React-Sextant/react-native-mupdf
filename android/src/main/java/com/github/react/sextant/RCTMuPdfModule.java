@@ -1,6 +1,7 @@
 package com.github.react.sextant;
 
 import com.artifex.mupdfdemo.Annotation;
+import com.artifex.mupdfdemo.MuPDFReaderView;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -42,6 +43,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             if (requestCode == REQUEST_ECODE_SCAN) {
                 WritableMap map = Arguments.createMap();
                 map.putString("OpenMode",OpenMode);
+                map.putInt("Page",MuPDFReaderView.mPageCore);
                 mPromise.resolve(map);
             }
         }
