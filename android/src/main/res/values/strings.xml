@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">ReaderGitHub</string>
-	<string name="version">1.0</string>
+	<string name="mupdf_title">MuPDF</string>
+	<string name="version">1.6 (git build)</string>
 	<string name="no_media_warning">Storage media not present</string>
 	<string name="no_media_hint">Sharing the storage media with a PC can make it inaccessible</string>
 	<string name="cancel">Cancel</string>
@@ -25,8 +25,6 @@
 	<string name="edit_annotations">Edit annotations</string>
 	<string name="ink">Ink</string>
 	<string name="save">Save</string>
-	<string name="proof">Proof</string>
-	<string name="separation">Separation</string>
 	<string name="print">Print</string>
 	<string name="dismiss">Dismiss</string>
 	<string name="parent_directory">[Up one level]</string>
@@ -55,8 +53,10 @@
 	<string name="copy_text">copy text</string>
 	<string name="format_currently_not_supported">Format currently not supported</string>
 	<string name="toggle_reflow_mode">Toggle reflow mode</string>
-	<string name="pre_page">上一页</string>
-	<string name="next_page">下一页</string>
-	<string name="menu_open">开</string>
-	<string name="menu_close">关</string>
+
+    <string name="open_failed">Unable to open the document</string>
+    <string name="helpPutSign">Double-tap where you want to place your signature</string>
+    <string name="noSignOnPdfTitle">Warning</string>
+    <string name="noSignOnPdf">The document has not been signed. Please, double-tap where you want to place your signature</string>
+    <string name="OkKey">Ok</string>
 </resources>

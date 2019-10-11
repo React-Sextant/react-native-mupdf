@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="accept">Aceptar</string>
-	<string name="app_name">MuPDF</string>
+	<string name="mupdf_title">MuPDF</string>
 	<string name="cancel">Cancelar</string>
 	<string name="cannot_open_buffer">No se puede abrir el búfer</string>
 	<string name="cannot_open_document">No se puede abrir el documento</string>
@@ -51,4 +51,9 @@
 	<string name="toggle_links">Resaltar y activar</string>
 	<string name="underline">Subrayar</string>
 	<string name="yes">Sí</string>
+
+    <string name="open_failed">No ha sido posible abrir el documento</string>
+    <string name="helpPutSign">Toque dos veces seguidas donde desee ubicar su firma</string>
+    <string name="noSignOnPdfTitle">Atención</string>
+    <string name="noSignOnPdf">El documento no ha sido firmado.Por favor, toque dos veces seguidas donde desee ubicar su firma.</string>
 </resources>

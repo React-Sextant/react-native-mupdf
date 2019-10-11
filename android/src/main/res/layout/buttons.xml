@@ -22,7 +22,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_toLeftOf="@+id/browseDirectionButton"
+				android:layout_toLeftOf="@+id/linkButton"
 				android:layout_alignParentLeft="true"
 				android:paddingLeft="16dp"
 				android:singleLine="true"
@@ -31,26 +31,25 @@
 				android:textAppearance="?android:attr/textAppearanceMedium" />
 
 			<ImageButton
-				android:id="@+id/browseDirectionButton"
+				android:id="@+id/linkButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_toLeftOf="@+id/switchScreenButton"
-				android:contentDescription="@string/browse_direction"
+				android:layout_toLeftOf="@+id/reflowButton"
+				android:contentDescription="@string/toggle_links"
 				android:background="@drawable/button"
 				android:src="@drawable/ic_link" />
 
 			<ImageButton
-				android:id="@+id/switchScreenButton"
+				android:id="@+id/reflowButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
 				android:layout_toLeftOf="@+id/outlineButton"
-				android:contentDescription="@string/switch_screen"
+				android:contentDescription="@string/toggle_reflow_mode"
 				android:background="@drawable/button"
-				android:src="@drawable/switch_screen_lcd_selector" />
+				android:src="@drawable/ic_reflow" />
 
-			<!--目录-->
 			<ImageButton
 				android:id="@+id/outlineButton"
 				android:layout_width="wrap_content"
@@ -61,7 +60,6 @@
 				android:background="@drawable/button"
 				android:src="@drawable/ic_list" />
 
-			<!--搜索-->
 			<ImageButton
 				android:id="@+id/searchButton"
 				android:layout_width="wrap_content"
@@ -104,7 +102,7 @@
 
 			<EditText
 				android:id="@+id/searchText"
-				android:background="@drawable/search_icon"
+				android:background="@drawable/search"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
@@ -142,7 +140,6 @@
 			android:layout_height="wrap_content"
 			android:background="@color/toolbar" >
 
-
 			<ImageButton
 				android:id="@+id/cancelAnnotButton"
 				android:layout_width="wrap_content"
@@ -151,9 +148,9 @@
 				android:layout_alignParentLeft="true"
 				android:contentDescription="@string/cancel"
 				android:background="@drawable/button"
-				android:onClick="onCancelAnnotButtonClick"
+				android:onClick="OnCancelAnnotButtonClick"
 				android:src="@drawable/ic_cancel" />
-			<!--高亮-->
+
 			<ImageButton
 				android:id="@+id/highlightButton"
 				android:layout_width="wrap_content"
@@ -165,7 +162,6 @@
 				android:onClick="OnHighlightButtonClick"
 				android:src="@drawable/ic_highlight" />
 
-			<!--下划线-->
 			<ImageButton
 				android:id="@+id/underlineButton"
 				android:layout_width="wrap_content"
@@ -176,7 +172,6 @@
 				android:background="@drawable/button"
 				android:onClick="OnUnderlineButtonClick"
 				android:src="@drawable/ic_underline" />
-
 
 			<ImageButton
 				android:id="@+id/strikeOutButton"
@@ -189,7 +184,6 @@
 				android:onClick="OnStrikeOutButtonClick"
 				android:src="@drawable/ic_strike" />
 
-			<!--墨迹-->
 			<ImageButton
 				android:id="@+id/inkButton"
 				android:layout_width="wrap_content"
@@ -198,7 +192,7 @@
 				android:layout_alignParentRight="true"
 				android:contentDescription="@string/ink"
 				android:background="@drawable/button"
-				android:onClick="onInkButtonClick"
+				android:onClick="OnInkButtonClick"
 				android:src="@drawable/ic_pen" />
 
 		</RelativeLayout>
@@ -217,7 +211,7 @@
 				android:layout_alignParentLeft="true"
 				android:contentDescription="@string/cancel"
 				android:background="@drawable/button"
-				android:onClick="onCancelDeleteButtonClick"
+				android:onClick="OnCancelDeleteButtonClick"
 				android:src="@drawable/ic_cancel" />
 
 			<TextView
@@ -242,7 +236,7 @@
 				android:layout_alignParentRight="true"
 				android:contentDescription="@string/delete"
 				android:background="@drawable/button"
-				android:onClick="onDeleteButtonClick"
+				android:onClick="OnDeleteButtonClick"
 				android:src="@drawable/ic_trash" />
 
 		</RelativeLayout>
@@ -265,19 +259,6 @@
 				android:src="@drawable/ic_cancel" />
 
 			<ImageButton
-				android:id="@+id/proofButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_centerVertical="true"
-				android:layout_toLeftOf="@+id/printButton"
-				android:contentDescription="@string/proof"
-				android:background="@drawable/button"
-				android:onClick="OnProofButtonClick"
-				android:src="@drawable/ic_proof"
-				android:visibility="gone"
-				/>
-
-			<ImageButton
 				android:id="@+id/printButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -286,11 +267,8 @@
 				android:contentDescription="@string/print"
 				android:background="@drawable/button"
 				android:onClick="OnPrintButtonClick"
-				android:src="@drawable/ic_print"
-				android:visibility="gone"
-				/>
+				android:src="@drawable/ic_print" />
 
-			<!--复制文本-->
 			<ImageButton
 				android:id="@+id/copyTextButton"
 				android:layout_width="wrap_content"
@@ -404,5 +382,4 @@
 		android:background="@drawable/page_num"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:textColor="#FFFFFF" />
-
 </RelativeLayout>
