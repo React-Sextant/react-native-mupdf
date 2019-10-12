@@ -11,7 +11,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 
 
-public class MuPdfView extends MuPDFReaderView{
+public class MuPdfView extends MuPDFReaderView implements FilePicker.FilePickerSupport{
     private ReactContext mContext;
 
     private final int    OUTLINE_REQUEST=0;
@@ -37,7 +37,7 @@ public class MuPdfView extends MuPDFReaderView{
             return;
         }
 
-        this.setAdapter(new MuPDFPageAdapter(mContext, muPDFCore));
+        this.setAdapter(new MuPDFPageAdapter(mContext, this,muPDFCore));
         this.resetupChildren();
         this.setDisplayedViewIndex(1);
     }
@@ -59,4 +59,7 @@ public class MuPdfView extends MuPDFReaderView{
         }
         return muPDFCore;
     }
+
+    @Override
+    public void performPickFor(FilePicker picker) {}
 }
