@@ -1,22 +1,9 @@
-import {NativeModules} from 'react-native';
+import React from 'react'
 
-const { RNMuPdfModule } = NativeModules;
-
-module.exports = {
-    startPDFActivity(args){
-        return new Promise((resolve,reject) => {
-            RNMuPdfModule.startPDFActivity(args).then(res=>{
-                resolve(res)
-            }).catch(err=>{
-                reject(err)
-            })
-        })
-
-    },
-    finishPDFActivity(){
-        RNMuPdfModule.finishPDFActivity()
-    },
-    sendData(args){
-        RNMuPdfModule.sendData(args)
-    },
-};
+export default class Pdf extends React.Component {
+    render(){
+        return (
+            <MuPDF />
+        )
+    }
+}

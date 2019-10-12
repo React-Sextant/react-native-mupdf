@@ -1,27 +1,11 @@
 package com.github.react.sextant;
 
-import java.io.File;
-
 import android.content.Context;
-import android.view.ViewGroup;
-import android.util.Log;
-import android.graphics.PointF;
-import android.net.Uri;
 
-import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.facebook.react.common.MapBuilder;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-
-import static java.lang.String.format;
-import java.lang.ClassCastException;
+import com.facebook.react.uimanager.ViewGroupManager;
 
 public class RCTMuPdfManager extends SimpleViewManager<MuPdfView> {
     private static final String REACT_CLASS = "RCTMuPdf";
@@ -47,5 +31,11 @@ public class RCTMuPdfManager extends SimpleViewManager<MuPdfView> {
     @Override
     public void onDropViewInstance(MuPdfView mupdfView) {
         mupdfView = null;
+    }
+
+    @Override
+    public void onAfterUpdateTransaction(MuPdfView pdfView) {
+        super.onAfterUpdateTransaction(pdfView);
+        pdfView.drawPdf();
     }
 }

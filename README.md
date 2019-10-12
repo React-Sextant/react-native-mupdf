@@ -1,16 +1,12 @@
 # react-native-mupdf
-mupdf-android-viewer-mini in react native view manager
+mupdf-android-viewer in react native view manager
 
-## Manual configuration
-android/build.gradle
-```bash
-allprojects {
-	repositories {
-	    ...
-	    maven { url 'http://maven.ghostscript.com/' } //add here
-	}
-}
-```
+### Manual configuration
+#### react-native/android/build.gradle
+ - minSdkVersion > 16 `must`
+ - compileSdkVersion = 28 `must`
+ - targetSdkVersion = 22    `is best`
+ - supportLibVersion = "28.0.0" `is best`
 
 ## Usage
 ```jsx harmony
