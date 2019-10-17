@@ -1,11 +1,13 @@
 package com.github.react.sextant;
 
 import android.content.Context;
+import android.view.View;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
+import com.facebook.react.ReactRootView;
 
 public class RCTMuPdfManager extends SimpleViewManager<MuPdfView> {
     private static final String REACT_CLASS = "RCTMuPdf";
@@ -24,8 +26,7 @@ public class RCTMuPdfManager extends SimpleViewManager<MuPdfView> {
 
     @Override
     public MuPdfView createViewInstance(ThemedReactContext context) {
-        this.mupdfView = new MuPdfView(context,null);
-        return mupdfView;
+        return new MuPdfView(context, null);
     }
 
     @Override

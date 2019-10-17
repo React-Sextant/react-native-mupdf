@@ -1,23 +1,17 @@
 package com.github.react.sextant;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import com.artifex.mupdfdemo.FilePicker;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
 import com.artifex.mupdfdemo.MuPDFReaderView;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.uimanager.ThemedReactContext;
 
-
-public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSupport{
-    private Context mContext;
-
+public class NativeViewActivity extends Activity implements FilePicker.FilePickerSupport{
     private final int    OUTLINE_REQUEST=0;
     private final int    PRINT_REQUEST=1;
     private final int    FILEPICK_REQUEST=2;
@@ -29,13 +23,11 @@ public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSu
 
     private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t2.pdf"; // 文件路径
 
-    public MuPdfView(final Context ctx, AttributeSet atts) {
-        super(ctx, atts);
-        mContext = ctx;
-//        drawPdf();
-    }
 
-    public void drawPdf() {
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
         muPDFCore = openFile(filePath);
 
         if (muPDFCore == null) {
@@ -43,12 +35,11 @@ public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSu
             return;
         }
 
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.youkan_view, this);
-        muPDFReaderView = view.findViewById(R.id.mu_pdf_mupdfreaderview);
-        muPDFReaderView.setAdapter(new MuPDFPageAdapter(mContext, this,muPDFCore));
+        setContentView(R.layout.youkan_view);
+        muPDFReaderView = (MuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
+        muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, this,muPDFCore));
+//        muPDFReaderView.smartMoveForwards();
     }
-
 
     /**
      * 打开文件
@@ -58,7 +49,7 @@ public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSu
     private MuPDFCore openFile(String path) {
 
         try {
-            muPDFCore = new MuPDFCore(mContext, path);
+            muPDFCore = new MuPDFCore(this, path);
         } catch (Exception e) {
             return null;
         } catch (OutOfMemoryError e) {
@@ -68,5 +59,7 @@ public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSu
     }
 
     @Override
-    public void performPickFor(FilePicker picker) {}
+    public void performPickFor(FilePicker picker) {
+        mFilePicker = picker;
+    }
 }

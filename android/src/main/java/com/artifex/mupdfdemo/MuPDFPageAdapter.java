@@ -96,6 +96,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 
 			sizingTask.execute((Void)null);
 		}
+
 		return pageView;
 	}
 
