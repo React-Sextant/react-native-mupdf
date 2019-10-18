@@ -17,7 +17,9 @@ public interface MuPDFView {
 	public boolean copySelection();
 	public StringBuilder getSelectedString();
 	public boolean markupSelection(Annotation.Type type);
+	public boolean markupSelection(int page, PointF[] quadPoints, Annotation.Type type);
 	public void deleteSelectedAnnotation();
+	public void deleteSelectedAnnotation(int page, int index);
 	public void setSearchBoxes(RectF searchBoxes[]);
 	public void setLinkHighlighting(boolean f);
 	public void deselectAnnotation();
@@ -25,6 +27,7 @@ public interface MuPDFView {
 	public void continueDraw(float x, float y);
 	public void cancelDraw();
 	public boolean saveDraw();
+	public boolean saveDraw(int page, PointF[][] arcs);
 	public void setChangeReporter(Runnable reporter);
 	public void update();
 	public void updateHq(boolean update);

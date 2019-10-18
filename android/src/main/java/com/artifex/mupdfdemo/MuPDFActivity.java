@@ -1,12 +1,15 @@
 package com.artifex.mupdfdemo;
 
-import java.io.InputStream;
-import java.util.concurrent.Executor;
-
 import com.artifex.mupdfdemo.ReaderView.ViewMapper;
 import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.ThreadPerTaskExecutor;
+import com.facebook.react.ReactActivity;
+import com.github.react.sextant.MyListener;
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,9 +18,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,7 +43,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
-public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupport
+public class MuPDFActivity extends ReactActivity implements FilePicker.FilePickerSupport
 {
     private LinearLayout mSearchBar;
     private ViewAnimator mBottomBarSwitcher;
@@ -50,6 +52,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
     private RelativeLayout bookselecttextup;
     private RelativeLayout bookselecttextdown;
     private RelativeLayout bookselectmenu;
+    private RelativeLayout annotationselectmenu;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -60,6 +63,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
     private MuPDFCore    core;
     private String       mFileName;
     private String       mFilePath;
+    private int          mPage;
     private MuPDFReaderView mDocView;
     private View         mButtonsView;
     private boolean      mButtonsVisible;
@@ -69,14 +73,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
     private int          mPageSliderRes;
     private TextView     mPageNumberView;
     private TextView     mInfoView;
-    private ImageButton  mSearchButton;
-    private ImageButton  mReflowButton;
-    private ImageButton  mOutlineButton;
-    private ImageButton	mMoreButton;
-    private TextView     mAnnotTypeText;
-    private ImageButton mAnnotButton;
     private ViewAnimator mTopBarSwitcher;
-    private ImageButton  mLinkButton;
     private TopBarMode   mTopBarMode = TopBarMode.Main;
     private ImageButton  mSearchBack;
     private ImageButton  mSearchFwd;
@@ -235,6 +232,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             Intent intent = getIntent();
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
+            mPage = intent.getIntExtra("page",0);
 
             core = openFile(mFilePath);
             SearchTaskResult.set(null);
@@ -255,6 +253,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dismiss),
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
+                            RCTMuPdfModule.error = true;
                             finish();
                         }
                     });
@@ -262,6 +261,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
                 @Override
                 public void onCancel(DialogInterface dialog) {
+                    RCTMuPdfModule.error = true;
                     finish();
                 }
             });
@@ -298,6 +298,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
                 new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int which) {
+                        RCTMuPdfModule.error = true;
                         finish();
                     }
                 });
@@ -319,6 +320,12 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
                         core.countPages()));
                 mPageSlider.setMax((core.countPages() - 1) * mPageSliderRes);
                 mPageSlider.setProgress(i * mPageSliderRes);
+
+                /**
+                 * @ReactMethod 发送页面改变事件
+                 * **/
+                RCTMuPdfModule.sendPageChangeEvent(i);
+
                 super.onMoveToChild(i);
             }
 
@@ -338,6 +345,10 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             @Override
             protected void onDocMotion() {
                 hideButtons();
+
+                if(annotationselectmenu.getVisibility() == VISIBLE){
+                    annotationselectmenu.setVisibility(View.INVISIBLE);
+                }
             }
 
             /**
@@ -370,6 +381,112 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             }
         };
         mDocView.setAdapter(new MuPDFPageAdapter(this, this, core));
+
+        /**
+         * @ReactMethod 监听MyListener
+         * **/
+        RCTMuPdfModule.setUpListener(new MyListener() {
+            @Override
+            public void onEvent(String str) {
+                try{
+                    MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+
+                    switch (jsonObject.get("type").getAsString()){
+
+                        /**
+                         * 更新页面
+                         *
+                         * @key type: "update_page"
+                         * @key page: int
+                         * **/
+                        case "update_page":
+                            if(pageView!=null && jsonObject.get("page").getAsInt() >= 0 && jsonObject.get("page").getAsInt() != pageView.getPage()){
+                                final int page = jsonObject.get("page").getAsInt();
+
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+
+                                        mDocView.setDisplayedViewIndex(page);
+
+                                    }
+                                });
+                            }
+                            break;
+                        /**
+                         * 更新批注
+                         *
+                         * @key type: "add_annotation"
+                         * @key path: PointF[][]
+                         * @key page: int
+                         * **/
+                        case "add_annotation":
+                            JsonArray jsonArray = jsonObject.get("path").getAsJsonArray();
+                            PointF[][] p=new PointF[jsonArray.size()][];
+                            for(int i=0;i<jsonArray.size();i++){
+                                JsonArray two = jsonArray.get(i).getAsJsonArray();
+                                PointF [] points=new PointF[two.size()];
+                                for(int j=0;j<two.size();j++){
+                                    points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                                }
+                                p[i] = points;
+                            }
+
+                            if (pageView != null){
+                                pageView.saveDraw(jsonObject.get("page").getAsInt(),p);
+                            }
+                            break;
+                        /**
+                         * 更新标注
+                         *
+                         * @key type: "add_markup_annotation"
+                         * @key path: PointF[]
+                         * @key page: int
+                         * @key annotation_type (enum)String
+                         * **/
+                        case "add_markup_annotation":
+                            JsonArray jsonArray2 = jsonObject.get("path").getAsJsonArray();
+                            PointF[] p2=new PointF[jsonArray2.size()];
+                            for(int i=0;i<jsonArray2.size();i++){
+                                p2[i] = new PointF(jsonArray2.get(i).getAsJsonArray().get(0).getAsFloat(),jsonArray2.get(i).getAsJsonArray().get(1).getAsFloat());
+                            }
+                            if (pageView != null){
+                                switch (jsonObject.get("annotation_type").getAsString()){
+                                    case "UNDERLINE":
+                                        pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.UNDERLINE);
+                                        break;
+                                    case "HIGHLIGHT":
+                                        pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.HIGHLIGHT);
+                                        break;
+                                }
+
+
+                            }
+                            break;
+                        /**
+                         * 删除批注
+                         *
+                         * @key type: "delete_annotation"
+                         * @key annot_index: int
+                         * @key page int
+                         * **/
+                        case "delete_annotation":
+                            if (pageView != null){
+                                pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
+                            }
+                            break;
+                    }
+
+                }catch (Exception e) {
+
+                }
+
+            }
+        });
+
 
         /**
          * 震动实例
@@ -447,8 +564,30 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             }
 
             @Override
-            public void pageChanged(int page){
+            public void singleTapOnHit(RectF rect, float scale){
+                MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                if(rect != null) {
+                    float docRelX = rect.left * scale + pageView.getLeft();
+                    float docRelY = rect.top * scale + pageView.getTop();
 
+                    annotationselectmenu.setVisibility(View.VISIBLE);
+
+                    if(docRelX<0){
+                        annotationselectmenu.setX(0);
+                    }else if(mDocView.getWidth() - docRelX <  annotationselectmenu.getMeasuredWidth()){
+                        annotationselectmenu.setX(mDocView.getWidth()-annotationselectmenu.getMeasuredWidth());
+                    }else {
+                        annotationselectmenu.setX(docRelX);
+                    }
+
+                    if(docRelY<annotationselectmenu.getMeasuredHeight()){
+                        annotationselectmenu.setY((rect.bottom-rect.top) * scale+docRelY);
+                    }else {
+                        annotationselectmenu.setY(docRelY-annotationselectmenu.getMeasuredHeight());
+                    }
+                }else {
+                    annotationselectmenu.setVisibility(View.INVISIBLE);
+                }
             }
 
             @Override
@@ -575,12 +714,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             }
         });
 
-//        mLinkButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                setLinkHighlight(!mLinkHighlight);
-//            }
-//        });
-
         if (core.hasOutline()) {
 //            mOutlineButton.setOnClickListener(new View.OnClickListener() {
 //                public void onClick(View v) {
@@ -624,7 +757,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case OUTLINE_REQUEST:
                 if (resultCode >= 0)
@@ -730,14 +863,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
     private void setButtonEnabled(ImageButton button, boolean enabled) {
         button.setEnabled(enabled);
         button.setColorFilter(enabled ? Color.argb(255, 255, 255, 255):Color.argb(255, 128, 128, 128));
-    }
-
-    private void setLinkHighlight(boolean highlight) {
-        mLinkHighlight = highlight;
-        // LINK_COLOR tint
-        mLinkButton.setColorFilter(highlight ? Color.argb(0xFF, 172, 114, 37) : Color.argb(0xFF, 255, 255, 255));
-        // Inform pages of the change.
-        mDocView.setLinksEnabled(highlight);
     }
 
     private void showButtons() {
@@ -869,6 +994,10 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
         bookselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.bookselectmenu);//主菜单
         bookselecttextup = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextup);//上箭头
         bookselecttextdown = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextdown);//下箭头
+
+        annotationselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.idMuPDFPopHit);//批注外包盒子
+        annotationselectmenu.setVisibility(View.INVISIBLE);
+
         hidePopMenu();
     }
 
@@ -1170,5 +1299,16 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
             pageView.deselectText();
 
         hidePopMenu();
+    }
+
+    /******** mupdf_pop_hit.xml ********/
+
+    /**
+     * 删除所选批注
+     * **/
+    public void onDeleteSelectedAnnotation(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null)
+            pageView.deleteSelectedAnnotation();
     }
 }

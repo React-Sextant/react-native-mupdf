@@ -96,13 +96,16 @@ class TextSelector {
 }
 
 public abstract class PageView extends ViewGroup {
-    private static final int HIGHLIGHT_COLOR = 0x802572AC;
-    private static final int LINK_COLOR = 0x80AC7225;
-    private static final int BOX_COLOR = 0xFF4444FF;
-    private static final int INK_COLOR = 0xFFFF0000;
-    private static final float INK_THICKNESS = 10.0f;
+    private static final int HIGHLIGHT_COLOR = 0x80ff5722;// 选中文字时的颜色
+    private static final int LINK_COLOR = 0x80ff5722;// 超链接颜色
+    private static final int BOX_COLOR = 0xFF696969;// 选中时边框的颜色
+    private static final int INK_COLOR = 0xFFF00000;// 绘制时画笔颜色
+    private static final float INK_THICKNESS = 8.0f;// 绘制时画笔宽
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
     private static final int PROGRESS_DIALOG_DELAY = 200;
+
+    private float CURRENT_SCALE;
+
     private static final String TAG = "PageView";
 
     private static final int SIGN_HEIGHT = 50;
@@ -327,6 +330,12 @@ public abstract class PageView extends ViewGroup {
                     // Work out current total scale factor
                     // from source to view
                     final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+
+                    /**
+                     * 存储当前scale值
+                     * **/
+                    CURRENT_SCALE = scale;
+
                     final Paint paint = new Paint();
                     final RectF mSelectFirstRect = new RectF();  //选择文本时的第一个字节节点
 
@@ -568,6 +577,9 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
+    /**
+     * 获得批注数据path
+     * **/
     protected PointF[][] getDraw() {
         if (mDrawing == null)
             return null;
@@ -587,9 +599,56 @@ public abstract class PageView extends ViewGroup {
     }
 
     public void setItemSelectBox(RectF rect) {
+        /**
+         * 显示菜单框
+         * **/
+        if (eventCallback != null) {
+            float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+            eventCallback.singleTapOnHit(rect,scale);
+        }
+
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();
+    }
+
+
+    /**
+     * 获得画笔粗细
+     */
+    protected float getInkThickness() {
+        if (CURRENT_SCALE == 0) {
+            return 9.07563f / 2;
+        } else {
+            return (INK_THICKNESS * CURRENT_SCALE) / 2;
+        }
+    }
+
+    /**
+     * 获得画笔颜色
+     */
+    protected float[] getColor() {
+
+        return changeColor(INK_COLOR);
+    }
+
+    /**
+     * 将十进制颜色值转换成RGB格式
+     * @param color
+     * @return
+     */
+    private float[] changeColor(int color) {
+
+        int red = (color & 0xff0000) >> 16;
+        int green = (color & 0x00ff00) >> 8;
+        int blue = (color & 0x0000ff);
+
+        float colors[] = new float[3];
+        colors[0] = red/255f;
+        colors[1] = green/255f;
+        colors[2] = blue/255f;
+
+        return colors;
     }
 
     @Override

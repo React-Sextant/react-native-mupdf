@@ -109,6 +109,9 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	public boolean markupSelection(Annotation.Type type) {
 		return false;
 	}
+	public boolean markupSelection(int page, PointF[] quadPoints, Annotation.Type type){
+		return false;
+	}
 
 	public void startDraw(float x, float y) {
 	}
@@ -122,6 +125,9 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	public boolean saveDraw() {
 		return false;
 	}
+	public boolean saveDraw(int page, PointF[][] arcs) {
+		return false;
+	}
 
 	public void setSearchBoxes(RectF[] searchBoxes) {
 	}
@@ -130,6 +136,8 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 
 	public void deleteSelectedAnnotation() {
+	}
+	public void deleteSelectedAnnotation(int page, int index) {
 	}
 
 	public void deselectAnnotation() {

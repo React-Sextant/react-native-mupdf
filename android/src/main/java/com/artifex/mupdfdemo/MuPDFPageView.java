@@ -109,7 +109,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<String,Void,Boolean> mSetWidgetText;
 	private AsyncTask<String,Void,Void> mSetWidgetChoice;
 	private AsyncTask<PointF[],Void,Void> mAddStrikeOut;
-	private AsyncTask<PointF[][],Void,Void> mAddInk;
+	private AsyncTask<Object,Void,Void> mAddInk;
 	private AsyncTask<Integer,Void,Void> mDeleteAnnotation;
 	private AsyncTask<Void,Void,String> mCheckSignature;
 	private AsyncTask<Void,Void,Boolean> mSign;
@@ -452,6 +452,9 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return text;
 	}
 
+	/**
+	 * 下划线添加确认
+	 * **/
 	public boolean markupSelection(final Annotation.Type type) {
 		final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
 		processSelectedText(new TextProcessor() {
@@ -499,6 +502,29 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
+	public boolean markupSelection(final int page, final PointF[] quadPoints, final Annotation.Type type) {
+
+		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
+			@Override
+			protected Void doInBackground(PointF[]... params) {
+				mCore.addMarkupAnnotation(page, quadPoints, type);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				loadAnnotations();
+				update();
+			}
+		};
+
+		mAddStrikeOut.execute(quadPoints);
+
+		deselectText();
+
+		return true;
+	}
+
 	public void deleteSelectedAnnotation() {
 		if (mSelectedAnnotationIndex != -1) {
 			if (mDeleteAnnotation != null)
@@ -525,6 +551,28 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		}
 	}
 
+	public void deleteSelectedAnnotation(final int page, final int annot_index){
+		if (annot_index != -1) {
+			if (mDeleteAnnotation != null)
+				mDeleteAnnotation.cancel(true);
+			mDeleteAnnotation = new AsyncTask<Integer,Void,Void>() {
+				@Override
+				protected Void doInBackground(Integer... params) {
+					mCore.deleteAnnotation(page, params[0]);
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void result) {
+					loadAnnotations();
+					update();
+				}
+			};
+
+			mDeleteAnnotation.execute(annot_index);
+		}
+	}
+
 	public void deselectAnnotation() {
 		mSelectedAnnotationIndex = -1;
 		setItemSelectBox(null);
@@ -540,10 +588,10 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mAddInk.cancel(true);
 			mAddInk = null;
 		}
-		mAddInk = new AsyncTask<PointF[][],Void,Void>() {
+		mAddInk = new AsyncTask<Object,Void,Void>() {
 			@Override
-			protected Void doInBackground(PointF[][]... params) {
-				mCore.addInkAnnotation(mPageNumber, params[0]);
+			protected Void doInBackground(Object... params) {
+				mCore.addInkAnnotation(mPageNumber, (PointF[][])params[0], (float[])params[1], (float)params[2]);
 				return null;
 			}
 
@@ -555,8 +603,38 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 		};
 
-		mAddInk.execute(getDraw());
+		mAddInk.execute(getDraw(), getColor(), getInkThickness());
 		cancelDraw();
+
+		return true;
+	}
+
+	public boolean saveDraw(final int page, PointF[][] arcs) {
+
+		if (arcs == null)
+			return false;
+
+		if (mAddInk != null) {
+			mAddInk.cancel(true);
+			mAddInk = null;
+		}
+
+		mAddInk = new AsyncTask<Object,Void,Void>() {
+			@Override
+			protected Void doInBackground(Object... params) {
+				mCore.addInkAnnotation(page, (PointF[][])params[0], (float[])params[1], (float)params[2]);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				loadAnnotations();
+				update();
+			}
+
+		};
+
+		mAddInk.execute(getDraw(), getColor(), getInkThickness());
 
 		return true;
 	}

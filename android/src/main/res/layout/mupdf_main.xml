@@ -12,6 +12,8 @@
 
     <include layout="@layout/mupdf_pop_menu" />
 
+    <include android:id="@+id/idMuPDFPopHit" layout="@layout/mupdf_pop_hit" />
+
     <!--当前操作信息-->
     <TextView
         android:id="@+id/info"

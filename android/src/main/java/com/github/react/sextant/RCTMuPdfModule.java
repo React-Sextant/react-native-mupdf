@@ -2,7 +2,9 @@ package com.github.react.sextant;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PointF;
 
+import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.MuPDFActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -18,8 +20,9 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
-    private final  int REQUEST_ECODE_SCAN=20191017;
+    private final int REQUEST_ECODE_SCAN=20191017;
     public static Promise mPromise;
+    public static boolean error;    //打开文件是否报错
     private static ReactApplicationContext mContext;
 
     public RCTMuPdfModule(ReactApplicationContext reactContext) {
@@ -34,28 +37,15 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
             if (requestCode == REQUEST_ECODE_SCAN && mPromise != null) {
-                WritableMap map = Arguments.createMap();
-                mPromise.resolve(map);
+                if(error){
+                    mPromise.reject("文件打开失败");
+                }else {
+                    WritableMap map = Arguments.createMap();
+                    mPromise.resolve(map);
+                }
             }
         }
     };
-
-    /**
-     * 从JavaScript发送数据给Native
-     * **/
-    private static MyListener myListener;
-    public static void setUpListener(MyListener Listener) { myListener = Listener; }
-    @ReactMethod
-    public void sendData(String str){
-        myListener.onEvent(str);
-    }
-
-    /**
-     * 发送事件给JavaScript
-     * **/
-    public static void sendEvent(String data){
-        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("MUPDF_Event_Manager",data);
-    }
 
     @ReactMethod
     public void open(ReadableMap map, Promise promise){
@@ -80,6 +70,107 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
+    }
+
+    /**
+     * 从JavaScript发送数据给Native
+     * **/
+    private static MyListener myListener;
+    public static void setUpListener(MyListener Listener) { myListener = Listener; }
+    @ReactMethod
+    public void sendData(String str){
+        myListener.onEvent(str);
+    }
+
+
+    /**
+     * 发送事件给JavaScript
+     * **/
+    public static void sendEvent(String data){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("MUPDF_Event_Manager",data);
+    }
+
+    /**
+     * 将保存当前批注事件传递给JavaScript
+     * **/
+    public static void sendInkAnnotationEvent(int page, PointF[][] arcs,float color[], float inkThickness){
+
+        String path = "";
+        for(int i=0;i<arcs.length;i++){
+            String xy = "";
+            for(int j=0;j<arcs[i].length;j++){
+                if(xy.equals("")){
+                    xy+="["+arcs[i][j].x+","+arcs[i][j].y+"]";
+                }else {
+                    xy+=",["+arcs[i][j].x+","+arcs[i][j].y+"]";
+                }
+            }
+            if(path.equals("")){
+                path+="["+xy+"]";
+            }else {
+                path+=",["+xy+"]";
+            }
+        }
+
+
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"add_annotation\", " +
+                                "\"path\":["+path+"],"+
+                                "\"page\":"+page+
+                                "}"
+                );
+    }
+
+    /**
+     * 将保存下划线/高亮事件传递给JavaScript
+     * **/
+    public static void sendMarkupAnnotationEvent(int page, PointF[] quadPoints, Annotation.Type type){
+        String path = "";
+        for(int i=0;i<quadPoints.length;i++){
+            if(path.equals("")){
+                path+="["+quadPoints[i].x+","+quadPoints[i].y+"]";
+            }else {
+                path+=",["+quadPoints[i].x+","+quadPoints[i].y+"]";
+            }
+        }
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"add_markup_annotation\", " +
+                                "\"path\":["+path+"],"+
+                                "\"page\":"+page + "," +
+                                "\"annotation_type\": \"" + type + "\"" +
+                                "}"
+                );
+    }
+
+    /**
+     * 将当前页面改变事件发送给JavaScript
+     * **/
+    public static void sendPageChangeEvent(int page){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"update_page\", " +
+                                "\"page\":"+page+
+                                "}"
+                );
+    }
+
+    /**
+     * 将删除批注事件发送给Javascript
+     * **/
+    public static void sendDeleteSelectedAnnotationEvent(int page, int annot_index){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"delete_annotation\", " +
+                                "\"page\":"+page + "," +
+                                "\"annot_index\":"+annot_index +
+                                "}"
+                );
     }
 
     @Override

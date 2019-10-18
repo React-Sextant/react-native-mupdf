@@ -8,6 +8,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 public class MuPDFCore
 {
@@ -51,6 +52,16 @@ public class MuPDFCore
 	private native byte[] textAsHtml();
 	private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
 	private native void addInkAnnotationInternal(PointF[][] arcs);
+	/**
+	 * 绘制
+	 * @param arcs 点
+	 * @param colorR 颜色值 R
+	 * @param colorG 颜色值 G
+	 * @param colorB 颜色值 B
+	 * @param inkThickness 线的粗细
+	 */
+	private native void addInkAnnotationInternal(PointF[][] arcs, float colorR, float colorG, float colorB, float inkThickness);
+
 	private native void deleteAnnotationInternal(int annot_index);
 	private native int passClickEventInternal(int page, float x, float y);
 	private native void setFocusedWidgetChoiceSelectedInternal(String [] selected);
@@ -211,6 +222,10 @@ public class MuPDFCore
 			int patchW, int patchH,
 			Cookie cookie) {
 		updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+
+		/**
+		 * @ReactMethod 发送页面改变事件
+		 * **/
 	}
 
 	public synchronized PassClickResult passClickEvent(int page, float x, float y) {
@@ -319,16 +334,32 @@ public class MuPDFCore
 	public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
 		gotoPage(page);
 		addMarkupAnnotationInternal(quadPoints, type.ordinal());
+
+		/**
+		 * @ReactMethod 主动发送标注事件
+		 * **/
+		RCTMuPdfModule.sendMarkupAnnotationEvent(page, quadPoints, type);
 	}
 
-	public synchronized void addInkAnnotation(int page, PointF[][] arcs) {
+	public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
 		gotoPage(page);
-		addInkAnnotationInternal(arcs);
+		addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
+
+		/**
+		 * @ReactMethod 发送批注事件
+		 * **/
+		RCTMuPdfModule.sendInkAnnotationEvent(page, arcs, color, inkThickness);
 	}
 
 	public synchronized void deleteAnnotation(int page, int annot_index) {
 		gotoPage(page);
 		deleteAnnotationInternal(annot_index);
+
+		/**
+		 * @ReactMethod 发送删除批注事件
+		 * **/
+		RCTMuPdfModule.sendDeleteSelectedAnnotationEvent(page,annot_index);
+
 	}
 
 	public synchronized boolean hasOutline() {
