@@ -102,6 +102,10 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 		return false;
 	}
 
+	public StringBuilder getSelectedString() {
+		return null;
+	}
+
 	public boolean markupSelection(Annotation.Type type) {
 		return false;
 	}

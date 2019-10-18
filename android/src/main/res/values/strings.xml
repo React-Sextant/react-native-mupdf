@@ -4,6 +4,9 @@
 	<string name="version">1.6 (git build)</string>
 	<string name="no_media_warning">Storage media not present</string>
 	<string name="no_media_hint">Sharing the storage media with a PC can make it inaccessible</string>
+	<string name="issignature">Whether to generate the signature content</string>
+	<string name="prechapter">Last</string>
+	<string name="nextchapter">Next</string>
 	<string name="cancel">Cancel</string>
 	<string name="search_backwards">Search backwards</string>
 	<string name="search_forwards">Search forwards</string>
@@ -48,6 +51,7 @@
 	<string name="choose_value">Choose value</string>
 	<string name="not_supported">Not supported</string>
 	<string name="copy_text_to_the_clipboard">Copy text to the clipboard</string>
+	<string name="search_engine">https://www.google.com/search?q=</string>
 	<string name="more">More</string>
 	<string name="accept">Accept</string>
 	<string name="copy_text">copy text</string>

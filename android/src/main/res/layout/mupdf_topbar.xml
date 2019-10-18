@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+    <ViewAnimator
+        android:id="@+id/idTopBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:onClick="onBubbling"
+        android:layout_centerHorizontal="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DD000000"
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="10dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@mipmap/pageback"
+                android:onClick="onFinishActivity"/>
+
+            <TextView
+                android:id="@+id/idFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="#FFFFFFFF"
+                android:textSize="14dp"
+                android:maxLines="1"
+                android:layout_marginRight="80dp"
+                android:layout_marginLeft="80dp"
+                android:ellipsize="end"
+                android:text="暂无文件名"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:onClick="OnOpenSearchButtonClick"
+                android:background="@mipmap/search" />
+        </RelativeLayout>
+    </ViewAnimator>
+    <LinearLayout
+        android:id="@+id/idSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/toolbar"
+        android:visibility="gone">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cancel"
+            android:background="@drawable/button"
+            android:onClick="OnCancelSearchButtonClick"
+            android:src="@drawable/ic_cancel" />
+
+        <EditText
+            android:id="@+id/searchText"
+            android:background="@drawable/search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:hint="@string/search"
+            android:singleLine="true" />
+
+        <ImageButton
+            android:id="@+id/searchBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/search_backwards"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_arrow_left" />
+
+        <ImageButton
+            android:id="@+id/searchForward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/search_forwards"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_arrow_right" />
+
+    </LinearLayout>
+
+</RelativeLayout>

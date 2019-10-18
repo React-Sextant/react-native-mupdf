@@ -1,5 +1,7 @@
 package com.artifex.utils;
 
+import android.graphics.RectF;
+
 /**
  * Created by @elage on 6/2/15.
  */
@@ -13,4 +15,6 @@ public interface DigitalizedEventCallback {
     public void singleTapOnPdfPosition(int page, float viewX, float viewY, float pdfX, float pdfY);
     public void pageChanged(int page);
     public void error(String message);
+
+    public void touchMoveOnPdfPosition(RectF rect, float scale);
 }

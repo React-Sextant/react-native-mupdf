@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <!-- SEEKBAR背景底部的颜色 -->
+    <item >
+        <shape>
+            <corners android:radius="10dip" />
+
+            <gradient
+                android:angle="270"
+                android:centerColor="#ff4D4D4D"
+                android:centerY="0.45"
+                android:endColor="#ff4D4D4D"
+                android:startColor="#ff4D4D4D" />
+        </shape>
+    </item>
+    <!-- 拖动后的颜色 -->
+    <item >
+        <clip>
+            <shape>
+                <corners android:radius="10dip" />
+
+                <gradient
+                    android:angle="270"
+                    android:centerColor="#ffEE7600"
+                    android:centerY="0.45"
+                    android:endColor="#ffEE7600"
+                    android:startColor="#ffEE7600" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

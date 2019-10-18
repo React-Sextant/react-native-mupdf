@@ -15,6 +15,7 @@ public interface MuPDFView {
 	public void selectText(float x0, float y0, float x1, float y1);
 	public void deselectText();
 	public boolean copySelection();
+	public StringBuilder getSelectedString();
 	public boolean markupSelection(Annotation.Type type);
 	public void deleteSelectedAnnotation();
 	public void setSearchBoxes(RectF searchBoxes[]);
@@ -30,4 +31,7 @@ public interface MuPDFView {
 	public void removeHq();
 	public void releaseResources();
 	public void releaseBitmaps();
+
+	public int getTop();
+	public int getLeft();
 }

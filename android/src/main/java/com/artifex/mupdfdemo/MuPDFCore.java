@@ -65,7 +65,7 @@ public class MuPDFCore
 	private native LinkInfo [] getPageLinksInternal(int page);
 	private native RectF[] getWidgetAreasInternal(int page);
 	private native Annotation[] getAnnotationsInternal(int page);
-//	private native OutlineItem [] getOutlineInternal();
+	private native OutlineItem [] getOutlineInternal();
 	private native boolean hasOutlineInternal();
 	private native boolean needsPasswordInternal();
 	private native boolean authenticatePasswordInternal(String password);
@@ -291,12 +291,17 @@ public class MuPDFCore
 
 				for (TextChar[] sp: ln) {
 					for (TextChar tc: sp) {
-						if (tc.c != ' ') {
-							wd.Add(tc);
-						} else if (wd.w.length() > 0) {
-							wds.add(wd);
-							wd = new TextWord();
-						}
+
+						wd.Add(tc);
+						wds.add(wd);
+						wd = new TextWord();
+
+//						if (tc.c != ' ') {
+//							wd.Add(tc);
+//						} else if (wd.w.length() > 0) {
+//							wds.add(wd);
+//							wd = new TextWord();
+//						}
 					}
 				}
 
@@ -330,9 +335,9 @@ public class MuPDFCore
 		return hasOutlineInternal();
 	}
 
-//	public synchronized OutlineItem [] getOutline() {
-//		return getOutlineInternal();
-//	}
+	public synchronized OutlineItem [] getOutline() {
+		return getOutlineInternal();
+	}
 
 	public synchronized boolean needsPassword() {
 		return needsPasswordInternal();

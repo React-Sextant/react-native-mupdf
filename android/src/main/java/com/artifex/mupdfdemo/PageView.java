@@ -328,6 +328,7 @@ public abstract class PageView extends ViewGroup {
                     // from source to view
                     final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
                     final Paint paint = new Paint();
+                    final RectF mSelectFirstRect = new RectF();  //选择文本时的第一个字节节点
 
                     if (!mIsBlank && mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
@@ -355,12 +356,18 @@ public abstract class PageView extends ViewGroup {
                             }
 
                             public void onWord(TextWord word) {
+                                if(mSelectFirstRect.left == 0 && mSelectFirstRect.right == 0 && mSelectFirstRect.top == 0 && mSelectFirstRect.bottom == 0){
+                                    mSelectFirstRect.union(word);
+                                }
+
                                 rect.union(word);
                             }
 
                             public void onEndLine() {
                                 if (!rect.isEmpty())
                                     canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
+                                    if (eventCallback != null)
+                                        eventCallback.touchMoveOnPdfPosition(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,rect.right,rect.bottom),scale);
                             }
                         });
                     }

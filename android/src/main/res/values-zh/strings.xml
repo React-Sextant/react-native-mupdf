@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="issignature">是否生成批注内容</string>
+	<string name="prechapter">上一页</string>
+	<string name="nextchapter">下一页</string>
 	<string name="accept">接受</string>
 	<string name="mupdf_title">MuPDF</string>
 	<string name="cancel">取消</string>
@@ -12,6 +15,7 @@
 	<string name="copy">复制</string>
 	<string name="copy_text">复制文本</string>
 	<string name="copy_text_to_the_clipboard">将文本复制到剪贴板</string>
+	<string name="search_engine">https://www.baidu.com/s?wd=</string>
 	<string name="delete">删除</string>
 	<string name="dismiss">解除</string>
 	<string name="document_has_changes_save_them_">文档已变更，保存变更吗？</string>

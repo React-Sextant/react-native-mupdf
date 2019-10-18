@@ -406,27 +406,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	@TargetApi(11)
 	public boolean copySelection() {
-		final StringBuilder text = new StringBuilder();
-
-		processSelectedText(new TextProcessor() {
-			StringBuilder line;
-
-			public void onStartLine() {
-				line = new StringBuilder();
-			}
-
-			public void onWord(TextWord word) {
-				if (line.length() > 0)
-					line.append(' ');
-				line.append(word.w);
-			}
-
-			public void onEndLine() {
-				if (text.length() > 0)
-					text.append('\n');
-				text.append(line);
-			}
-		});
+		final StringBuilder text = getSelectedString();
 
 		if (text.length() == 0)
 			return false;
@@ -444,6 +424,32 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		deselectText();
 
 		return true;
+	}
+
+	public StringBuilder getSelectedString() {
+		final StringBuilder text = new StringBuilder();
+
+		processSelectedText(new TextProcessor() {
+			StringBuilder line;
+
+			public void onStartLine() {
+				line = new StringBuilder();
+			}
+
+			public void onWord(TextWord word) {
+//				if (line.length() > 0)
+//					line.append(' ');
+				line.append(word.w);
+			}
+
+			public void onEndLine() {
+				if (text.length() > 0)
+					text.append('\n');
+				text.append(line);
+			}
+		});
+
+		return text;
 	}
 
 	public boolean markupSelection(final Annotation.Type type) {
