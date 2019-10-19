@@ -210,7 +210,6 @@ public class MuPDFCore
 		globals = 0;
 	}
 
-	private int send_once = -1;
 	public synchronized void drawPage(Bitmap bm, int page,
 			int pageW, int pageH,
 			int patchX, int patchY,
@@ -222,8 +221,8 @@ public class MuPDFCore
 		/**
 		 * @ReactMethod 发送页面改变事件
 		 * **/
-		if(send_once != CURRENT_PAGE){
-			send_once = CURRENT_PAGE;
+		if(CURRENT_PAGE == -1){
+			CURRENT_PAGE = page;
 			RCTMuPdfModule.sendPageChangeEvent(CURRENT_PAGE);
 		}
 

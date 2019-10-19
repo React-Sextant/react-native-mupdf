@@ -1,6 +1,8 @@
 package com.github.react.sextant;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 
@@ -176,6 +178,15 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                                 "\"annot_index\":"+annot_index +
                                 "}"
                 );
+    }
+
+    /**
+     * 主动关闭当前页面并返回RN页面
+     * **/
+    @ReactMethod
+    public void finishPDFActivity(){
+        Activity currentActivity = getCurrentActivity();
+        currentActivity.finish();
     }
 
     @Override

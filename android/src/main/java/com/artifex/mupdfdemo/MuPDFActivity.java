@@ -45,6 +45,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
+
 public class MuPDFActivity extends ReactActivity implements FilePicker.FilePickerSupport
 {
     private LinearLayout mSearchBar;
@@ -326,7 +328,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 mPageSlider.setMax((core.countPages() - 1) * mPageSliderRes);
                 mPageSlider.setProgress(i * mPageSliderRes);
 
-                SharedPreferencesUtil.CURRENT_PAGE = i;
+                /**
+                 * @ReactMethod 发送页面改变事件
+                 * **/
+                if(CURRENT_PAGE != -1){
+                    RCTMuPdfModule.sendPageChangeEvent(i);
+                }
 
                 super.onMoveToChild(i);
             }
