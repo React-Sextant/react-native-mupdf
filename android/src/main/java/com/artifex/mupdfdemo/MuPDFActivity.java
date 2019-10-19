@@ -488,6 +488,24 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
                             }
                             break;
+                        /**
+                         * 结束同屏
+                         * **/
+                        case "end_same_screen":
+                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (which == AlertDialog.BUTTON_NEGATIVE){
+                                        finish();
+                                    }
+                                }
+                            };
+                            AlertDialog alert = mAlertBuilder.create();
+                            alert.setTitle("温馨提示");
+                            alert.setMessage("同屏已结束，是否继续浏览？");
+                            alert.setButton(AlertDialog.BUTTON_POSITIVE, "确定", listener);
+                            alert.setButton(AlertDialog.BUTTON_NEGATIVE, "返回上一页", listener);
+                            alert.show();
+                            break;
                     }
 
                 }catch (Exception e) {
