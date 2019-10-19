@@ -37,6 +37,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -54,6 +55,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private RelativeLayout bookselecttextdown;
     private RelativeLayout bookselectmenu;
     private RelativeLayout annotationselectmenu;
+    private FrameLayout samescreenbutton;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -65,6 +67,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private String       mFileName;
     private String       mFilePath;
     private int          mPage;
+    private String       mMode;
     private MuPDFReaderView mDocView;
     private View         mButtonsView;
     private boolean      mButtonsVisible;
@@ -233,6 +236,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             Intent intent = getIntent();
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
+            mMode = intent.getStringExtra("mode");
             mPage = intent.getIntExtra("page",0);
 
             core = openFile(mFilePath);
@@ -996,6 +1000,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         annotationselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.idMuPDFPopHit);//批注外包盒子
         annotationselectmenu.setVisibility(View.INVISIBLE);
 
+        samescreenbutton = (FrameLayout)mButtonsView.findViewById(R.id.samescreenbutton);//结束同屏按钮
+
+        if(mMode.equals("主控方")){
+            samescreenbutton.setVisibility(View.VISIBLE);
+        }
+
         hidePopMenu();
     }
 
@@ -1066,24 +1076,46 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     @Override
     public void onBackPressed() {
-        if (core != null && core.hasChanges()) {
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == AlertDialog.BUTTON_POSITIVE)
-                        core.save();
-
-                    finish();
-                }
-            };
-            AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle("MuPDF");
-            alert.setMessage(getString(R.string.document_has_changes_save_them_));
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
-            alert.show();
-        } else {
+        if(mMode.equals("主控方")){
+            confirm();
+        }else {
             super.onBackPressed();
         }
+//        if (core != null && core.hasChanges()) {
+//            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    if (which == AlertDialog.BUTTON_POSITIVE)
+//                        core.save();
+//
+//                    finish();
+//                }
+//            };
+//            AlertDialog alert = mAlertBuilder.create();
+//            alert.setTitle("MuPDF");
+//            alert.setMessage(getString(R.string.document_has_changes_save_them_));
+//            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
+//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
+//            alert.show();
+//        } else {
+//            super.onBackPressed();
+//        }
+    }
+
+    //结束同屏-温馨提示
+    public void confirm(){
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == AlertDialog.BUTTON_POSITIVE){
+                    finish();
+                }
+            }
+        };
+        AlertDialog alert = mAlertBuilder.create();
+        alert.setTitle("温馨提示");
+        alert.setMessage("确认结束同屏？");
+        alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
+        alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
+        alert.show();
     }
 
     @Override
@@ -1168,6 +1200,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         showInfo(getString(R.string.draw_annotation));
     }
     /**
+     * 结束同屏
+     * **/
+    public void onSameScreenEndClick(View v){
+        confirm();
+    }
+
+    /**
      * 保存批注
      * **/
     public void onAnnotationSave(View v){
@@ -1208,7 +1247,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 返回上一页
      * **/
     public void onFinishActivity(View v){
-        finish();
+        if(mMode.equals("主控方")){
+            confirm();
+        }else {
+            finish();
+        }
     }
 
     /**
