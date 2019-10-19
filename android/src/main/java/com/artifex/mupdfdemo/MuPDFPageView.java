@@ -634,7 +634,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 		};
 
-		mAddInk.execute(getDraw(), getColor(), getInkThickness());
+		mAddInk.execute(arcs, getColor(), getInkThickness());
 
 		return true;
 	}

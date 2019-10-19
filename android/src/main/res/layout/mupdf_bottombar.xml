@@ -55,6 +55,7 @@
                     android:paddingBottom="5dp" />
             </FrameLayout>
             <FrameLayout
+                android:id="@+id/pizhubutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right">

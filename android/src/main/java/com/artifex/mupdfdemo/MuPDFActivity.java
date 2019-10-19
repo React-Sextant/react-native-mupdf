@@ -58,6 +58,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private RelativeLayout bookselectmenu;
     private RelativeLayout annotationselectmenu;
     private FrameLayout samescreenbutton;
+    private FrameLayout pizhubutton;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -740,7 +741,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         // Reenstate last state if it was recorded
         SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-        mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
+//        mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
 
         /**
          * 首次进入时的操作
@@ -1008,9 +1009,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         annotationselectmenu.setVisibility(View.INVISIBLE);
 
         samescreenbutton = (FrameLayout)mButtonsView.findViewById(R.id.samescreenbutton);//结束同屏按钮
+        pizhubutton = (FrameLayout)mButtonsView.findViewById(R.id.pizhubutton);//结束同屏按钮
 
         if(mMode.equals("主控方")){
             samescreenbutton.setVisibility(View.VISIBLE);
+        }else if(mMode.equals("被控方")){
+            pizhubutton.setVisibility(View.INVISIBLE);
         }
 
         hidePopMenu();
@@ -1083,7 +1087,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     @Override
     public void onBackPressed() {
-        if(mMode.equals("主控方")){
+        if(core != null && mMode.equals("主控方")){
             confirm();
         }else {
             super.onBackPressed();
