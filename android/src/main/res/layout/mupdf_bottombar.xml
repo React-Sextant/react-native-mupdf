@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true">
+        <TextView
+            android:id="@+id/pageNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/page_num"
+            android:textColor="#FFFFFF"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="invisible"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <!--        批注按钮-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right">
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    fab:fab_colorNormal="#EB554A"
+                    fab:fab_colorPressed="#E97E76"
+                    android:onClick="onPizhuClick"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="#ffffff"
+                    android:text="批注"
+                    android:textSize="16dp"
+                    android:paddingBottom="5dp" />
+            </FrameLayout>
+        </LinearLayout>
+
+
+
+        <ViewAnimator
+            android:id="@+id/idBottomBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onBubbling">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#EE000000"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="35dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="35dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:clickable="true"
+                        android:onClick="onSmartMoveBackwards"
+                        android:text="@string/prechapter"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="15dp" />
+
+                    <SeekBar
+                        android:id="@+id/pageSlider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="42dp"
+                        android:layout_marginRight="42dp"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progressDrawable="@drawable/seekbardragstyle"
+                        android:thumb="@mipmap/barbottommenu"
+                        android:thumbOffset="0dip" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
+                        android:onClick="onSmartMoveForwards"
+                        android:text="@string/nextchapter"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="15dp" />
+                </RelativeLayout>
+
+            </LinearLayout>
+        </ViewAnimator>
+    </LinearLayout>
+
+
+</RelativeLayout>

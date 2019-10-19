@@ -1,0 +1,11 @@
+# OSX
+#
+.DS_Store
+
+# Android/IntelliJ
+#
+.idea
+*.iml
+
+# build
+build/

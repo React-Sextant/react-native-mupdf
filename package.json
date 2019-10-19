@@ -1,0 +1,31 @@
+{
+  "name": "react-native-mupdf",
+  "version": "2.0.0",
+  "summary": "A react native PDF view component",
+  "description": "react-native-mupdf UI manager",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/React-Sextant/react-native-mupdf.git"
+  },
+  "keywords": [
+    "react",
+    "native",
+    "mupdf"
+  ],
+  "author": {
+    "name": "1uokun",
+    "url": "https://github.com/1uokun"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/React-Sextant/react-native-mupdf",
+  "bugs": {
+    "url": "https://github.com/React-Sextant/react-native-mupdf/issues"
+  },
+  "dependencies": {
+
+  },
+  "peerDependencies": {
+
+  }
+}

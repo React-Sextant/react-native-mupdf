@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/annotationConfirm"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:onClick="onBubbling"
+    android:layout_centerHorizontal="true">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#EE000000">
+
+        <TextView
+            android:id="@+id/pencildosavetip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/issignature"
+            android:textColor="#ffffffff"
+            android:textSize="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pencildosavetip"
+            android:gravity="bottom"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/pencildonestyle"
+                android:gravity="center"
+                android:text="@string/okay"
+                android:textColor="#ffffffff"
+                android:onClick="onAnnotationSave"
+                android:textSize="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/pencildonestyle"
+                android:gravity="center"
+                android:text="@string/cancel"
+                android:textColor="#ffffffff"
+                android:onClick="onAnnotationCancel"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</ViewAnimator>
