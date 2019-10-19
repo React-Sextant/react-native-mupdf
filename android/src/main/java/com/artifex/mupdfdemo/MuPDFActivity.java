@@ -53,6 +53,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private RelativeLayout bookselecttextdown;
     private RelativeLayout bookselectmenu;
     private RelativeLayout annotationselectmenu;
+    public static int current_page;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -321,10 +322,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 mPageSlider.setMax((core.countPages() - 1) * mPageSliderRes);
                 mPageSlider.setProgress(i * mPageSliderRes);
 
-                /**
-                 * @ReactMethod 发送页面改变事件
-                 * **/
-                RCTMuPdfModule.sendPageChangeEvent(i);
+                current_page = i;
 
                 super.onMoveToChild(i);
             }

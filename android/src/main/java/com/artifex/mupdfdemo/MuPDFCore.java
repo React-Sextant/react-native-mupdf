@@ -10,6 +10,8 @@ import android.graphics.RectF;
 import com.github.react.sextant.R;
 import com.github.react.sextant.RCTMuPdfModule;
 
+import static com.artifex.mupdfdemo.MuPDFActivity.current_page;
+
 public class MuPDFCore
 {
 	/* load our native library */
@@ -178,6 +180,8 @@ public class MuPDFCore
 		gotoPageInternal(page);
 		this.pageWidth = getPageWidth();
 		this.pageHeight = getPageHeight();
+
+		System.out.println("LUOKUN2 "+page);
 	}
 
 	public synchronized PointF getPageSize(int page) {
@@ -207,6 +211,7 @@ public class MuPDFCore
 		globals = 0;
 	}
 
+	private int send_once = -1;
 	public synchronized void drawPage(Bitmap bm, int page,
 			int pageW, int pageH,
 			int patchX, int patchY,
@@ -214,6 +219,15 @@ public class MuPDFCore
 			Cookie cookie) {
 		gotoPage(page);
 		drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+
+		/**
+		 * @ReactMethod 发送页面改变事件
+		 * **/
+		if(send_once != current_page){
+			send_once = current_page;
+			RCTMuPdfModule.sendPageChangeEvent(current_page);
+		}
+
 	}
 
 	public synchronized void updatePage(Bitmap bm, int page,
@@ -222,10 +236,6 @@ public class MuPDFCore
 			int patchW, int patchH,
 			Cookie cookie) {
 		updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
-
-		/**
-		 * @ReactMethod 发送页面改变事件
-		 * **/
 	}
 
 	public synchronized PassClickResult passClickEvent(int page, float x, float y) {
