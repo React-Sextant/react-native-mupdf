@@ -23,7 +23,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
     private final int REQUEST_ECODE_SCAN=20191017;
-    public static Promise mPromise;
+    private Promise mPromise;
     public static boolean error;    //打开文件是否报错
     private static ReactApplicationContext mContext;
 

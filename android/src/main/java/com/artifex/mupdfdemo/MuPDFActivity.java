@@ -760,6 +760,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         // Reenstate last state if it was recorded
         SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 //        mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
+        mDocView.setDisplayedViewIndex(mPage);
 
         /**
          * 首次进入时的操作
