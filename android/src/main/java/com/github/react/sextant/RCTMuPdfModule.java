@@ -19,6 +19,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
 
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
@@ -51,6 +52,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void open(ReadableMap map, Promise promise){
+        CURRENT_PAGE = -1;
         mPromise = promise;
         Activity currentActivity = getCurrentActivity();
 

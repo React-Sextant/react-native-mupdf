@@ -61,6 +61,16 @@ export default class extends React.Component {
 
     };
 
+    uploadAnnotation=()=>{
+        let annotations = this.state.annotations||{};
+        let annotations2 = this.state.annotations2||{};
+        for(let i in annotations2){
+            if(Array.isArray(annotations2[i])&&annotations2[i].length>0){
+                annotations[i] = annotations2[i]
+            }
+        }
+    };
+
 
     render(){
 
