@@ -17,7 +17,7 @@
 	<string name="copy_text_to_the_clipboard">将文本复制到剪贴板</string>
 	<string name="search_engine">https://www.baidu.com/s?wd=</string>
 	<string name="delete">删除</string>
-	<string name="dismiss">解除</string>
+	<string name="dismiss">确定</string>
 	<string name="document_has_changes_save_them_">文档已变更，保存变更吗？</string>
 	<string name="draw_annotation">作批注</string>
 	<string name="edit_annotations">编辑批注</string>
@@ -51,7 +51,7 @@
 	<string name="select">选择</string>
 	<string name="select_text">选择文本</string>
 	<string name="strike_out">删除线</string>
-	<string name="text_not_found">未发现文本</string>
+	<string name="text_not_found">暂无您搜索的文字</string>
 	<string name="toggle_links">高亮并启用墨迹</string>
 	<string name="underline">下划线</string>
 	<string name="yes">是</string>

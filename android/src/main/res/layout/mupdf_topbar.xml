@@ -21,12 +21,30 @@
             android:paddingRight="12dp"
             android:paddingTop="10dp" >
 
-            <ImageView
+<!--            <ImageView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentLeft="true"-->
+<!--                android:background="@mipmap/pageback"-->
+<!--                android:onClick="onFinishActivity"/>-->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:background="@mipmap/pageback"
-                android:onClick="onFinishActivity"/>
+                android:gravity="center_vertical"
+                android:paddingRight="10dp"
+                android:onClick="onFinishActivity">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:background="@mipmap/pageback"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14dp"
+                    android:text="返回"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/idFileName"
@@ -62,7 +80,7 @@
             android:contentDescription="@string/cancel"
             android:background="@drawable/button"
             android:onClick="OnCancelSearchButtonClick"
-            android:src="@drawable/ic_cancel" />
+            android:src="@mipmap/close" />
 
         <EditText
             android:id="@+id/searchText"
@@ -74,13 +92,24 @@
             android:hint="@string/search"
             android:singleLine="true" />
 
+        <TextView
+            android:id="@+id/searchSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="10dp"
+            android:textSize="18dp"
+            android:text="搜索"
+            android:onClick="onSearchSubmit" />
         <ImageButton
             android:id="@+id/searchBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/search_backwards"
             android:background="@drawable/button"
-            android:src="@drawable/ic_arrow_left" />
+            android:src="@mipmap/left"
+            android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/searchForward"
@@ -88,7 +117,8 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/search_forwards"
             android:background="@drawable/button"
-            android:src="@drawable/ic_arrow_right" />
+            android:src="@mipmap/right"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

@@ -83,6 +83,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private TopBarMode   mTopBarMode = TopBarMode.Main;
     private ImageButton  mSearchBack;
     private ImageButton  mSearchFwd;
+    private TextView     mSearchSubmit;
     private EditText     mSearchText;
     private SearchTask   mSearchTask;
     private AlertDialog.Builder mAlertBuilder;
@@ -690,17 +691,20 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 //            mAnnotButton.setVisibility(View.GONE);
         }
 
-        mSearchBack.setEnabled(false);
-        mSearchFwd.setEnabled(false);
-        mSearchBack.setColorFilter(Color.argb(255, 128, 128, 128));
-        mSearchFwd.setColorFilter(Color.argb(255, 128, 128, 128));
+//        mSearchBack.setEnabled(false);
+//        mSearchFwd.setEnabled(false);
+//        mSearchBack.setColorFilter(Color.argb(255, 128, 128, 128));
+//        mSearchFwd.setColorFilter(Color.argb(255, 128, 128, 128));
 
         mSearchText.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
                 boolean haveText = s.toString().length() > 0;
-                setButtonEnabled(mSearchBack, haveText);
-                setButtonEnabled(mSearchFwd, haveText);
+//                setButtonEnabled(mSearchBack, haveText);
+//                setButtonEnabled(mSearchFwd, haveText);
+                mSearchSubmit.setVisibility(View.VISIBLE);
+                mSearchBack.setVisibility(View.GONE);
+                mSearchFwd.setVisibility(View.GONE);
 
                 if (SearchTaskResult.get() != null && !mSearchText.getText().toString().equals(SearchTaskResult.get().txt)) {
                     SearchTaskResult.set(null);
@@ -907,7 +911,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 showKeyboard();
             }
             slideUpToVisible(mBottomBarSwitcher);
-            slideDownToVisible(mTopBarSwitcher);
+//            slideDownToVisible(mTopBarSwitcher);
             mPageNumberView.setVisibility(View.VISIBLE);
         }
     }
@@ -916,10 +920,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         if (mButtonsVisible) {
             mButtonsVisible = false;
             hideKeyboard();
-            slideUpToHide(mTopBarSwitcher);
+//            slideUpToHide(mTopBarSwitcher);
             slideDownToHide(mBottomBarSwitcher);
             mPageNumberView.setVisibility(View.INVISIBLE);
         }
+
+        searchModeOff();
     }
 
     private void showPopMenu(){
@@ -946,9 +952,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     }
 
     private void searchModeOff() {
-        if (mTopBarMode == TopBarMode.Search) {
+        if (mTopBarMode == TopBarMode.Search || mSearchBar.getVisibility()==View.VISIBLE) {
             mTopBarMode = TopBarMode.Main;
             hideKeyboard();
+            mSearchBack.setVisibility(View.GONE);
+            mSearchFwd.setVisibility(View.GONE);
+            mSearchSubmit.setVisibility(View.VISIBLE);
             SearchTaskResult.set(null);
             mDocView.resetupChildren();
             mSearchBar.setVisibility(View.GONE);
@@ -1014,6 +1023,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mSearchBack = (ImageButton)mButtonsView.findViewById(R.id.searchBack);
         mSearchFwd = (ImageButton)mButtonsView.findViewById(R.id.searchForward);
         mSearchText = (EditText)mButtonsView.findViewById(R.id.searchText);
+        mSearchSubmit = (TextView) mButtonsView.findViewById(R.id.searchSubmit);
         mAcceptSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.annotationConfirm);
         mInfoView.setVisibility(View.INVISIBLE);
         mAcceptSwitcher.setVisibility(View.INVISIBLE);
@@ -1268,6 +1278,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         finish();
     }
 
+    public void onSearchSubmit(View v){
+        mDocView.resetupChildren();
+        search(1);
+        mSearchBack.setVisibility(View.VISIBLE);
+        mSearchFwd.setVisibility(View.VISIBLE);
+        mSearchSubmit.setVisibility(View.GONE);
+    }
     /**
      * 打开搜索
      * **/
