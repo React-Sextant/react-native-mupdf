@@ -19,6 +19,7 @@ export function openMuPDF(_filePath,_fileName,_annotations){
                 filePath:_filePath,
                 fileName:_fileName,
             }).then(res=>{
+                Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
                 for(let i in annotations2){
                     if(Array.isArray(annotations2[i])&&annotations2[i].length>0){
@@ -28,6 +29,7 @@ export function openMuPDF(_filePath,_fileName,_annotations){
                 global.once = false;
                 resolve({...res,annotations:annotations})
             }).catch(err=>{
+                Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
                 global.once = false;
                 reject(err)
