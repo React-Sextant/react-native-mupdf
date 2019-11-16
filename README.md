@@ -21,7 +21,7 @@ async function open(){
         let index = cache_list.findIndex(pre=>{return Boolean(pre.fileId===fileId&&Boolean(!fileMD5||pre.fileMD5===fileMD5))});
         if(index>-1){
             Progress.setLoading(1);
-            openMuPDF(cache_list[index].filePath,title,JSON.parse(fileOtherRecordStr)).then(res=>{
+            openMuPDF(cache_list[index].filePath,title,JSON.parse(fileOtherRecordStr||"{}")).then(res=>{
                 updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
             }).catch(err=>{
                 deleteLocationFile(cache_list[index].filePath);
@@ -30,7 +30,7 @@ async function open(){
             })
         }else {
             downloadFileFetch({url:url},(path)=>{
-                openMuPDF(path,title,JSON.parse(fileOtherRecordStr)).then(res=>{
+                openMuPDF(path,title,JSON.parse(fileOtherRecordStr||"{}")).then(res=>{
                     updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
                     cache_list.push({
                         filePath:path,
@@ -41,6 +41,8 @@ async function open(){
                 }).catch(err=>{
                     deleteLocationFile(path)
                 })
+            },()=>{
+                Progress.setLoading(0);
             })
         }
     }catch (e) {

@@ -73,6 +73,11 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             intent.putExtra("page", map.getInt("page"));
         }
 
+        //模式："主控方"
+        if(map.hasKey("mode")){
+            intent.putExtra("mode", map.getString("mode"));
+        }
+
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
 
