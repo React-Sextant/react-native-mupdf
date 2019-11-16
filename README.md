@@ -1,5 +1,5 @@
 # react-native-mupdf
-mupdf-android-viewer in react native view manager
+Replace youkan pdf
 
 ### Manual configuration
 #### react-native/android/build.gradle
@@ -10,23 +10,44 @@ mupdf-android-viewer in react native view manager
 
 ## Usage
 ```jsx harmony
-import React from 'react'
-import {View,requireNativeComponent} from 'react-native'
+import {AsyncStorage} from 'react-native'
+import { downloadFileFetch, openMuPDF, deleteLocationFile } from 'react-native-mupdf'
+import Progress from 'react-sextant/lib/root-view/progress'
 
-const Mupdf = requireNativeComponent("RCTMuPdf")
-
-export default class extends React.Component {
-
-    render(){
-        return (
-            <View style={{flex:1}}>
-                <Mupdf
-                    style={{flex:1}}
-                    path={"/storage/emulated/0/Download/4.pdf"}
-                />
-            </View>
-        )
+async function open(){
+    try{
+        Progress.setLoading(0.01);
+        let cache_list = JSON.parse(await AsyncStorage.getItem('mupdf_file_data_path')||"[]");
+        let index = cache_list.findIndex(pre=>{return Boolean(pre.fileId===fileId&&Boolean(!fileMD5||pre.fileMD5===fileMD5))});
+        if(index>-1){
+            Progress.setLoading(1);
+            openMuPDF(cache_list[index].filePath,title,JSON.parse(fileOtherRecordStr)).then(res=>{
+                updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
+            }).catch(err=>{
+                deleteLocationFile(cache_list[index].filePath);
+                cache_list.splice(index,1);
+                AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list))
+            })
+        }else {
+            downloadFileFetch({url:url},(path)=>{
+                openMuPDF(path,title,JSON.parse(fileOtherRecordStr)).then(res=>{
+                    updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
+                    cache_list.push({
+                        filePath:path,
+                        fileId:fileId,
+                        fileMD5:fileMD5
+                    });
+                    AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list))
+                }).catch(err=>{
+                    deleteLocationFile(path)
+                })
+            })
+        }
+    }catch (e) {
+        Toast.fail("当前网络忙")
     }
 }
+
+function updateFileAnnotation(){}
 
 ```
