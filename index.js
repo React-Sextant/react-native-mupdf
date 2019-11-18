@@ -115,8 +115,10 @@ export function handleListenMuPDF(msg){
         }
     }else if(data.type === "update_page"){
         if(Array.isArray(annotations2[data.page])){
-            annotations2[data.page].forEach(a=>{
-                MuPDF.sendData(JSON.stringify(a))
+            annotations2[data.page].forEach((a,i)=>{
+                setTimeout(()=>{
+                    MuPDF.sendData(JSON.stringify(a))
+                },50*i)
             });
             annotations2[data.page] = [];
         }
