@@ -63,7 +63,7 @@ export function downloadFileFetch(params,callback,errorBack){
                 if (fileSize.size != totalSize || fileSize.size < 2000) {
                     Toast.offline('服务器繁忙，请重试！');
                     await deleteLocationFile(resp.path());
-                    errorBack()
+                    errorBack('文件错误')
                 }else {
                     callback(resp.path())
                 }
@@ -71,7 +71,7 @@ export function downloadFileFetch(params,callback,errorBack){
             .catch((err) => {
                 global.once = false;
                 DeviceEventEmitter.removeAllListeners('fetch_download');
-                errorBack()
+                errorBack(err)
             });
 
 
@@ -81,14 +81,14 @@ export function downloadFileFetch(params,callback,errorBack){
                 task.cancel(()=>{
                     global.once = false;
                     DeviceEventEmitter.removeAllListeners('fetch_download');
-                    errorBack()
+                    errorBack("主动结束下载")
                 })
             }
         });
     }catch (e) {
         global.once = false;
         DeviceEventEmitter.removeAllListeners('fetch_download');
-        errorBack()
+        errorBack(e)
     }
 }
 

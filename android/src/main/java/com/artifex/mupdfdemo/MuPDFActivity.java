@@ -70,6 +70,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private String       mFileName;
     private String       mFilePath;
     private int          mPage;
+    private String       mMode;
     private MuPDFReaderView mDocView;
     private View         mButtonsView;
     private boolean      mButtonsVisible;
@@ -239,6 +240,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             Intent intent = getIntent();
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
+            mMode = intent.getStringExtra("mode");
             mPage = intent.getIntExtra("page",0);
 
             core = openFile(mFilePath);
@@ -1039,6 +1041,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         pizhubutton = (FrameLayout)mButtonsView.findViewById(R.id.pizhubutton);//结束同屏按钮
 
         hidePopMenu();
+
+        if(mMode != null){
+            if(mMode.equals("主控方")){
+                samescreenbutton.setVisibility(View.VISIBLE);
+            }else if(mMode.equals("被控方")){
+                pizhubutton.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
 
@@ -1108,7 +1118,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     @Override
     public void onBackPressed() {
-        finish();
+        if(core != null && mMode != null && mMode.equals("主控方")){
+            confirm();
+        }else {
+            super.onBackPressed();
+        }
 //        if (core != null && core.hasChanges()) {
 //            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
 //                public void onClick(DialogInterface dialog, int which) {
@@ -1275,7 +1289,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 返回上一页
      * **/
     public void onFinishActivity(View v){
-        finish();
+        if(mMode !=null && mMode.equals("主控方")){
+            confirm();
+        }else {
+            finish();
+        }
     }
 
     public void onSearchSubmit(View v){
