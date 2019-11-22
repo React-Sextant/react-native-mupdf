@@ -383,7 +383,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             float _left;
             float _top;
             float free_text_font_size = 50;
-            float scaledSizeInPixels = this.getResources().getDisplayMetrics().scaledDensity;
             @Override
             protected void onFreetextAdd(float x, float y) {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -399,11 +398,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     if(!_text.equals("")){
                         if(mTempMap != null) {
                             mTempMap.put("text",_text);
-                            mTempMap.put("width",(float)mFreeTextView.getMeasuredWidth()*scaledSizeInPixels);
-                            mTempMap.put("height",(float)mFreeTextView.getMeasuredHeight()*scaledSizeInPixels);
+                            mTempMap.put("width",(float)mFreeTextView.getMeasuredWidth());
+                            mTempMap.put("height",(float)mFreeTextView.getMeasuredHeight());
                             pageView.addFreetextAnnotation(mTempMap);
                         }else {
-                            pageView.addFreetextAnnotation(_left,_top,(float)mFreeTextView.getMeasuredWidth()*scaledSizeInPixels,(float)mFreeTextView.getMeasuredHeight()*scaledSizeInPixels,mFreeTextView.getText().toString());
+                            pageView.addFreetextAnnotation(_left,_top,(float)mFreeTextView.getMeasuredWidth(),(float)mFreeTextView.getMeasuredHeight(),mFreeTextView.getText().toString());
                         }
                     }
 

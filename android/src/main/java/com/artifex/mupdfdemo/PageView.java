@@ -463,7 +463,7 @@ public abstract class PageView extends ViewGroup {
 
                                 textPaint.setTextSize((float)map.get("size") * scale);
                                 // 自动换行
-                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale),
+                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale * scaledSizeInPixels),
                                         Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
                                 canvas.save();
                                 canvas.translate((float)map.get("x") * scale, (float)map.get("y") * scale);
