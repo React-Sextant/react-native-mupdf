@@ -11,6 +11,8 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.HashMap;
+
 public class MuPDFReflowView extends WebView implements MuPDFView {
 	private final MuPDFCore mCore;
 	private final Handler mHandler;
@@ -163,6 +165,26 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 
 	public void releaseBitmaps() {
+	}
+
+	@Override
+	public void addFreetextAnnotation(float x, float y, float width, float height, String text) {
+
+	}
+
+	@Override
+	public void addFreetextAnnotation(HashMap map) {
+
+	}
+
+	@Override
+	public int getFreetextIndex() {
+		return 0;
+	}
+
+	@Override
+	public int getSelectedAnnotationIndex() {
+		return 0;
 	}
 
 	@Override

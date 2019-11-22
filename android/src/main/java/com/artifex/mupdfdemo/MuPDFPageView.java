@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.artifex.mupdfdemo.MuPDFCore.Cookie;
 
@@ -95,6 +96,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private RectF mWidgetAreas[];
 	private Annotation mAnnotations[];
 	private int mSelectedAnnotationIndex = -1;
+	private int mSelectedFreetextIndex = -1;
 	private AsyncTask<Void,Void,RectF[]> mLoadWidgetAreas;
 	private AsyncTask<Void,Void,Annotation[]> mLoadAnnotations;
 	private AlertDialog.Builder mTextEntryBuilder;
@@ -321,7 +323,29 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		final float docRelY = (y - getTop())/scale;
 		boolean hit = false;
 		int i;
+		int t;
 
+		//自定义文本批注
+		mSelectedFreetextIndex = -1;
+		for (t=0;t < CloudData.mFreetext.size(); t++) {
+			HashMap map = CloudData.mFreetext.get(t);
+			PointF p1 = new PointF((float)map.get("x"),(float)map.get("y"));
+			PointF p2 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y"));
+			PointF p3 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
+			PointF p4 = new PointF((float)map.get("x"),(float)map.get("y")+(float)map.get("height"));
+
+			PointF p = new PointF(docRelX, docRelY);
+
+			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
+				mSelectedFreetextIndex = t;
+				RectF rect = new RectF();
+				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
+				setItemSelectBox(rect);
+				return Hit.FreeText;
+			}
+		}
+
+		//原生批注
 		if (mAnnotations != null) {
 			for (i = 0; i < mAnnotations.length; i++)
 				if (mAnnotations[i].contains(docRelX, docRelY)) {
@@ -331,14 +355,14 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			if (hit) {
 				switch (mAnnotations[i].type) {
-				case HIGHLIGHT:
-				case UNDERLINE:
-				case SQUIGGLY:
-				case STRIKEOUT:
-				case INK:
-					mSelectedAnnotationIndex = i;
-					setItemSelectBox(mAnnotations[i]);
-					return Hit.Annotation;
+					case HIGHLIGHT:
+					case UNDERLINE:
+					case SQUIGGLY:
+					case STRIKEOUT:
+					case INK:
+						mSelectedAnnotationIndex = i;
+						setItemSelectBox(mAnnotations[i]);
+						return Hit.Annotation;
 				}
 			}
 		}
@@ -382,15 +406,15 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 						@Override
 						public void visitSignature(PassClickResultSignature result) {
 							switch (result.state) {
-							case NoSupport:
-								warnNoSignatureSupport();
-								break;
-							case Unsigned:
-								invokeSigningDialog();
-								break;
-							case Signed:
-								invokeSignatureCheckingDialog();
-								break;
+								case NoSupport:
+									warnNoSignatureSupport();
+									break;
+								case Unsigned:
+									invokeSigningDialog();
+									break;
+								case Signed:
+									invokeSignatureCheckingDialog();
+									break;
 							}
 						}
 					});
@@ -402,6 +426,26 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		}
 
 		return Hit.Nothing;
+	}
+
+	public int getFreetextIndex(){
+		return mSelectedFreetextIndex;
+	}
+	public int getSelectedAnnotationIndex(){
+		return mSelectedAnnotationIndex;
+	}
+
+	/**
+	 * 判断点是否在一个矩形内
+	 * **/
+	boolean IsPointInMatrix(PointF p1,PointF p2,PointF p3,PointF p4,PointF p){
+		return GetCross(p1, p2, p) * GetCross(p3, p4, p) >= 0 && GetCross(p2, p3, p) * GetCross(p4, p1, p) >= 0;
+	}
+	/**
+	 * IsPointInMatrix辅助函数
+	 * **/
+	float GetCross(PointF p1,PointF p2, PointF p){
+		return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y);
 	}
 
 	@TargetApi(11)
@@ -526,7 +570,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	}
 
 	public void deleteSelectedAnnotation() {
-		if (mSelectedAnnotationIndex != -1) {
+		if(mSelectedFreetextIndex != -1){
+			CloudData.mFreetext.remove(mSelectedFreetextIndex);
+			mSelectedFreetextIndex = -1;
+			setItemSelectBox(null);
+
+		}else if (mSelectedAnnotationIndex != -1) {
 			if (mDeleteAnnotation != null)
 				mDeleteAnnotation.cancel(true);
 
@@ -774,5 +823,10 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		}
 
 		super.releaseResources();
+	}
+
+	@Override
+	public float getScale() {
+		return 0;
 	}
 }

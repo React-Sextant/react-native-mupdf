@@ -29,6 +29,7 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -44,6 +45,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
+
+import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
 
@@ -75,6 +78,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private View         mButtonsView;
     private boolean      mButtonsVisible;
     private EditText     mPasswordView;
+    private EditText     mFreeTextView;
+    private HashMap      mTempMap;   //编辑文本的缓存字典
     private TextView     mFilenameView;
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
@@ -367,28 +372,58 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
              * **/
             @Override
             protected void onHit(Hit item) {
+                if (mTopBarMode != TopBarMode.Main) {
+                    mTopBarMode = TopBarMode.Main;
+                }
+            }
 
-//                switch (mTopBarMode) {
-//                    case Annot:
-//                        if (item == Hit.Annotation) {
-//                            showButtons();
-//                            mTopBarMode = TopBarMode.Delete;
-//
-//                        }
-//                        break;
-//                    case Delete:
-//                        mTopBarMode = TopBarMode.Annot;
-//
-//                        // fall through
-//                    default:
-//                        // Not in annotation editing mode, but the pageview will
-//                        // still select and highlight hit annotations, so
-//                        // deselect just in case.
-//                        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-//                        if (pageView != null)
-//                            pageView.deselectAnnotation();
-//                        break;
-//                }
+            /**
+             * 监听添加文本批注事件
+             * **/
+            float _left;
+            float _top;
+            float free_text_font_size = 50;
+            float scaledSizeInPixels = this.getResources().getDisplayMetrics().scaledDensity;
+            @Override
+            protected void onFreetextAdd(float x, float y) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                //再次点击画布时取消编辑并保存已键入的值
+                if(mFreeTextView.getVisibility() == View.VISIBLE){
+                    mDocView.setMode(Mode.Viewing);
+                    mFreeTextView.setVisibility(View.INVISIBLE);
+                    annotationselectmenu.setVisibility(View.INVISIBLE);
+
+                    String _text = mFreeTextView.getText().toString().replace("\n", "");
+                    MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+
+                    if(!_text.equals("")){
+                        if(mTempMap != null) {
+                            mTempMap.put("text",_text);
+                            mTempMap.put("width",(float)mFreeTextView.getMeasuredWidth()*scaledSizeInPixels);
+                            mTempMap.put("height",(float)mFreeTextView.getMeasuredHeight()*scaledSizeInPixels);
+                            pageView.addFreetextAnnotation(mTempMap);
+                        }else {
+                            pageView.addFreetextAnnotation(_left,_top,(float)mFreeTextView.getMeasuredWidth()*scaledSizeInPixels,(float)mFreeTextView.getMeasuredHeight()*scaledSizeInPixels,mFreeTextView.getText().toString());
+                        }
+                    }
+
+                    mFreeTextView.setText("");
+                    mTempMap = null;
+
+                    if (imm != null)
+                        imm.hideSoftInputFromWindow(mFreeTextView.getWindowToken(), 0);
+                }else {
+                    RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
+                    lp.setMargins((int)x, (int)y,0,0);
+                    mFreeTextView.setLayoutParams(lp);
+                    mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,free_text_font_size);
+                    mFreeTextView.setVisibility(View.VISIBLE);
+                    _left = x;
+                    _top = y;
+
+                    if (imm != null)
+                        imm.showSoftInput(mFreeTextView, 0);
+                }
             }
         };
         mDocView.setAdapter(new MuPDFPageAdapter(this, this, core));
@@ -1015,6 +1050,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     private void makeButtonsView() {
         mButtonsView = getLayoutInflater().inflate(R.layout.mupdf_main,null);
+        mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);//文本批注input
         mBottomBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.idBottomBar);
         mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
@@ -1241,6 +1277,17 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mDocView.setMode(MuPDFReaderView.Mode.Drawing);
         showInfo(getString(R.string.draw_annotation));
     }
+
+    /**
+     * 文本批注
+     * **/
+    public void onFreetextClick(View v){
+        hideButtons();
+        mTopBarMode = TopBarMode.Accept;
+        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
+        showInfo(getString(R.string.draw_freetext));
+    }
+
     /**
      * 结束同屏
      * **/

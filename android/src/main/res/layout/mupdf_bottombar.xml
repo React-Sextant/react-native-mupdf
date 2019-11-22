@@ -77,15 +77,13 @@
         </LinearLayout>
 
 
-
         <ViewAnimator
             android:id="@+id/idBottomBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onBubbling">
-
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#EE000000"
                 android:orientation="vertical">
@@ -93,7 +91,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="35dp"
+                    android:layout_marginBottom="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_marginTop="35dp"
@@ -131,9 +129,49 @@
                         android:textSize="15dp" />
                 </RelativeLayout>
 
-            </LinearLayout>
-        </ViewAnimator>
-    </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    >
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:background="@drawable/button"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="18dp"
+                            android:onClick="onPizhuClick"
+                            android:src="@mipmap/pencil" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:background="@drawable/button"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="18dp"
+                            android:onClick="onFreetextClick"
+                            android:src="@mipmap/writetext"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ViewAnimator>
+
+    </LinearLayout>
 
 </RelativeLayout>

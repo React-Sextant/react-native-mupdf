@@ -13,6 +13,9 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,9 +27,12 @@ import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import com.github.react.sextant.R;
+
+import static android.util.TypedValue.complexToDimensionPixelSize;
 
 // Make our ImageViews opaque to optimize redraw
 class OpaqueImageView extends ImageView {
@@ -100,6 +106,7 @@ public abstract class PageView extends ViewGroup {
     private static final int LINK_COLOR = 0x80ff5722;// 超链接颜色
     private static final int BOX_COLOR = 0xFF696969;// 选中时边框的颜色
     private static final int INK_COLOR = 0xFFF00000;// 绘制时画笔颜色
+    private static final int FREETEXT_COLOR = 0xFFFF0000;// 文本批注字体颜色
     private static final float INK_THICKNESS = 8.0f;// 绘制时画笔宽
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
     private static final int PROGRESS_DIALOG_DELAY = 200;
@@ -136,6 +143,7 @@ public abstract class PageView extends ViewGroup {
     private RectF mItemSelectBox;
     protected ArrayList<ArrayList<PointF>> mDrawing;
     private View mSearchView;
+    private View mCustomerView;
     private boolean mIsBlank;
     private boolean mHighlightLinks;
 
@@ -432,6 +440,42 @@ public abstract class PageView extends ViewGroup {
 
             addView(mSearchView);
         }
+        if(mCustomerView == null){
+            mCustomerView = new View(mContext) {
+                /**
+                 * 监听custom_view层【文本、其他】填充动作
+                 * **/
+                @Override
+                protected void onDraw(final Canvas canvas) {
+                    super.onDraw(canvas);
+                    // Work out current total scale factor
+                    // from source to view
+                    final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+                    float scaledSizeInPixels = this.getResources().getDisplayMetrics().scaledDensity;
+                    TextPaint textPaint = new TextPaint();
+                    textPaint.setAntiAlias(true);
+
+                    if (CloudData.mFreetext.size()>0) {
+                        textPaint.setColor(FREETEXT_COLOR);
+                        for (int i = 0; i < CloudData.mFreetext.size(); i++) {
+                            HashMap map = CloudData.mFreetext.get(i);
+                            if((int)map.get("page") == getPage()){
+
+                                textPaint.setTextSize((float)map.get("size") * scale);
+                                // 自动换行
+                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale),
+                                        Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                                canvas.save();
+                                canvas.translate((float)map.get("x") * scale, (float)map.get("y") * scale);
+                                layout.draw(canvas);
+                                canvas.restore();
+                            }
+                        }
+                    }
+                }
+            };
+            addView(mCustomerView);
+        }
         requestLayout();
     }
 
@@ -605,11 +649,42 @@ public abstract class PageView extends ViewGroup {
         if (eventCallback != null) {
             float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
             eventCallback.singleTapOnHit(rect,scale);
+            deselectText();
         }
 
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();
+
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
+    }
+
+    public void addFreetextAnnotation(float x, float y, float width, float height, String text){
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+        HashMap map = new HashMap();
+        map.put("type","textbox");
+        map.put("x",docRelX);
+        map.put("y",docRelY);
+        map.put("width",width);
+        map.put("height",height);
+        map.put("text",text);
+        map.put("size",50 / scale);
+        map.put("page",getPage());
+        map.put("scale",scale);
+        CloudData.mFreetext.add(map);
+
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
+    }
+
+    public void addFreetextAnnotation(HashMap map){
+        CloudData.mFreetext.add(map);
+
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
     }
 
 
@@ -691,8 +766,17 @@ public abstract class PageView extends ViewGroup {
             mEntire.layout(0, 0, w, h);
         }
 
+        /**
+         * 初始化时 mSearchView占满全屏
+         * 1。用于批注被选中时显示box
+         * 2。用于画批注保存前的预览图
+         * 3。feature 添加自定义文本的话得又加一层画布了或者 svg也不错
+         * **/
         if (mSearchView != null) {
             mSearchView.layout(0, 0, w, h);
+        }
+        if(mCustomerView != null) {
+            mCustomerView.layout(0, 0, w, h);
         }
 
         if (mPatchViewSize != null) {

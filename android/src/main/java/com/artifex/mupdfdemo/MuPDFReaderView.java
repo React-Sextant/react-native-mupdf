@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class MuPDFReaderView extends ReaderView {
-	enum Mode {Viewing, Selecting, Drawing}
+	enum Mode {Viewing, Selecting, Drawing, Freetexting}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
@@ -24,7 +24,8 @@ public class MuPDFReaderView extends ReaderView {
 
 	protected void onTapMainDocArea() {}
 	protected void onDocMotion() {}
-	protected void onHit(Hit item) {};
+	protected void onHit(Hit item) {}
+	protected void onFreetextAdd(float x, float y) {}
 
 	public void setLinksEnabled(boolean b) {
 		mLinksEnabled = b;
@@ -69,9 +70,8 @@ public class MuPDFReaderView extends ReaderView {
 
 	public boolean onSingleTapUp(MotionEvent e) {
 		LinkInfo link = null;
-
+		MuPDFView pageView = (MuPDFView) getDisplayedView();
 		if (mMode == Mode.Viewing && !tapDisabled) {
-			MuPDFView pageView = (MuPDFView) getDisplayedView();
 			Hit item = pageView.passClickEvent(e.getX(), e.getY());
 			onHit(item);
 			if (item == Hit.Nothing) {
@@ -108,6 +108,12 @@ public class MuPDFReaderView extends ReaderView {
 					onTapMainDocArea();
 				}
 			}
+		}else if (mMode == Mode.Freetexting) {
+			onFreetextAdd(e.getX(), e.getY());
+		}else if (mMode == Mode.Selecting) {
+			mMode = Mode.Viewing;
+			Hit item = pageView.passClickEvent(e.getX(), e.getY());
+			onHit(item);
 		}
 		return super.onSingleTapUp(e);
 	}
@@ -152,7 +158,12 @@ public class MuPDFReaderView extends ReaderView {
 		// Not sure why this is needed, but without it
 		// pinch zoom can make the buttons appear
 		tapDisabled = true;
-		return super.onScaleBegin(d);
+		switch (mMode) {
+			case Freetexting:
+				return false;
+			default:
+				return super.onScaleBegin(d);
+		}
 	}
 
 	public void onLongPress(MotionEvent event) {
@@ -205,35 +216,35 @@ public class MuPDFReaderView extends ReaderView {
 	private static final float TOUCH_TOLERANCE = 2;
 
 	private void touch_start(float x, float y) {
-
-		MuPDFView pageView = (MuPDFView)getDisplayedView();
-		if (pageView != null)
-		{
-			pageView.startDraw(x, y);
-		}
-		mX = x;
-		mY = y;
-	}
-
-	private void touch_move(float x, float y) {
-
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
-		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
-		{
-			MuPDFView pageView = (MuPDFView)getDisplayedView();
-			if (pageView != null)
-			{
-				pageView.continueDraw(x, y);
+		if ( mMode == Mode.Drawing ) {
+			MuPDFView pageView = (MuPDFView) getDisplayedView();
+			if (pageView != null) {
+				pageView.startDraw(x, y);
 			}
 			mX = x;
 			mY = y;
 		}
 	}
 
+	private void touch_move(float x, float y) {
+		if ( mMode == Mode.Drawing ) {
+			float dx = Math.abs(x - mX);
+			float dy = Math.abs(y - mY);
+			if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
+			{
+				MuPDFView pageView = (MuPDFView)getDisplayedView();
+				if (pageView != null)
+				{
+					pageView.continueDraw(x, y);
+				}
+				mX = x;
+				mY = y;
+			}
+		}
+	}
+
 	private void touch_up() {
 
-		// NOOP
 	}
 
 	protected void onChildSetup(int i, View v) {
