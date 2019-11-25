@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.graphics.RectF;
 import android.os.Handler;
 
-import com.github.react.sextant.R;
+import com.github.ReactSextant.mupdf.R;
 
 class ProgressDialogX extends ProgressDialog {
 	public ProgressDialogX(Context context) {

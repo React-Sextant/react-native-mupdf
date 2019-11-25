@@ -7,7 +7,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.PointF;
 import android.graphics.RectF;
 
-import com.github.react.sextant.R;
+import com.github.ReactSextant.mupdf.R;
 
 public class MuPDFCore
 {

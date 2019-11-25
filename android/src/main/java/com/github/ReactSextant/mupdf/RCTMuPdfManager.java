@@ -1,4 +1,4 @@
-package com.github.react.sextant;
+package com.github.ReactSextant.mupdf;
 
 import android.content.Context;
 import android.view.View;

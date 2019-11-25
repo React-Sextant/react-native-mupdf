@@ -6,7 +6,7 @@ import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.view.View;
 
-import com.github.react.sextant.R;
+import com.github.ReactSextant.mupdf.R;
 
 public class SafeAnimatorInflater
 {

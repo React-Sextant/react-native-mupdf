@@ -26,7 +26,7 @@ import com.artifex.utils.PdfBitmap;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.github.react.sextant.R;
+import com.github.ReactSextant.mupdf.R;
 
 // Make our ImageViews opaque to optimize redraw
 class OpaqueImageView extends ImageView {
