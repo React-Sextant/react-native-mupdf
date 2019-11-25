@@ -37,6 +37,5 @@ public class RCTMuPdfManager extends SimpleViewManager<MuPdfView> {
     @Override
     public void onAfterUpdateTransaction(MuPdfView mupdfView) {
         super.onAfterUpdateTransaction(mupdfView);
-        mupdfView.drawPdf();
     }
 }

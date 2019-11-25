@@ -1,53 +1,60 @@
 package com.github.ReactSextant.mupdf;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 
-import com.artifex.mupdfdemo.FilePicker;
 import com.artifex.mupdfdemo.MuPDFCore;
-import com.artifex.mupdfdemo.MuPDFPageAdapter;
-import com.artifex.mupdfdemo.MuPDFReaderView;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.uimanager.ThemedReactContext;
 
 
-public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSupport{
-    private Context mContext;
+public class MuPdfView extends View{
 
-    private final int    OUTLINE_REQUEST=0;
-    private final int    PRINT_REQUEST=1;
-    private final int    FILEPICK_REQUEST=2;
+    private final String APP = "MuPDFView";
 
-    private MuPDFCore muPDFCore;
-    private MuPDFReaderView muPDFReaderView;
-
-    private FilePicker mFilePicker;
-
+    private Context     mContext;
+    private MuPDFCore   muPDFCore;
     private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t2.pdf"; // 文件路径
 
     public MuPdfView(final Context ctx, AttributeSet atts) {
         super(ctx, atts);
         mContext = ctx;
-//        drawPdf();
     }
 
-    public void drawPdf() {
-        muPDFCore = openFile(filePath);
+    @Override
+    protected void onDraw(final Canvas canvas) {
+        super.onDraw(canvas);
+
+        openFile(filePath);
 
         if (muPDFCore == null) {
-            System.out.println("打开失败");
+            Log.e(APP, "muPDFCore null");
             return;
         }
 
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.youkan_view, this);
-        muPDFReaderView = view.findViewById(R.id.mu_pdf_mupdfreaderview);
-        muPDFReaderView.setAdapter(new MuPDFPageAdapter(mContext, this,muPDFCore));
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void, PointF> sizingTask = new AsyncTask<Void,Void,PointF>() {
+
+            @Override
+            protected PointF doInBackground(Void... voids) {
+                return muPDFCore.getPageSize(0);
+            }
+
+            @Override
+            protected void onPostExecute(PointF result) {
+                super.onPostExecute(result);
+                Log.e(APP, "getPageSize: "+result);
+            }
+        };
+
+        sizingTask.execute((Void)null);
     }
+
 
 
     /**
@@ -67,6 +74,4 @@ public class MuPdfView extends RelativeLayout implements FilePicker.FilePickerSu
         return muPDFCore;
     }
 
-    @Override
-    public void performPickFor(FilePicker picker) {}
 }
