@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.PointF;
 
 import com.artifex.mupdfdemo.Annotation;
+import com.artifex.mupdfdemo.CloudData;
 import com.artifex.mupdfdemo.MuPDFActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -18,6 +19,11 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
 
@@ -44,6 +50,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                     mPromise.reject("文件打开失败");
                 }else {
                     WritableMap map = Arguments.createMap();
+                    map.putString("cloudData",sendCloudDataString());
                     mPromise.resolve(map);
                 }
             }
@@ -76,6 +83,11 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         //模式："主控方"
         if(map.hasKey("mode")){
             intent.putExtra("mode", map.getString("mode"));
+        }
+
+        //cloudData
+        if(map.hasKey("cloudData")){
+            parseCloudDataString(map.getString("cloudData"));
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
@@ -180,6 +192,58 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                                 "\"annot_index\":"+annot_index +
                                 "}"
                 );
+    }
+
+    /**
+     * 关闭页面时将CloudData数据传给promise
+     *
+     * int page, float size, float x, float y, float width, float height, String text
+     * **/
+    public String sendCloudDataString(){
+        try {
+            String cloudData = "";
+            if (CloudData.mFreetext.size()>0) {
+                for (int i = 0; i < CloudData.mFreetext.size(); i++) {
+                    HashMap map = CloudData.mFreetext.get(i);
+                    if(cloudData.equals("")){
+                        cloudData+= "{\"page\":"+map.get("page")+",\"size\":"+map.get("size")+",\"x\":"+map.get("x")+",\"y\":"+map.get("y")+",\"width\":"+map.get("width")+",\"height\":"+map.get("height")+",\"text\":\""+map.get("text")+"\"}";
+                    }else {
+                        cloudData+=",{\"page\":"+map.get("page")+",\"size\":"+map.get("size")+",\"x\":"+map.get("x")+",\"y\":"+map.get("y")+",\"width\":"+map.get("width")+",\"height\":"+map.get("height")+",\"text\":\""+map.get("text")+"\"}";
+                    }
+                }
+                CloudData.mFreetext.clear();
+                return "["+cloudData+"]";
+            }else {
+                return null;
+            }
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    /**
+     * 解析CloudData数据
+     *
+     * int page, float size, float x, float y, float width, float height, String text
+     * **/
+    public void parseCloudDataString(String str){
+        try{
+            JsonParser jsonParser = new JsonParser();
+            JsonArray jsonArray = (JsonArray) jsonParser.parse(str);
+            for(int i = 0;i< jsonArray.size(); i++){
+                HashMap map = new HashMap();
+                map.put("page",jsonArray.get(i).getAsJsonObject().get("page").getAsInt());
+                map.put("size",jsonArray.get(i).getAsJsonObject().get("size").getAsFloat());
+                map.put("x",jsonArray.get(i).getAsJsonObject().get("x").getAsFloat());
+                map.put("y",jsonArray.get(i).getAsJsonObject().get("y").getAsFloat());
+                map.put("width",jsonArray.get(i).getAsJsonObject().get("width").getAsFloat());
+                map.put("height",jsonArray.get(i).getAsJsonObject().get("height").getAsFloat());
+                map.put("text",jsonArray.get(i).getAsJsonObject().get("text").getAsString());
+                CloudData.mFreetext.add(map);
+            }
+        }catch (Exception e){
+
+        }
     }
 
     /**

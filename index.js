@@ -13,12 +13,13 @@ export function openMuPDF(_filePath,_fileName,_annotations){
     }else {
         global.once = true;
         global.annotations = {};    //当前pdf产生的临时数据
-        global.annotations2 = _annotations;   //服务器拉取的数据
+        global.annotations2 = _annotations.annotations ? _annotations.annotations : _annotations;   //服务器拉取的数据
         DeviceEventEmitter.addListener('MUPDF_Event_Manager',handleListenMuPDF,this);
         return new Promise((resolve,reject) => {
             MuPDF.open({
                 filePath:_filePath,
                 fileName:_fileName,
+                cloudData:_annotations.cloudData
             }).then(res=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);

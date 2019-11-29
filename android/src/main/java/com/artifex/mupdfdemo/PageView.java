@@ -455,23 +455,28 @@ public abstract class PageView extends ViewGroup {
                     TextPaint textPaint = new TextPaint();
                     textPaint.setAntiAlias(true);
 
-                    if (CloudData.mFreetext.size()>0) {
-                        textPaint.setColor(FREETEXT_COLOR);
-                        for (int i = 0; i < CloudData.mFreetext.size(); i++) {
-                            HashMap map = CloudData.mFreetext.get(i);
-                            if((int)map.get("page") == getPage()){
+                    try{
+                        if (CloudData.mFreetext.size()>0) {
+                            textPaint.setColor(FREETEXT_COLOR);
+                            for (int i = 0; i < CloudData.mFreetext.size(); i++) {
+                                HashMap map = CloudData.mFreetext.get(i);
+                                if((int)map.get("page") == getPage()){
 
-                                textPaint.setTextSize((float)map.get("size") * scale);
-                                // 自动换行
-                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale * scaledSizeInPixels),
-                                        Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
-                                canvas.save();
-                                canvas.translate((float)map.get("x") * scale, (float)map.get("y") * scale);
-                                layout.draw(canvas);
-                                canvas.restore();
+                                    textPaint.setTextSize((float)map.get("size") * scale);
+                                    // 自动换行
+                                    StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale * scaledSizeInPixels),
+                                            Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                                    canvas.save();
+                                    canvas.translate((float)map.get("x") * scale, (float)map.get("y") * scale);
+                                    layout.draw(canvas);
+                                    canvas.restore();
+                                }
                             }
                         }
+                    }catch (RuntimeException e){
+
                     }
+
                 }
             };
             addView(mCustomerView);
