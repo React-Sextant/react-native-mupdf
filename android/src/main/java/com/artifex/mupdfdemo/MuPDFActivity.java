@@ -101,6 +101,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private AlertDialog mAlertDialog;
     private FilePicker mFilePicker;
 
+    private CloudData mCloudData;
+
     public void createAlertWaiter() {
         mAlertsActive = true;
         if (mAlertTask != null) {
@@ -521,6 +523,18 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                         case "delete_annotation":
                             if (pageView != null){
                                 pageView.deleteSelectedAnnotation(jsonObject.get("page").getAsInt(),jsonObject.get("annot_index").getAsInt());
+                            }
+                            break;
+                        /**
+                         * 更新cloudData
+                         *
+                         * @key type: "update_cloud_data"
+                         * @key data: map
+                         * **/
+                        case "update_cloud_data":
+                            if (pageView != null && pageView.getCustomerView() != null){
+                                mCloudData = new CloudData(RCTMuPdfModule.parseCloudData(jsonObject.get("data").getAsString()));
+                                pageView.getCustomerView().invalidate();
                             }
                             break;
                         /**

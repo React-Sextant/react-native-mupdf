@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 /* This enum should be kept in line with the cooresponding C enum in mupdf.c */
 enum SignatureState {
@@ -327,8 +328,8 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 		//自定义文本批注
 		mSelectedFreetextIndex = -1;
-		for (t=0;t < CloudData.mFreetext.size(); t++) {
-			HashMap map = CloudData.mFreetext.get(t);
+		for (t=0; t < mCloudData.getmFreetext().size(); t++) {
+			HashMap map = mCloudData.getmFreetext().get(t);
 			PointF p1 = new PointF((float)map.get("x"),(float)map.get("y"));
 			PointF p2 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y"));
 			PointF p3 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
@@ -571,7 +572,8 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	public void deleteSelectedAnnotation() {
 		if(mSelectedFreetextIndex != -1){
-			CloudData.mFreetext.remove(mSelectedFreetextIndex);
+			mCloudData.getmFreetext().remove(mSelectedFreetextIndex);
+
 			mSelectedFreetextIndex = -1;
 			setItemSelectBox(null);
 

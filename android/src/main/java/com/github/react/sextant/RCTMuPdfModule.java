@@ -23,6 +23,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
@@ -33,6 +34,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private Promise mPromise;
     public static boolean error;    //打开文件是否报错
     private static ReactApplicationContext mContext;
+    private CloudData mCloudData = CloudData.get(getReactApplicationContext());
 
     public RCTMuPdfModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -50,7 +52,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                     mPromise.reject("文件打开失败");
                 }else {
                     WritableMap map = Arguments.createMap();
-                    map.putString("cloudData",sendCloudDataString());
+                    map.putString("cloudData",stringCloudData(mCloudData));
                     mPromise.resolve(map);
                 }
             }
@@ -87,7 +89,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
         //cloudData
         if(map.hasKey("cloudData")){
-            parseCloudDataString(map.getString("cloudData"));
+            mCloudData = new CloudData(parseCloudData(map.getString("cloudData")));
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
@@ -195,23 +197,37 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * 更新CloudData
+     * **/
+    public static void updateCloudData(int page, CloudData data){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"update_cloud_data\", " +
+                                "\"page\":"+page + "," +
+                                "\"data\":"+stringCloudData(data) +
+                                "}"
+                );
+    }
+
+    /**
      * 关闭页面时将CloudData数据传给promise
      *
      * int page, float size, float x, float y, float width, float height, String text
      * **/
-    public String sendCloudDataString(){
+    public static String stringCloudData(CloudData data){
         try {
             String cloudData = "";
-            if (CloudData.mFreetext.size()>0) {
-                for (int i = 0; i < CloudData.mFreetext.size(); i++) {
-                    HashMap map = CloudData.mFreetext.get(i);
+            if (data.getmFreetext().size()>0) {
+                for (int i = 0; i < data.getmFreetext().size(); i++) {
+                    HashMap map = data.getmFreetext().get(i);
                     if(cloudData.equals("")){
                         cloudData+= "{\"page\":"+map.get("page")+",\"size\":"+map.get("size")+",\"x\":"+map.get("x")+",\"y\":"+map.get("y")+",\"width\":"+map.get("width")+",\"height\":"+map.get("height")+",\"text\":\""+map.get("text")+"\"}";
                     }else {
                         cloudData+=",{\"page\":"+map.get("page")+",\"size\":"+map.get("size")+",\"x\":"+map.get("x")+",\"y\":"+map.get("y")+",\"width\":"+map.get("width")+",\"height\":"+map.get("height")+",\"text\":\""+map.get("text")+"\"}";
                     }
                 }
-                CloudData.mFreetext.clear();
+                data.getmFreetext().clear();
                 return "["+cloudData+"]";
             }else {
                 return null;
@@ -226,7 +242,8 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
      *
      * int page, float size, float x, float y, float width, float height, String text
      * **/
-    public void parseCloudDataString(String str){
+    public static ArrayList<HashMap> parseCloudData(String str){
+        ArrayList<HashMap> cloudData = null;
         try{
             JsonParser jsonParser = new JsonParser();
             JsonArray jsonArray = (JsonArray) jsonParser.parse(str);
@@ -239,10 +256,11 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                 map.put("width",jsonArray.get(i).getAsJsonObject().get("width").getAsFloat());
                 map.put("height",jsonArray.get(i).getAsJsonObject().get("height").getAsFloat());
                 map.put("text",jsonArray.get(i).getAsJsonObject().get("text").getAsString());
-                CloudData.mFreetext.add(map);
+                cloudData.add(map);
             }
+            return cloudData;
         }catch (Exception e){
-
+            return cloudData;
         }
     }
 

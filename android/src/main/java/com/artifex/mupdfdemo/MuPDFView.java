@@ -2,12 +2,14 @@ package com.artifex.mupdfdemo;
 
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.view.View;
 
 import java.util.HashMap;
 
 enum Hit {Nothing, Widget, Annotation, FreeText};
 
 public interface MuPDFView {
+	public View getCustomerView();
 	public void setPage(int page, PointF size);
 	public void setScale(float scale);
 	public int getPage();

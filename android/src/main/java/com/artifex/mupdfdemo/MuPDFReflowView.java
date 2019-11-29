@@ -54,6 +54,11 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 		loadUrl("javascript:elem=document.getElementById('content');window.HTMLOUT.reportContentHeight("+mParentSize.x+"*elem.offsetHeight/elem.offsetWidth)");
 	}
 
+	@Override
+	public View getCustomerView() {
+		return null;
+	}
+
 	public void setPage(int page, PointF size) {
 		mPage = page;
 		if (mLoadHTML != null) {

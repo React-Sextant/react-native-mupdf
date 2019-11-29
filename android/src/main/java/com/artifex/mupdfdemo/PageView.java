@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 import static android.util.TypedValue.complexToDimensionPixelSize;
 
@@ -143,7 +144,7 @@ public abstract class PageView extends ViewGroup {
     private RectF mItemSelectBox;
     protected ArrayList<ArrayList<PointF>> mDrawing;
     private View mSearchView;
-    private View mCustomerView;
+    public View mCustomerView;
     private boolean mIsBlank;
     private boolean mHighlightLinks;
 
@@ -162,6 +163,7 @@ public abstract class PageView extends ViewGroup {
     private PdfBitmap picturePdfBitmap; // *BACKWARD COMPATIBILITY*
 
     private MuPDFCore core;
+    public CloudData mCloudData;
 
     public PageView(Context c, Point parentSize, MuPDFPageAdapter adapter) {
         super(c);
@@ -171,6 +173,7 @@ public abstract class PageView extends ViewGroup {
         setBackgroundColor(BACKGROUND_COLOR);
         mEntireMat = new Matrix();
         mAdapter = adapter;
+        mCloudData = CloudData.get(c);
     }
 
     protected abstract CancellableTaskDefinition<Void, Void> getDrawPageTask(Bitmap bm, int sizeX, int sizeY, int patchX, int patchY, int patchWidth, int patchHeight);
@@ -456,10 +459,10 @@ public abstract class PageView extends ViewGroup {
                     textPaint.setAntiAlias(true);
 
                     try{
-                        if (CloudData.mFreetext.size()>0) {
+                        if (mCloudData.getmFreetext().size()>0) {
                             textPaint.setColor(FREETEXT_COLOR);
-                            for (int i = 0; i < CloudData.mFreetext.size(); i++) {
-                                HashMap map = CloudData.mFreetext.get(i);
+                            for (int i = 0; i < mCloudData.getmFreetext().size(); i++) {
+                                HashMap map = mCloudData.getmFreetext().get(i);
                                 if((int)map.get("page") == getPage()){
 
                                     textPaint.setTextSize((float)map.get("size") * scale);
@@ -665,6 +668,10 @@ public abstract class PageView extends ViewGroup {
             mCustomerView.invalidate();
     }
 
+    public View getCustomerView(){
+        return mCustomerView;
+    }
+
     public void addFreetextAnnotation(float x, float y, float width, float height, String text){
         float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
         float docRelX = (x - getLeft()) / scale;
@@ -679,14 +686,15 @@ public abstract class PageView extends ViewGroup {
         map.put("size",50 / scale);
         map.put("page",getPage());
         map.put("scale",scale);
-        CloudData.mFreetext.add(map);
+        mCloudData.add(map);
+        System.out.println("LUOKUN: "+mCloudData.mFreetext+"; "+map.get("page"));
 
         if (mCustomerView != null)
             mCustomerView.invalidate();
     }
 
     public void addFreetextAnnotation(HashMap map){
-        CloudData.mFreetext.add(map);
+        mCloudData.add(map);
 
         if (mCustomerView != null)
             mCustomerView.invalidate();
