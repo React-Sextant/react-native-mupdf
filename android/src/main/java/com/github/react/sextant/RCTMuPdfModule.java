@@ -34,7 +34,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private Promise mPromise;
     public static boolean error;    //打开文件是否报错
     private static ReactApplicationContext mContext;
-    private CloudData mCloudData = CloudData.get(getReactApplicationContext());
+    private CloudData mCloudData = CloudData.get();
 
     public RCTMuPdfModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -53,6 +53,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                 }else {
                     WritableMap map = Arguments.createMap();
                     map.putString("cloudData",stringCloudData(mCloudData));
+                    mCloudData.clear();
                     mPromise.resolve(map);
                 }
             }
@@ -89,7 +90,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
         //cloudData
         if(map.hasKey("cloudData")){
-            mCloudData = new CloudData(parseCloudData(map.getString("cloudData")));
+            mCloudData.setmFreetext(parseCloudData(map.getString("cloudData")));
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
@@ -227,7 +228,6 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                         cloudData+=",{\"page\":"+map.get("page")+",\"size\":"+map.get("size")+",\"x\":"+map.get("x")+",\"y\":"+map.get("y")+",\"width\":"+map.get("width")+",\"height\":"+map.get("height")+",\"text\":\""+map.get("text")+"\"}";
                     }
                 }
-                data.getmFreetext().clear();
                 return "["+cloudData+"]";
             }else {
                 return null;
@@ -243,7 +243,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
      * int page, float size, float x, float y, float width, float height, String text
      * **/
     public static ArrayList<HashMap> parseCloudData(String str){
-        ArrayList<HashMap> cloudData = null;
+        ArrayList<HashMap> cloudData = new ArrayList<HashMap>();
         try{
             JsonParser jsonParser = new JsonParser();
             JsonArray jsonArray = (JsonArray) jsonParser.parse(str);

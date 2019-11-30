@@ -173,7 +173,7 @@ public abstract class PageView extends ViewGroup {
         setBackgroundColor(BACKGROUND_COLOR);
         mEntireMat = new Matrix();
         mAdapter = adapter;
-        mCloudData = CloudData.get(c);
+        mCloudData = CloudData.get();
     }
 
     protected abstract CancellableTaskDefinition<Void, Void> getDrawPageTask(Bitmap bm, int sizeX, int sizeY, int patchX, int patchY, int patchWidth, int patchHeight);
@@ -687,7 +687,6 @@ public abstract class PageView extends ViewGroup {
         map.put("page",getPage());
         map.put("scale",scale);
         mCloudData.add(map);
-        System.out.println("LUOKUN: "+mCloudData.mFreetext+"; "+map.get("page"));
 
         if (mCustomerView != null)
             mCustomerView.invalidate();

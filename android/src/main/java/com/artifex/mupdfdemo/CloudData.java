@@ -13,15 +13,14 @@ import java.util.HashMap;
 public class CloudData {
 
     private static CloudData sCloudData;
-    public ArrayList<HashMap> mFreetext;
+    private ArrayList<HashMap> mFreetext;
 
     /**
      * 创建sCloudData单例
      * **/
-    public static CloudData get(Context context){
+    public static CloudData get(){
         if(sCloudData == null){
             sCloudData = new CloudData();
-            System.out.println("LUOKUN: new");
         }
 
         return sCloudData;
@@ -31,7 +30,7 @@ public class CloudData {
         mFreetext = new ArrayList<HashMap>();
     }
 
-    public CloudData(ArrayList<HashMap> list){
+    public void setmFreetext(ArrayList<HashMap> list){
         mFreetext = list;
     }
 
@@ -39,16 +38,16 @@ public class CloudData {
         return mFreetext;
     }
 
+    public void clear(){
+        mFreetext.clear();
+    }
+
     public void add(HashMap map){
         mFreetext.add(map);
         RCTMuPdfModule.updateCloudData((int)map.get("page"), sCloudData);
     }
 
-//    //文本批注{x,y,width,size,page,type:"textBox"}
-//    public static ArrayList<HashMap> mFreetext = new ArrayList<HashMap>();
-//
-//    public static void addFreetext(HashMap map){
-//        mFreetext.add(map);
-//        RCTMuPdfModule.updateCloudData((int)map.get("page"));
-//    }
+    public void remove(int i){
+        RCTMuPdfModule.updateCloudData((int)mFreetext.remove(i).get("page"), sCloudData);
+    }
 }

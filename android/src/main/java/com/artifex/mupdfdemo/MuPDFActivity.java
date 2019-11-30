@@ -101,7 +101,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private AlertDialog mAlertDialog;
     private FilePicker mFilePicker;
 
-    private CloudData mCloudData;
+    private CloudData mCloudData = CloudData.get();
 
     public void createAlertWaiter() {
         mAlertsActive = true;
@@ -533,7 +533,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                          * **/
                         case "update_cloud_data":
                             if (pageView != null && pageView.getCustomerView() != null){
-                                mCloudData = new CloudData(RCTMuPdfModule.parseCloudData(jsonObject.get("data").getAsString()));
+                                mCloudData.setmFreetext(RCTMuPdfModule.parseCloudData(jsonObject.get("data").toString()));
                                 pageView.getCustomerView().invalidate();
                             }
                             break;
@@ -558,7 +558,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     }
 
                 }catch (Exception e) {
-
                 }
 
             }
