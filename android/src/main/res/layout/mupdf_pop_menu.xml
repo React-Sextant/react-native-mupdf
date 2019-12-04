@@ -14,6 +14,31 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:onClick="onStrikeoutSave"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:paddingHorizontal="5dp"
+                android:layout_marginLeft="11dp"
+                android:paddingBottom="13dp"
+                android:paddingTop="13dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/strikeout" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:text="@string/strike_out"
+                    android:textColor="#ffffff"
+                    android:textSize="15dp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:onClick="onUnderlineSave"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

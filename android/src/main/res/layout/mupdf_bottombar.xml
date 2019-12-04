@@ -147,6 +147,21 @@
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="18dp"
+                            android:onClick="onOutlineClick"
+                            android:src="@mipmap/outlinebottommenu" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:background="@drawable/button"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="18dp"
                             android:onClick="onPizhuClick"
                             android:src="@mipmap/pencil" />
                     </LinearLayout>
@@ -164,6 +179,21 @@
                             android:layout_marginBottom="18dp"
                             android:onClick="onFreetextClick"
                             android:src="@mipmap/writetext"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:background="@drawable/button"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="18dp"
+                            android:onClick="onTurnClick"
+                            android:src="@mipmap/turnvertical" />
                     </LinearLayout>
 
                 </LinearLayout>

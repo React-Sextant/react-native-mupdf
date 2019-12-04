@@ -508,6 +508,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                     case "HIGHLIGHT":
                                         pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.HIGHLIGHT);
                                         break;
+                                    case "STRIKEOUT":
+                                        pageView.markupSelection(jsonObject.get("page").getAsInt(), p2, Annotation.Type.STRIKEOUT);
+                                        break;
                                 }
 
 
@@ -1280,9 +1283,17 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     /******** mupdf_accept.xml ********/
 
     /**
+     * 打开目录
+     * **/
+    public void onOutlineClick(View v){
+
+    }
+
+    /**
      * 批注
      * **/
     public void onPizhuClick(View v){
+        onCancelSave(v);
         hideButtons();
         slideUpToVisible(mAcceptSwitcher);
         mTopBarMode = TopBarMode.Accept;
@@ -1294,10 +1305,19 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 文本批注
      * **/
     public void onFreetextClick(View v){
+        onCancelSave(v);
         hideButtons();
         mTopBarMode = TopBarMode.Accept;
         mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
         showInfo(getString(R.string.draw_freetext));
+    }
+
+    /**
+     * 翻页设置
+     * **/
+    public void onTurnClick(View v){
+        mDocView.setHorizontalScrolling(false);
+        showInfo(getString(R.string.page_turn));
     }
 
     /**
@@ -1393,6 +1413,17 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
 
     /******** mupdf_pop_menu.xml ********/
+
+    /**
+     * 添加删除线
+     * **/
+    public void onStrikeoutSave(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null)
+            pageView.markupSelection(Annotation.Type.STRIKEOUT);
+
+        hidePopMenu();
+    }
 
     /**
      * 添加下划线

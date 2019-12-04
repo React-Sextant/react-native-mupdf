@@ -41,7 +41,7 @@ public class ReaderView
 	private static final float MAX_SCALE        = 3.0f;
 	private static final float REFLOW_SCALE_FACTOR = 0.5f;
 
-	private static final boolean HORIZONTAL_SCROLLING = true;
+	private boolean HORIZONTAL_SCROLLING = true;
 
 	private Adapter           mAdapter;
 	private int               mCurrent;    // Adapter's index for the current view
@@ -165,6 +165,11 @@ public class ReaderView
 		if (advance > max)
 			advance = max;
 		return advance;
+	}
+
+	public void setHorizontalScrolling(boolean bool){
+		HORIZONTAL_SCROLLING = bool;
+		requestLayout();
 	}
 
 	public void smartMoveForwards() {

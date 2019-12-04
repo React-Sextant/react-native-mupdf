@@ -308,9 +308,9 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	}
 
 	private void warnNoSignatureSupport() {
-		AlertDialog dialog = mSignatureReportBuilder.create();
-		dialog.setTitle("App built with no signature support");
-		dialog.show();
+//		AlertDialog dialog = mSignatureReportBuilder.create();
+//		dialog.setTitle("App built with no signature support");
+//		dialog.show();
 	}
 
 	public void setChangeReporter(Runnable reporter) {
