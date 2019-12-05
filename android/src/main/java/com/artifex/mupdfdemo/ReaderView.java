@@ -19,6 +19,7 @@ import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -72,6 +73,7 @@ public class ReaderView
 
     private float             mLastTouchX;
     private float             mLastTouchY;
+	private long              touchDuration;
 
 	private Collection<PdfBitmap> pdfBitmaps;
 
@@ -89,7 +91,7 @@ public class ReaderView
 
 	public ReaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		
+
 		// "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
 		// is instantiated in the IDE, so we need to be a bit careful what we do).
 		if (isInEditMode())
@@ -541,6 +543,7 @@ public class ReaderView
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
             mLastTouchX = MotionEventCompat.getX(event, ident);
             mLastTouchY = MotionEventCompat.getY(event, ident);
+			touchDuration = new Date().getTime();
         }
 
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -549,13 +552,28 @@ public class ReaderView
             int displacementX = (int) Math.abs(mLastTouchX - upX);
             int displacementY = (int) Math.abs(mLastTouchY - upY);
             movementEnd = (displacementX > 10) || (displacementY > 10);
+			/**
+			 * 短时间内（< 150）滑动一定距离(> 100)时，允许翻页操作
+			 *
+			 * mLastTouchX > upX 下一页
+			 * mLastTouchX < upX 上一页
+			 * **/
+			if(new Date().getTime() - touchDuration < 150 && displacementX > 100){
+				if(mLastTouchX > upX && mChildViews.get(mCurrent+1) != null){
+					smartMoveForwards();
+					return true;
+				} else if(mLastTouchX < upX && mChildViews.get(mCurrent-1) != null){
+					smartMoveBackwards();
+					return true;
+				}
+			}
         }
 
         processTouchEvent(event, movementEnd);
 
         return true;
     }
-    
+
     private void processTouchEvent(MotionEvent event, boolean withRefresh) {
 		mScaleGestureDetector.onTouchEvent(event);
 		mGestureDetector.onTouchEvent(event);
@@ -959,7 +977,7 @@ public class ReaderView
             return false;
         }
     }
-    
+
     public void refreshView(){
         long downTime = SystemClock.uptimeMillis()+200;
         long eventTime = SystemClock.uptimeMillis() + 210;
