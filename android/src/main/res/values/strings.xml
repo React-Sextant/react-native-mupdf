@@ -30,7 +30,8 @@
 	<string name="save">Save</string>
 	<string name="print">Print</string>
 	<string name="dismiss">Dismiss</string>
-	<string name="page_turn">Page turning</string>
+	<string name="page_turn_vertical">Page turning vertical</string>
+	<string name="page_turn_horizontal">Page turning horizontal</string>
 	<string name="parent_directory">[Up one level]</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>

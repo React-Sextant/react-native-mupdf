@@ -90,6 +90,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private TopBarMode   mTopBarMode = TopBarMode.Main;
     private ImageButton  mSearchBack;
     private ImageButton  mSearchFwd;
+    private LinearLayout  mOutlineButton;
     private TextView     mSearchSubmit;
     private EditText     mSearchText;
     private SearchTask   mSearchTask;
@@ -808,18 +809,18 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         });
 
         if (core.hasOutline()) {
-//            mOutlineButton.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    OutlineItem outline[] = core.getOutline();
-//                    if (outline != null) {
-//                        OutlineActivityData.get().items = outline;
-//                        Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
-//                        startActivityForResult(intent, OUTLINE_REQUEST);
-//                    }
-//                }
-//            });
+            mOutlineButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    OutlineItem outline[] = core.getOutline();
+                    if (outline != null) {
+                        OutlineActivityData.get().items = outline;
+                        Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+                        startActivityForResult(intent, OUTLINE_REQUEST);
+                    }
+                }
+            });
         } else {
-//            mOutlineButton.setVisibility(View.GONE);
+            mOutlineButton.setVisibility(View.GONE);
         }
 
         // Reenstate last state if it was recorded
@@ -1089,6 +1090,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mSearchText = (EditText)mButtonsView.findViewById(R.id.searchText);
         mSearchSubmit = (TextView) mButtonsView.findViewById(R.id.searchSubmit);
         mAcceptSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.annotationConfirm);
+        mOutlineButton = (LinearLayout) mButtonsView.findViewById(R.id.outlineButton);
         mInfoView.setVisibility(View.INVISIBLE);
         mAcceptSwitcher.setVisibility(View.INVISIBLE);
 
@@ -1294,11 +1296,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     /******** mupdf_accept.xml ********/
 
     /**
-     * 打开目录
+     * 打开目录 outlineButton
      * **/
-    public void onOutlineClick(View v){
-
-    }
 
     /**
      * 批注
@@ -1327,8 +1326,15 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 翻页设置
      * **/
     public void onTurnClick(View v){
-        mDocView.setHorizontalScrolling(false);
-        showInfo(getString(R.string.page_turn));
+        if(mDocView.getHorizontalScrolling()){
+            mDocView.setHorizontalScrolling(false);
+            showInfo(getString(R.string.page_turn_vertical));
+        }else {
+            mDocView.setHorizontalScrolling(true);
+            showInfo(getString(R.string.page_turn_horizontal));
+        }
+
+
     }
 
     /**

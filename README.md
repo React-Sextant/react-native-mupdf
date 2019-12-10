@@ -22,7 +22,7 @@ async function open(){
         if(index>-1){
             Progress.setLoading(1);
             openMuPDF(cache_list[index].filePath,title,JSON.parse(fileOtherRecordStr||"{}")).then(res=>{
-                updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
+                updateFileAnnotation(fileUUID,JSON.stringify(res));
             }).catch(err=>{
                 deleteLocationFile(cache_list[index].filePath);
                 cache_list.splice(index,1);
@@ -31,7 +31,7 @@ async function open(){
         }else {
             downloadFileFetch({url:url},(path)=>{
                 openMuPDF(path,title,JSON.parse(fileOtherRecordStr||"{}")).then(res=>{
-                    updateFileAnnotation(fileUUID,JSON.stringify(res.annotations));
+                    updateFileAnnotation(fileUUID,JSON.stringify(res));
                     cache_list.push({
                         filePath:path,
                         fileId:fileId,

@@ -39,7 +39,8 @@
 	<string name="nothing_to_save">没有要保存的内容</string>
 	<string name="okay">确定</string>
 	<string name="outline_title">目录</string>
-	<string name="page_turn">翻页方式已切换</string>
+	<string name="page_turn_vertical">翻页方式已切换为上下滚动</string>
+	<string name="page_turn_horizontal">翻页方式已切换为左右滑动</string>
 	<string name="parent_directory">[向上一级]</string>
 	<string name="picker_title_App_Ver_Dir">%1$s%2$s:%3$s</string>
 	<string name="print">打印</string>

@@ -174,6 +174,10 @@ public class ReaderView
 		requestLayout();
 	}
 
+	public boolean getHorizontalScrolling(){
+		return HORIZONTAL_SCROLLING;
+	}
+
 	public void smartMoveForwards() {
 		View v = mChildViews.get(mCurrent);
 		if (v == null)
