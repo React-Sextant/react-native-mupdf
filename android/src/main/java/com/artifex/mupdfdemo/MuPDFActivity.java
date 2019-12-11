@@ -260,7 +260,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
             mMode = intent.getStringExtra("mode");
-            mPage = intent.getIntExtra("page",0);
+            SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+            mPage = intent.getIntExtra("page",prefs.getInt("page"+mFileName, 0));
 
             core = openFile(mFilePath);
             SearchTaskResult.set(null);
