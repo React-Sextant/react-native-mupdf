@@ -821,7 +821,18 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 }
             });
         } else {
-            mOutlineButton.setVisibility(View.GONE);
+            mOutlineButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    OutlineItem outline[] = new OutlineItem[core.countPages()];
+                    for(int i=0;i<core.countPages();i++){
+                        outline[i] = new OutlineItem(1,"页面"+(i+1),i);
+                    }
+                    OutlineActivityData.get().items = outline;
+                    Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+                    startActivityForResult(intent, OUTLINE_REQUEST);
+                }
+            });
+//            mOutlineButton.setVisibility(View.GONE);
         }
 
         // Reenstate last state if it was recorded
