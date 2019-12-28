@@ -39,7 +39,7 @@ public class OutlineActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		OutlineActivityData.get().position = getListView().getFirstVisiblePosition();
-		setResult(mItems[position].page);
+		setResult(mItems[position-1].page);
 		finish();
 	}
 
