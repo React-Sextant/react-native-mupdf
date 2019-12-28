@@ -816,6 +816,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     if (outline != null) {
                         OutlineActivityData.get().items = outline;
                         Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+                        intent.putExtra("fileName",mFileName);
                         startActivityForResult(intent, OUTLINE_REQUEST);
                     }
                 }
@@ -829,6 +830,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     }
                     OutlineActivityData.get().items = outline;
                     Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+                    intent.putExtra("fileName",mFileName);
                     startActivityForResult(intent, OUTLINE_REQUEST);
                 }
             });

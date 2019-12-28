@@ -60,6 +60,7 @@
                 android:text="暂无文件名"/>
 
             <ImageButton
+                android:id="@+id/search_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

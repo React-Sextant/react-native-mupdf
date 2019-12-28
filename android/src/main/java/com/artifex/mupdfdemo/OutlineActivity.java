@@ -1,12 +1,18 @@
 package com.artifex.mupdfdemo;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.github.react.sextant.R;
 
 public class OutlineActivity extends ListActivity {
 	OutlineItem mItems[];
+	String mFileName;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -19,6 +25,14 @@ public class OutlineActivity extends ListActivity {
 		getListView().setSelection(OutlineActivityData.get().position);
 		getListView().setDividerHeight(0);
 		setResult(-1);
+
+		View header = getLayoutInflater().inflate(R.layout.mupdf_topbar, getListView(), false);
+		header.findViewById(R.id.search_button).setVisibility(View.INVISIBLE);
+		Intent intent = getIntent();
+		mFileName = intent.getStringExtra("fileName");
+		TextView idFileName = (TextView)header.findViewById(R.id.idFileName);
+		idFileName.setText(mFileName);
+		getListView().addHeaderView(header);
 	}
 
 	@Override
@@ -27,5 +41,17 @@ public class OutlineActivity extends ListActivity {
 		OutlineActivityData.get().position = getListView().getFirstVisiblePosition();
 		setResult(mItems[position].page);
 		finish();
+	}
+
+	public void OnOpenSearchButtonClick(View v){
+
+	}
+
+	public void onFinishActivity(View v){
+		finish();
+	}
+
+	public void onBubbling(View v){
+
 	}
 }
