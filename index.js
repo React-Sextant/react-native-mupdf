@@ -67,6 +67,7 @@ export function downloadFileFetch(params,callback,errorBack){
                     await deleteLocationFile(resp.path());
                     errorBack('文件错误')
                 }else {
+                    Progress.setLoading(0);
                     callback(resp.path())
                 }
             })
