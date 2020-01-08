@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+
+import java.util.Date;
 
 public class MuPDFReaderView extends ReaderView {
 	enum Mode {Viewing, Selecting, Drawing, Freetexting}
@@ -19,8 +22,11 @@ public class MuPDFReaderView extends ReaderView {
 	private boolean tapDisabled = false;
 	private boolean isLongPressed = false;//Continue onScroll event after onLongPress 长按事件之后继续其他事件
 	private int tapPageMargin;
-    
+
     private final boolean TAP_PAGING_ENABLED = false;
+
+	private float             mLastTouchX;
+	private long              touchDuration;
 
 	protected void onTapMainDocArea() {}
 	protected void onDocMotion() {}
@@ -200,6 +206,34 @@ public class MuPDFReaderView extends ReaderView {
 					mGestureDetector.onTouchEvent(cancel);
 					isLongPressed = false;
 					break;
+			}
+		}else if(mMode != Mode.Drawing){
+
+			// We need this check to avoid refreshing the screen after a "tap" or "double tap". We only want to refresh the PDF after a pan, pinch or drag.
+			int ident = MotionEventCompat.getActionIndex(event);
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				mLastTouchX = MotionEventCompat.getX(event, ident);
+				touchDuration = new Date().getTime();
+			}
+
+			if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+				float upX = MotionEventCompat.getX(event, ident);
+				int displacementX = (int) Math.abs(mLastTouchX - upX);
+				/**
+				 * 短时间内（< 150）滑动一定距离(> 100)时，允许翻页操作
+				 *
+				 * mLastTouchX > upX 下一页
+				 * mLastTouchX < upX 上一页
+				 * **/
+				if(new Date().getTime() - touchDuration < 150 && displacementX > 100){
+					if(mLastTouchX > upX && mChildViews.get(mCurrent+1) != null){
+						smartMoveForwards();
+						return true;
+					} else if(mLastTouchX < upX && mChildViews.get(mCurrent-1) != null){
+						smartMoveBackwards();
+						return true;
+					}
+				}
 			}
 		}
 
