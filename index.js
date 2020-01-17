@@ -54,7 +54,7 @@ export function downloadFileFetch(params,callback,errorBack){
         let task = RNFetchBlob.config({
             fileCache: true,
             appendExt: params.url.indexOf(".tif")>-1?'tif':'pdf'
-        }).fetch('GET', params.url);
+        }).fetch('GET', params.url,params.headers);
         task.progress((received, total) => {
             totalSize = total;
             Progress.setLoading(Number(received / total).toFixed(2)*1);
