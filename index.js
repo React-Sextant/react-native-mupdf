@@ -5,13 +5,13 @@ import Progress from 'react-sextant/lib/root-view/progress'
 
 const { MuPDF } = NativeModules;
 
-global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;        //是否已进入mupdf插件页（只允许点一次文件）
+let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次文件）
 
 export function openMuPDF(_filePath,_fileName,_annotations){
-    if(global.REACT_NATIVE_MUPDF_IS_IN_MUPDF){
+    if(_isInMuPdf){
         return false;
     }else {
-        global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = true;
+        _isInMuPdf = true;
         global.annotations = {};    //当前pdf产生的临时数据
         global.annotations2 = _annotations.annotations ? _annotations.annotations : _annotations;   //服务器拉取的数据
         DeviceEventEmitter.addListener('MUPDF_Event_Manager',handleListenMuPDF,this);
@@ -28,22 +28,26 @@ export function openMuPDF(_filePath,_fileName,_annotations){
                         annotations[i] = annotations2[i]
                     }
                 }
-                global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;
+                _isInMuPdf = false;
                 resolve({...res,annotations:annotations})
             }).catch(err=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
-                global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;
+                _isInMuPdf = false;
                 reject(err)
             })
         })
     }
 }
 export function finishPDFActivity(){
-    MuPDF.finishPDFActivity()
+    if(_isInMuPdf){
+        MuPDF.finishPDFActivity()
+    }
 }
 export function sendData(args){
-    MuPDF.sendData(args)
+    if(_isInMuPdf){
+        MuPDF.sendData(args)
+    }
 }
 /**
  * 下载文件
@@ -72,7 +76,7 @@ export function downloadFileFetch(params,callback,errorBack){
                 }
             })
             .catch((err) => {
-                global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;
+                _isInMuPdf = false;
                 DeviceEventEmitter.removeAllListeners('fetch_download');
                 errorBack(err)
             });
@@ -82,14 +86,14 @@ export function downloadFileFetch(params,callback,errorBack){
         DeviceEventEmitter.addListener('fetch_download',()=>{
             if(task&&task.cancel){
                 task.cancel(()=>{
-                    global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;
+                    _isInMuPdf = false;
                     DeviceEventEmitter.removeAllListeners('fetch_download');
                     errorBack("主动结束下载")
                 })
             }
         });
     }catch (e) {
-        global.REACT_NATIVE_MUPDF_IS_IN_MUPDF = false;
+        _isInMuPdf = false;
         DeviceEventEmitter.removeAllListeners('fetch_download');
         errorBack(e)
     }
