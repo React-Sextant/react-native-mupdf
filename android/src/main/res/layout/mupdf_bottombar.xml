@@ -30,52 +30,11 @@
 
         <!--        批注按钮-->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/idDynamicMenus"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <FrameLayout
-                android:id="@+id/samescreenbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:visibility="gone">
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    fab:fab_colorNormal="#EB554A"
-                    fab:fab_colorPressed="#E97E76"
-                    android:onClick="onSameScreenEndClick"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="#ffffff"
-                    android:text="结束同屏"
-                    android:textSize="12dp"
-                    android:paddingBottom="5dp" />
-            </FrameLayout>
-            <FrameLayout
-                android:id="@+id/pizhubutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right">
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    fab:fab_colorNormal="#EB554A"
-                    fab:fab_colorPressed="#E97E76"
-                    android:onClick="onPizhuClick"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="#ffffff"
-                    android:text="批注"
-                    android:textSize="16dp"
-                    android:paddingBottom="5dp" />
-            </FrameLayout>
-        </LinearLayout>
-
+            android:layout_gravity="end"
+            android:orientation="vertical" />
 
         <ViewAnimator
             android:id="@+id/idBottomBar"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#EB554A"
+            fab:fab_colorPressed="#E97E76"/>
+        <TextView
+            android:id="@+id/dm_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#ffffff"
+            android:text=""
+            android:textSize="12dp"
+            android:paddingBottom="5dp" />
+</FrameLayout>

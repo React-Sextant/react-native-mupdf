@@ -5,6 +5,7 @@ import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.SharedPreferencesUtil;
 import com.artifex.utils.ThreadPerTaskExecutor;
 import com.facebook.react.ReactActivity;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.github.react.sextant.MyListener;
 import com.github.react.sextant.R;
 import com.github.react.sextant.RCTMuPdfModule;
@@ -47,6 +48,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+import org.w3c.dom.Text;
+
 import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
@@ -74,7 +77,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private String       mFileName;
     private String       mFilePath;
     private int          mPage;
-    private String       mMode;
+    private String       mMode; // 同屏模式
     private MuPDFReaderView mDocView;
     private View         mButtonsView;
     private boolean      mButtonsVisible;
@@ -259,7 +262,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             Intent intent = getIntent();
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
-            mMode = intent.getStringExtra("mode");
             SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
             mPage = intent.getIntExtra("page",prefs.getInt("page"+mFileName, 0));
 
@@ -863,6 +865,64 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         layout.addView(mDocView);
         layout.addView(mButtonsView);
         setContentView(layout);
+        addDynamicMenus();
+    }
+
+    /**
+     * 动态菜单
+     * **/
+    private void addDynamicMenus(){
+
+        Intent intent = getIntent();
+        String menus = intent.getStringExtra("menus");
+        if(menus == null){
+            menus = "[\"批注\"]";
+        }
+        JsonParser jsonParser = new JsonParser();
+        final JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
+        for(int i=0;i<menusArray.size();i++){
+
+            View view = View.inflate(this, R.layout.mupdf_dynamic_menus_button, null);
+            TextView dmText = (TextView)view.findViewById(R.id.dm_text);
+            FloatingActionButton dmButton = (FloatingActionButton)view.findViewById(R.id.dm_button);
+
+            /**
+             * 结束同屏
+             * **/
+            switch (menusArray.get(i).getAsString()) {
+                case "批注":
+                    dmText.setText("批注");
+                    dmText.setTextSize(16);
+                    dmButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            onPizhuClick(v);
+                        }
+                    });
+                    break;
+                case "结束同屏":
+                    mMode = "主控方";
+                    dmText.setText("结束同屏");
+                    dmButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            onSameScreenEndClick(v);
+                        }
+                    });
+                    break;
+                default:
+                    dmText.setText(menusArray.get(i).getAsString());
+                    final int finalI = i;
+                    dmButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            RCTMuPdfModule.sendDynamicMenusButtonEvent(menusArray.get(finalI).getAsString());
+                        }
+                    });
+                    break;
+            }
+
+            LinearLayout mMenus = findViewById(R.id.idDynamicMenus);
+            mMenus.addView(view);
+        }
+
     }
 
     @Override
@@ -1115,18 +1175,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         annotationselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.idMuPDFPopHit);//批注外包盒子
         annotationselectmenu.setVisibility(View.INVISIBLE);
 
-        samescreenbutton = (FrameLayout)mButtonsView.findViewById(R.id.samescreenbutton);//结束同屏按钮
-        pizhubutton = (FrameLayout)mButtonsView.findViewById(R.id.pizhubutton);//结束同屏按钮
-
         hidePopMenu();
 
-        if(mMode != null){
-            if(mMode.equals("主控方")){
-                samescreenbutton.setVisibility(View.VISIBLE);
-            }else if(mMode.equals("被控方")){
-                pizhubutton.setVisibility(View.INVISIBLE);
-            }
-        }
     }
 
 
