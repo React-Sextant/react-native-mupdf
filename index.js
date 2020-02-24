@@ -28,14 +28,14 @@ export async function openMuPDF2(params){
         let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
         if(index>-1) {
             Progress.setLoading(1);
-            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),JSON.stringify(params.menus||[])).then(res=>{
+            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus).then(res=>{
                 typeof params.callback === 'function'&&params.callback(res)
             }).catch(err=>{
                 typeof params.onError === 'function'&&params.onError(err)
             })
         }else {
             downloadFileFetch(params,(path)=>{
-                openMuPDF(path,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),JSON.stringify(params.menus||[])).then(res=>{
+                openMuPDF(path,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus).then(res=>{
                     if(params.cache && !Array.isArray(params.cacheList)){
                         cache_list.push({
                             filePath:path,
@@ -66,7 +66,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_menus){
                 filePath:_filePath,
                 fileName:_fileName,
                 cloudData:_annotations.cloudData,
-                menus:_menus||"[]"
+                menus:JSON.stringify(_menus)||"[\"批注\"]"
             }).then(res=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
