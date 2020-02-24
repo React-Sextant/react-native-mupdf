@@ -1,4 +1,4 @@
-import {NativeModules,DeviceEventEmitter} from 'react-native';
+import {NativeModules,DeviceEventEmitter,AsyncStorage} from 'react-native';
 import Toast from "antd-mobile/lib/toast";
 import RNFetchBlob from 'rn-fetch-blob'
 import Progress from 'react-sextant/lib/root-view/progress'
@@ -7,7 +7,53 @@ const { MuPDF } = NativeModules;
 
 let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次文件）
 
-export function openMuPDF(_filePath,_fileName,_annotations){
+/**
+ * params
+ * @param params.url        String      文件在线地址
+ * @param params.title      String      文件名称
+ * @param params.fileOtherRecordStr      String 文件批注数据
+ * @param params.md5        String      文件md5用于对比新老文件
+ * @param params.cache      Boolean     文件是否允许被缓存
+ * @param params.cacheList  Array       缓存列表
+ * @param params.menus      Array       MuPdf内按钮菜单
+ * @param params.callback   Function    成功打开MuPdf并关闭之后额度回调
+ * @param params.onError    Function    失败回调
+ * **/
+export async function openMuPDF2(params){
+    if(_isInMuPdf){
+        return false;
+    }else {
+        Progress.setLoading(0.01);
+        let cache_list = params.cacheList || JSON.parse(await AsyncStorage.getItem('mupdf_file_data_path')||"[]");
+        let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
+        if(index>-1) {
+            Progress.setLoading(1);
+            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),JSON.stringify(params.menus||[])).then(res=>{
+                typeof params.callback === 'function'&&params.callback(res)
+            }).catch(err=>{
+                typeof params.onError === 'function'&&params.onError(err)
+            })
+        }else {
+            downloadFileFetch(params,(path)=>{
+                openMuPDF(path,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),JSON.stringify(params.menus||[])).then(res=>{
+                    if(params.cache && !Array.isArray(params.cacheList)){
+                        cache_list.push({
+                            filePath:path,
+                            md5:(params.md5||params.url)
+                        });
+                        AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list));
+                    }
+                    typeof params.callback === 'function'&&params.callback(res)
+                }).catch(async err=>{
+                    await deleteLocationFile(path);
+                    typeof params.onError === 'function'&&params.onError(err)
+                })
+            })
+        }
+    }
+}
+
+export function openMuPDF(_filePath,_fileName,_annotations,_menus){
     if(_isInMuPdf){
         return false;
     }else {
@@ -19,7 +65,8 @@ export function openMuPDF(_filePath,_fileName,_annotations){
             MuPDF.open({
                 filePath:_filePath,
                 fileName:_fileName,
-                cloudData:_annotations.cloudData
+                cloudData:_annotations.cloudData,
+                menus:_menus||"[]"
             }).then(res=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);

@@ -9,6 +9,38 @@ Replace youkan pdf
  - supportLibVersion = "28.0.0" `is best`
 
 ## Usage
+
+#### openMuPDF2
+```jsx harmony
+/**
+ * params
+ * @param params.url        String      （必填）文件在线地址
+ * @param params.title      String      （必填）文件名称
+ * @param params.fileOtherRecordStr      String 文件批注数据
+ * @param params.md5        String      文件md5用于对比新老文件
+ * @param params.cache      Boolean     文件是否允许被缓存
+ * @param params.cacheList  Array       缓存列表
+ * @param params.menus      Array       MuPdf内按钮菜单
+ * @param params.callback   Function    成功打开MuPdf并关闭之后额度回调
+ * @param params.onError    Function    失败回调
+ * **/
+onPress=async ()=>{
+    await openMuPDF2({
+        url:"",
+        title:"",
+        md5:"",
+        cache:true,
+        callback:()=>{
+            DeviceEventEmitter.emit('mupdf_file_saved');
+        },
+        onError:()=>{
+
+        }
+    })
+};
+```
+
+#### openMuPDF
 ```jsx harmony
 import {AsyncStorage} from 'react-native'
 import { downloadFileFetch, openMuPDF, deleteLocationFile } from 'react-native-mupdf'
