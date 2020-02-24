@@ -83,14 +83,14 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             intent.putExtra("page", map.getInt("page"));
         }
 
-        //模式："主控方"
-        if(map.hasKey("mode")){
-            intent.putExtra("mode", map.getString("mode"));
-        }
-
         //cloudData
         if(map.hasKey("cloudData")){
             mCloudData.setmFreetext(parseCloudData(map.getString("cloudData")));
+        }
+
+        //菜单
+        if(map.hasKey("menus")){
+            intent.putExtra("menus", map.getString("menus"));
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
@@ -193,6 +193,19 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                                 "\"type\":\"delete_annotation\", " +
                                 "\"page\":"+page + "," +
                                 "\"annot_index\":"+annot_index +
+                                "}"
+                );
+    }
+
+    /**
+     * 将动态菜单点击事件发送给Javascript
+     * **/
+    public static void sendDynamicMenusButtonEvent(String name){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"dynamic_menus_button\", " +
+                                "\"name\":\""+name + "\"" +
                                 "}"
                 );
     }
