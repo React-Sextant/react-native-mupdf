@@ -573,6 +573,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                             alert.setButton(AlertDialog.BUTTON_NEGATIVE, "返回上一页", listener);
                             alert.show();
                             break;
+                        /**
+                         * 动态菜单
+                         * **/
+                        case "dynamic_menus_button":
+                            addDynamicMenus(jsonObject.get("menus").getAsString());
+                            break;
                     }
 
                 }catch (Exception e) {
@@ -865,19 +871,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         layout.addView(mDocView);
         layout.addView(mButtonsView);
         setContentView(layout);
-        addDynamicMenus();
+        addDynamicMenus(getIntent().getStringExtra("menus"));
     }
 
     /**
      * 动态菜单
      * **/
-    private void addDynamicMenus(){
+    private void addDynamicMenus(String menus){
 
-        Intent intent = getIntent();
-        String menus = intent.getStringExtra("menus");
-        if(menus == null){
-            menus = "[\"批注\"]";
-        }
         JsonParser jsonParser = new JsonParser();
         final JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
         for(int i=0;i<menusArray.size();i++){
@@ -920,6 +921,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             }
 
             LinearLayout mMenus = findViewById(R.id.idDynamicMenus);
+            // TODO: addView does't work by twice
             mMenus.addView(view);
         }
 
