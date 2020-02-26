@@ -66,7 +66,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_menus){
                 filePath:_filePath,
                 fileName:_fileName,
                 cloudData:_annotations.cloudData,
-                menus:JSON.stringify(_menus)||"[\"批注\"]"
+                menus:JSON.stringify(_menus)||"[{name:\"批注\"}]"
             }).then(res=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);

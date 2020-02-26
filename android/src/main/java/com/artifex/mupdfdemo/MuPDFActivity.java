@@ -882,13 +882,15 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     /**
      * 动态菜单
+     *
+     * eg: [{name:"菜单名称",disabled:bool}]
      * **/
     private void addDynamicMenus(String menus){
         LinearLayout dynamicMenus = findViewById(R.id.idDynamicMenus);
         dynamicMenus.removeAllViews();
 
         JsonParser jsonParser = new JsonParser();
-        final JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
+        JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
         for(int i=0;i<menusArray.size();i++){
 
             View view = View.inflate(this, R.layout.mupdf_dynamic_menus_button, null);
@@ -897,7 +899,17 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
             mMode = "";
 
-            switch (menusArray.get(i).getAsString()) {
+            final JsonObject jsonObject = menusArray.get(i).getAsJsonObject();
+
+            // 添加 disabled 属性
+            if(jsonObject.has("disabled") && jsonObject.get("disabled").getAsBoolean()){
+                dmButton.setColorDisabled(Color.parseColor("#B8B4B4"));
+                dmButton.setEnabled(false);
+            }
+
+
+            // name 属性判断
+            switch (jsonObject.get("name").getAsString()) {
                 case "批注":
                     dmText.setText("批注");
                     dmText.setTextSize(16);
@@ -917,11 +929,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     });
                     break;
                 default:
-                    dmText.setText(menusArray.get(i).getAsString());
-                    final int finalI = i;
+                    dmText.setText(jsonObject.get("name").getAsString());
+                    if(jsonObject.get("name").getAsString().length() == 2){
+                        dmText.setTextSize(16);
+                    }
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            RCTMuPdfModule.sendDynamicMenusButtonEvent(menusArray.get(finalI).getAsString());
+                            RCTMuPdfModule.sendDynamicMenusButtonEvent(jsonObject.get("name").getAsString());
                         }
                     });
                     break;
