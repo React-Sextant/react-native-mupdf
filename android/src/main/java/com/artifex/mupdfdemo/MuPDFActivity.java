@@ -64,8 +64,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private RelativeLayout bookselecttextdown;
     private RelativeLayout bookselectmenu;
     private RelativeLayout annotationselectmenu;
-    private FrameLayout samescreenbutton;
-    private FrameLayout pizhubutton;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -453,7 +451,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 try{
                     MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
                     JsonParser jsonParser = new JsonParser();
-                    JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
+                    final JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
 
                     switch (jsonObject.get("type").getAsString()){
 
@@ -577,7 +575,15 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                          * 动态菜单
                          * **/
                         case "dynamic_menus_button":
-                            addDynamicMenus(jsonObject.get("menus").getAsString());
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+
+                                    addDynamicMenus(jsonObject.get("menus").getAsString());
+
+                                }
+                            });
                             break;
                     }
 
@@ -878,6 +884,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 动态菜单
      * **/
     private void addDynamicMenus(String menus){
+        LinearLayout dynamicMenus = findViewById(R.id.idDynamicMenus);
+        dynamicMenus.removeAllViews();
 
         JsonParser jsonParser = new JsonParser();
         final JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
@@ -887,9 +895,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             TextView dmText = (TextView)view.findViewById(R.id.dm_text);
             FloatingActionButton dmButton = (FloatingActionButton)view.findViewById(R.id.dm_button);
 
-            /**
-             * 结束同屏
-             * **/
+            mMode = "";
+
             switch (menusArray.get(i).getAsString()) {
                 case "批注":
                     dmText.setText("批注");
@@ -920,9 +927,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     break;
             }
 
-            LinearLayout mMenus = findViewById(R.id.idDynamicMenus);
-            // TODO: addView does't work by twice
-            mMenus.addView(view);
+            dynamicMenus.addView(view);
         }
 
     }
