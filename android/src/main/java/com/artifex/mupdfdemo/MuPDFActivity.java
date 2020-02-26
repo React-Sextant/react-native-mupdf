@@ -907,6 +907,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 dmButton.setEnabled(false);
             }
 
+            // 添加 backgroundColor 属性
+            if(jsonObject.has("backgroundColor")){
+                dmButton.setColorNormal(Color.parseColor(jsonObject.get("backgroundColor").getAsString()));
+                dmButton.setColorPressed(getColorWithAlpha(Color.parseColor(jsonObject.get("backgroundColor").getAsString()),0.5f));
+            }
+
 
             // name 属性判断
             switch (jsonObject.get("name").getAsString()) {
@@ -1592,5 +1598,20 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null)
             pageView.deleteSelectedAnnotation();
+    }
+
+    /**
+     * 颜色设置透明度
+     *
+     * link: https://medium.com/@magdamiu/android-transparent-colors-a2d55a9b4e66
+     */
+    public static int getColorWithAlpha(int color, float ratio) {
+        int newColor = 0;
+        int alpha = Math.round(Color.alpha(color) * ratio);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        newColor = Color.argb(alpha, r, g, b);
+        return newColor;
     }
 }
