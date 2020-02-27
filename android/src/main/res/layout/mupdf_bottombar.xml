@@ -29,12 +29,36 @@
         android:layout_alignParentBottom="true">
 
         <!--        批注按钮-->
-        <LinearLayout
-            android:id="@+id/idDynamicMenus"
+        <ViewAnimator
+            android:id="@+id/floatingActionButtonSwitcher"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:translationY="0dp"
+            android:elevation="1dp"
+            android:layout_weight="1"
+            android:layout_gravity="end">
+            <ScrollView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content">
+                <LinearLayout
+                    android:id="@+id/idDynamicMenus"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="vertical" />
+            </ScrollView>
+        </ViewAnimator>
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/floatingActionsMenu"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:orientation="vertical" />
+            android:layout_marginBottom="10dp"
+            fab:fab_addButtonColorNormal="#FFFFFF"
+            fab:fab_addButtonColorPressed="#FFFFFF"
+            fab:fab_addButtonPlusIconColor="#999999" />
 
         <ViewAnimator
             android:id="@+id/idBottomBar"

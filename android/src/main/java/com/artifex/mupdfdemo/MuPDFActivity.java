@@ -6,6 +6,7 @@ import com.artifex.utils.SharedPreferencesUtil;
 import com.artifex.utils.ThreadPerTaskExecutor;
 import com.facebook.react.ReactActivity;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.github.react.sextant.MyListener;
 import com.github.react.sextant.R;
 import com.github.react.sextant.RCTMuPdfModule;
@@ -64,6 +65,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private RelativeLayout bookselecttextdown;
     private RelativeLayout bookselectmenu;
     private RelativeLayout annotationselectmenu;
+    private FloatingActionsMenu floatingActionsMenu;
+    private ViewAnimator floatingActionButtonSwitcher;
+    private LinearLayout dynamicMenus;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept};
@@ -878,6 +882,22 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         layout.addView(mButtonsView);
         setContentView(layout);
         addDynamicMenus(getIntent().getStringExtra("menus"));
+
+        /**
+         * 菜单数量多于3个以上时，显示floatingActionsMenu
+         * **/
+        floatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener(){
+            @Override
+            public void onMenuExpanded(){
+                dynamicMenus.setVisibility(View.VISIBLE);
+                slideUpToVisible(floatingActionButtonSwitcher);
+            }
+
+            @Override
+            public void onMenuCollapsed(){
+                slideDownToHide(floatingActionButtonSwitcher);
+            }
+        });
     }
 
     /**
@@ -886,11 +906,18 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * eg: [{name:"菜单名称",disabled:bool}]
      * **/
     private void addDynamicMenus(String menus){
-        LinearLayout dynamicMenus = findViewById(R.id.idDynamicMenus);
         dynamicMenus.removeAllViews();
 
         JsonParser jsonParser = new JsonParser();
         JsonArray menusArray = (JsonArray) jsonParser.parse(menus);
+
+        if(menusArray.size() > 3){
+            floatingActionsMenu.setVisibility(View.VISIBLE);
+            dynamicMenus.setVisibility(View.GONE);
+        }else {
+            dynamicMenus.setVisibility(View.VISIBLE);
+        }
+
         for(int i=0;i<menusArray.size();i++){
 
             View view = View.inflate(this, R.layout.mupdf_dynamic_menus_button, null);
@@ -905,6 +932,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             if(jsonObject.has("disabled") && jsonObject.get("disabled").getAsBoolean()){
                 dmButton.setColorDisabled(Color.parseColor("#B8B4B4"));
                 dmButton.setEnabled(false);
+            }
+
+            // 添加 theme 属性
+            if(!getIntent().getStringExtra("theme").equals("")){
+                dmButton.setColorNormal(Color.parseColor(getIntent().getStringExtra("theme")));
+                dmButton.setColorPressed(getColorWithAlpha(Color.parseColor(getIntent().getStringExtra("theme")),0.5f));
             }
 
             // 添加 backgroundColor 属性
@@ -1076,7 +1109,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 showKeyboard();
             }
             slideUpToVisible(mBottomBarSwitcher);
-//            slideDownToVisible(mTopBarSwitcher);
+
+            // floatingActionsMenu hide
+            if(floatingActionsMenu.getVisibility() == View.VISIBLE){
+                floatingActionsMenu.collapse();
+                slideUpToHide(floatingActionButtonSwitcher);
+            }
+
             mPageNumberView.setVisibility(View.VISIBLE);
         }
     }
@@ -1201,6 +1240,10 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         annotationselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.idMuPDFPopHit);//批注外包盒子
         annotationselectmenu.setVisibility(View.INVISIBLE);
+
+        dynamicMenus = (LinearLayout )mButtonsView.findViewById(R.id.idDynamicMenus);
+        floatingActionButtonSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.floatingActionButtonSwitcher);
+        floatingActionsMenu = (FloatingActionsMenu)mButtonsView.findViewById(R.id.floatingActionsMenu);
 
         hidePopMenu();
 
@@ -1397,6 +1440,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         onCancelSave(v);
         hideButtons();
         slideUpToVisible(mAcceptSwitcher);
+
+        // floatingActionsMenu hide
+        if(floatingActionsMenu.getVisibility() == View.VISIBLE){
+            floatingActionsMenu.collapse();
+            slideUpToHide(floatingActionButtonSwitcher);
+        }
+
         mTopBarMode = TopBarMode.Accept;
         mDocView.setMode(MuPDFReaderView.Mode.Drawing);
         showInfo(getString(R.string.draw_annotation));
