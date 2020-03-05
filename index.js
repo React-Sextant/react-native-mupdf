@@ -77,11 +77,13 @@ export function openMuPDF(_filePath,_fileName,_annotations,_menus,_theme){
                     }
                 }
                 _isInMuPdf = false;
+                _forbidden = false;
                 resolve({...res,annotations:annotations})
             }).catch(err=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
                 _isInMuPdf = false;
+                _forbidden = false;
                 reject(err)
             })
         })
@@ -156,6 +158,8 @@ export function deleteLocationFile(path){
     });
 }
 
+let _page = 0;
+let _forbidden = false;
 export function handleListenMuPDF(msg){
     let data = JSON.parse(msg);
     if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
@@ -169,13 +173,73 @@ export function handleListenMuPDF(msg){
             annotations[data.page].splice(data.annot_index-1,1);
         }
     }else if(data.type === "update_page"){
-        if(Array.isArray(annotations2[data.page])){
-            annotations2[data.page].forEach((a,i)=>{
-                setTimeout(()=>{
-                    MuPDF.sendData(JSON.stringify(a))
-                },50*i)
-            });
-            annotations2[data.page] = [];
+        _page = data.page;
+
+        if(_forbidden){
+            if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
+                annotations[_page].forEach((a,i)=>{
+                    setTimeout(()=>{
+                        MuPDF.sendData(JSON.stringify({
+                            type:"delete_annotation",
+                            annot_index:0,
+                            page:_page
+                        }))
+                    },40*i)
+                });
+                annotations2[data.page] = annotations[_page];
+                annotations[_page] = [];
+            }
+        }else {
+            if(Array.isArray(annotations2[data.page])&&annotations2[_page].length>0){
+                annotations2[data.page].forEach((a,i)=>{
+                    setTimeout(()=>{
+                        MuPDF.sendData(JSON.stringify(a))
+                    },40*i)
+                });
+                annotations2[data.page] = [];
+            }
+        }
+
+
+    }else if(data.type === "dynamic_menus_button"){
+        if(data.name === "隐藏批注"){
+            _forbidden = true;
+
+            MuPDF.sendData(JSON.stringify({
+                ...data,
+                menus:"[{name:\"显示批注\"}]"
+            }));
+
+            if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
+                annotations[_page].forEach((a,i)=>{
+                    setTimeout(()=>{
+                        MuPDF.sendData(JSON.stringify({
+                            type:"delete_annotation",
+                            annot_index:0,
+                            page:_page
+                        }))
+                    },30*i)
+                });
+                annotations2[_page] = annotations[_page];
+                annotations[_page] = [];
+            }
+
+        }else if(data.name === "显示批注"){
+            _forbidden = false;
+
+            MuPDF.sendData(JSON.stringify({
+                ...data,
+                menus:"[{name:\"批注\"},{name:\"隐藏批注\"}]"
+            }));
+
+            if(Array.isArray(annotations2[_page])&&annotations2[_page].length>0){
+                annotations2[_page].forEach((a,i)=>{
+                    setTimeout(()=>{
+                        MuPDF.sendData(JSON.stringify(a))
+                    },30*i)
+                });
+                annotations2[_page] = [];
+            }
         }
     }
 }
