@@ -205,12 +205,25 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     /**
      * 将动态菜单点击事件发送给Javascript
      * **/
-    public static void sendDynamicMenusButtonEvent(String name){
+    public static void sendDynamicMenusButtonEvent(String name, String menus){
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("MUPDF_Event_Manager",
                         "{" +
                                 "\"type\":\"dynamic_menus_button\", " +
-                                "\"name\":\""+name + "\"" +
+                                "\"name\":\""+name + "\", " +
+                                "\"menus\":"+menus +
+                                "}"
+                );
+    }
+
+    /**
+     * onFinishActivity hook
+     * **/
+    public static void sendFinishActivityEvent(){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"on_finish_activity_hook\" " +
                                 "}"
                 );
     }

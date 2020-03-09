@@ -18,6 +18,7 @@ let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次
  * @param params.menus      Array       MuPdf内按钮菜单
  * @param params.callback   Function    成功打开MuPdf并关闭之后额度回调
  * @param params.onError    Function    失败回调
+ * @param params.onFinishActivityHook
  * **/
 export async function openMuPDF2(params){
     if(_isInMuPdf){
@@ -28,14 +29,14 @@ export async function openMuPDF2(params){
         let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
         if(index>-1) {
             Progress.setLoading(1);
-            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme).then(res=>{
+            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme,params.onFinishActivityHook).then(res=>{
                 typeof params.callback === 'function'&&params.callback(res)
             }).catch(err=>{
                 typeof params.onError === 'function'&&params.onError(err)
             })
         }else {
             downloadFileFetch(params,(path)=>{
-                openMuPDF(path,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme).then(res=>{
+                openMuPDF(path,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme,params.onFinishActivityHook).then(res=>{
                     if(params.cache && !Array.isArray(params.cacheList)){
                         cache_list.push({
                             filePath:path,
@@ -53,14 +54,14 @@ export async function openMuPDF2(params){
     }
 }
 
-export function openMuPDF(_filePath,_fileName,_annotations,_menus,_theme){
+export function openMuPDF(_filePath,_fileName,_annotations,_menus,_theme,_onFinishActivityHook){
     if(_isInMuPdf){
         return false;
     }else {
         _isInMuPdf = true;
         global.annotations = {};    //当前pdf产生的临时数据
         global.annotations2 = _annotations.annotations ? _annotations.annotations : _annotations;   //服务器拉取的数据
-        DeviceEventEmitter.addListener('MUPDF_Event_Manager',handleListenMuPDF,this);
+        DeviceEventEmitter.addListener('MUPDF_Event_Manager',(msg)=>handleListenMuPDF(msg,_onFinishActivityHook),this);
         return new Promise((resolve,reject) => {
             MuPDF.open({
                 filePath:_filePath,
@@ -70,7 +71,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_menus,_theme){
                 theme:_theme||""
             }).then(res=>{
                 Progress.setLoading(0);
-                DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
+                DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager');
                 for(let i in annotations2){
                     if(Array.isArray(annotations2[i])&&annotations2[i].length>0){
                         annotations[i] = annotations2[i]
@@ -81,7 +82,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_menus,_theme){
                 resolve({...res,annotations:annotations})
             }).catch(err=>{
                 Progress.setLoading(0);
-                DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager',handleListenMuPDF,this);
+                DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager');
                 _isInMuPdf = false;
                 _forbidden = false;
                 reject(err)
@@ -160,7 +161,7 @@ export function deleteLocationFile(path){
 
 let _page = 0;
 let _forbidden = false;
-export function handleListenMuPDF(msg){
+export function handleListenMuPDF(msg,_onFinishActivityHook){
     let data = JSON.parse(msg);
     if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
         if(Array.isArray(annotations[data.page])){
@@ -240,6 +241,12 @@ export function handleListenMuPDF(msg){
                 });
                 annotations2[_page] = [];
             }
+        }
+    }else if(data.type === "on_finish_activity_hook"){
+        if(typeof _onFinishActivityHook === 'function'){
+            _onFinishActivityHook()
+        }else {
+            finishPDFActivity()
         }
     }
 }
