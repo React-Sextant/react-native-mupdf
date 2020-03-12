@@ -62,8 +62,10 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void open(ReadableMap map, Promise promise){
+        error = false;
         CURRENT_PAGE = -1;
         mPromise = promise;
+        mCloudData.clear();
         Activity currentActivity = getCurrentActivity();
 
         Intent intent = new Intent(currentActivity.getApplicationContext(), MuPDFActivity.class);
