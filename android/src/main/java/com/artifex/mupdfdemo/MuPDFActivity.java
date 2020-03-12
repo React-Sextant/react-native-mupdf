@@ -79,7 +79,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private String       mFileName;
     private String       mFilePath;
     private int          mPage;
-    private String       mMode; // 同屏模式
     private MuPDFReaderView mDocView;
     private View         mButtonsView;
     private boolean      mButtonsVisible;
@@ -922,8 +921,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             TextView dmText = (TextView)view.findViewById(R.id.dm_text);
             FloatingActionButton dmButton = (FloatingActionButton)view.findViewById(R.id.dm_button);
 
-            mMode = "";
-
             final JsonObject jsonObject = menusArray.get(i).getAsJsonObject();
 
             // 添加 disabled 属性
@@ -933,7 +930,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             }
 
             // 添加 theme 属性
-            if(!getIntent().getStringExtra("theme").equals("")){
+            if(getIntent().hasExtra("theme")&&!getIntent().getStringExtra("theme").equals("")){
                 dmButton.setColorNormal(Color.parseColor(getIntent().getStringExtra("theme")));
                 dmButton.setColorPressed(getColorWithAlpha(Color.parseColor(getIntent().getStringExtra("theme")),0.5f));
             }
@@ -953,15 +950,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             onPizhuClick(v);
-                        }
-                    });
-                    break;
-                case "结束同屏":
-                    mMode = "主控方";
-                    dmText.setText("结束同屏");
-                    dmButton.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            onSameScreenEndClick(v);
                         }
                     });
                     break;
@@ -1319,23 +1307,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
     //结束同屏-温馨提示
     public void confirm(){
-        if(core != null && mMode != null && mMode.equals("主控方")){
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == AlertDialog.BUTTON_POSITIVE){
-                        finish();
-                    }
-                }
-            };
-            AlertDialog alert = mAlertBuilder.create();
-            alert.setTitle("温馨提示");
-            alert.setMessage("确认结束同屏？");
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), listener);
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), listener);
-            alert.show();
-        }else {
-            RCTMuPdfModule.sendFinishActivityEvent();
-        }
+        RCTMuPdfModule.sendFinishActivityEvent();
     }
 
     @Override
@@ -1456,13 +1428,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         }
 
 
-    }
-
-    /**
-     * 结束同屏
-     * **/
-    public void onSameScreenEndClick(View v){
-        confirm();
     }
 
     /**

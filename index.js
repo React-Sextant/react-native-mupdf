@@ -8,17 +8,18 @@ const { MuPDF } = NativeModules;
 let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次文件）
 
 /**
- * params
- * @param params.url        String      文件在线地址
- * @param params.title      String      文件名称
- * @param params.fileOtherRecordStr      String 文件批注数据
- * @param params.md5        String      文件md5用于对比新老文件
- * @param params.cache      Boolean     文件是否允许被缓存
- * @param params.cacheList  Array       缓存列表
- * @param params.menus      Array       MuPdf内按钮菜单
- * @param params.callback   Function    成功打开MuPdf并关闭之后额度回调
- * @param params.onError    Function    失败回调
- * @param params.onFinishActivityHook
+ * openMuPDF2
+ *
+ * @param {String} params.url                   文件在线地址
+ * @param {String} params.title                 文件名称
+ * @param {String} params.fileOtherRecordStr    文件批注数据
+ * @param {String} params.md5                   文件md5用于对比新老文件
+ * @param {Boolean} params.cache                文件是否允许被缓存
+ * @param {Array} params.cacheList              缓存列表
+ * @param {Array} params.menus                  MuPdf内按钮菜单
+ * @param {Function} params.callback            成功打开MuPdf并关闭之后额度回调
+ * @param {Function} params.onError             失败回调
+ * @param {Function} params.onFinishActivityHook 关闭PDF钩子
  * **/
 export async function openMuPDF2(params){
     if(_isInMuPdf){
@@ -29,7 +30,7 @@ export async function openMuPDF2(params){
         let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
         if(index>-1) {
             Progress.setLoading(1);
-            openMuPDF(cache_list[index].filePath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme,params.onFinishActivityHook).then(res=>{
+            openMuPDF(cache_list[index].path||cache_list[index].filePath||cache_list[index].localPath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params.menus,params.theme,params.onFinishActivityHook).then(res=>{
                 typeof params.callback === 'function'&&params.callback(res)
             }).catch(err=>{
                 typeof params.onError === 'function'&&params.onError(err)
@@ -44,7 +45,7 @@ export async function openMuPDF2(params){
                         });
                         AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list));
                     }
-                    typeof params.callback === 'function'&&params.callback(res)
+                    typeof params.callback === 'function'&&params.callback({...res,path})
                 }).catch(async err=>{
                     await deleteLocationFile(path);
                     typeof params.onError === 'function'&&params.onError(err)
