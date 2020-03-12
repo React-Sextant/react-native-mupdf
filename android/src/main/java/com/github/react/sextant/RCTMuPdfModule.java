@@ -231,6 +231,19 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * onLoadComplete
+     * **/
+    public static void sendLoadCompleteEvent(){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"on_load_complete\" " +
+                                "}"
+                );
+    }
+
+
+    /**
      * 更新CloudData
      * **/
     public static void updateCloudData(int page, CloudData data){

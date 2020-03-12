@@ -862,13 +862,16 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         /**
          * 首次进入时的操作
          * **/
-        if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false))
-            mButtonsVisible = true;
-            hideButtons();
+        if (savedInstanceState == null)
+            RCTMuPdfModule.sendLoadCompleteEvent();
 
         /**
          * 处理横竖屏时数据丢失问题
          * **/
+        if(savedInstanceState == null||!savedInstanceState.getBoolean("ButtonsHidden", false))
+            mButtonsVisible = true;
+            hideButtons();
+
         if(savedInstanceState != null && savedInstanceState.getBoolean("SearchMode", false))
             searchModeOn();
 
