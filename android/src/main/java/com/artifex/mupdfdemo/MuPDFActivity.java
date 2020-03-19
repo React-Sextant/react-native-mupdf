@@ -1098,13 +1098,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 showKeyboard();
             }
             slideUpToVisible(mBottomBarSwitcher);
-
-            // floatingActionsMenu hide
-            if(floatingActionsMenu.getVisibility() == View.VISIBLE){
-                floatingActionsMenu.collapse();
-                slideUpToHide(floatingActionButtonSwitcher);
-            }
-
             mPageNumberView.setVisibility(View.VISIBLE);
         }
     }
@@ -1113,7 +1106,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         if (mButtonsVisible) {
             mButtonsVisible = false;
             hideKeyboard();
-//            slideUpToHide(mTopBarSwitcher);
             slideDownToHide(mBottomBarSwitcher);
             mPageNumberView.setVisibility(View.INVISIBLE);
         }
@@ -1395,12 +1387,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         onCancelSave(v);
         hideButtons();
         slideUpToVisible(mAcceptSwitcher);
-
-        // floatingActionsMenu hide
-        if(floatingActionsMenu.getVisibility() == View.VISIBLE){
-            floatingActionsMenu.collapse();
-            slideUpToHide(floatingActionButtonSwitcher);
-        }
 
         mTopBarMode = TopBarMode.Accept;
         mDocView.setMode(MuPDFReaderView.Mode.Drawing);
