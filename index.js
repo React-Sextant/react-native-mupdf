@@ -56,7 +56,7 @@ export async function openMuPDF2(params){
     }
 }
 
-export function openMuPDF(_filePath,_fileName,_annotations,_params){
+export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
     if(_isInMuPdf){
         return false;
     }else {
