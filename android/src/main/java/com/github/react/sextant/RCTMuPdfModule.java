@@ -310,15 +310,6 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         }
     }
 
-    /**
-     * 主动关闭当前页面并返回RN页面
-     * **/
-    @ReactMethod
-    public void finishPDFActivity(){
-        Activity currentActivity = getCurrentActivity();
-        currentActivity.finish();
-    }
-
     @Override
     public String getName() {
         return "MuPDF";

@@ -19,7 +19,7 @@ let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次
  * @param {Array} params.menus                  MuPdf内按钮菜单
  * @param {Function} params.callback            成功打开MuPdf并关闭之后额度回调
  * @param {Function} params.onError             失败回调
- * @param {Function} params.onFinishActivityHook 关闭PDF钩子
+ * @param {Function} params.onFinishActivityHook 关闭PDF钩子(返回键监听)
  * @param {Function} params.onLoadComplete      pdf加载已完成回调
  * **/
 export async function openMuPDF2(params){
@@ -94,7 +94,9 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
 }
 export function finishPDFActivity(){
     if(_isInMuPdf){
-        MuPDF.finishPDFActivity()
+        sendData(JSON.stringify({
+            type:"finish_activity"
+        }))
     }
 }
 export function sendData(args){
@@ -182,7 +184,7 @@ export function handleListenMuPDF(msg,params){
             if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
                 annotations[_page].forEach((a,i)=>{
                     setTimeout(()=>{
-                        MuPDF.sendData(JSON.stringify({
+                        sendData(JSON.stringify({
                             type:"delete_annotation",
                             annot_index:0,
                             page:_page
@@ -196,7 +198,7 @@ export function handleListenMuPDF(msg,params){
             if(Array.isArray(annotations2[data.page])&&annotations2[_page].length>0){
                 annotations2[data.page].forEach((a,i)=>{
                     setTimeout(()=>{
-                        MuPDF.sendData(JSON.stringify(a))
+                        sendData(JSON.stringify(a))
                     },40*i)
                 });
                 annotations2[data.page] = [];
@@ -208,7 +210,7 @@ export function handleListenMuPDF(msg,params){
         if(data.name === "隐藏批注"){
             _forbidden = true;
 
-            MuPDF.sendData(JSON.stringify({
+            sendData(JSON.stringify({
                 ...data,
                 menus:"[{name:\"显示批注\"}]"
             }));
@@ -216,7 +218,7 @@ export function handleListenMuPDF(msg,params){
             if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
                 annotations[_page].forEach((a,i)=>{
                     setTimeout(()=>{
-                        MuPDF.sendData(JSON.stringify({
+                        sendData(JSON.stringify({
                             type:"delete_annotation",
                             annot_index:0,
                             page:_page
@@ -230,7 +232,7 @@ export function handleListenMuPDF(msg,params){
         }else if(data.name === "显示批注"){
             _forbidden = false;
 
-            MuPDF.sendData(JSON.stringify({
+            sendData(JSON.stringify({
                 ...data,
                 menus:"[{name:\"批注\"},{name:\"隐藏批注\"}]"
             }));
@@ -238,7 +240,7 @@ export function handleListenMuPDF(msg,params){
             if(Array.isArray(annotations2[_page])&&annotations2[_page].length>0){
                 annotations2[_page].forEach((a,i)=>{
                     setTimeout(()=>{
-                        MuPDF.sendData(JSON.stringify(a))
+                        sendData(JSON.stringify(a))
                     },30*i)
                 });
                 annotations2[_page] = [];

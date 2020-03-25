@@ -557,22 +557,18 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                             }
                             break;
                         /**
-                         * 结束同屏
+                         * 关闭 mupdf activity
                          * **/
-                        case "end_same_screen":
-                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (which == AlertDialog.BUTTON_NEGATIVE){
-                                        finish();
-                                    }
+                        case "finish_activity":
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+
+                                    finish();
+
                                 }
-                            };
-                            AlertDialog alert = mAlertBuilder.create();
-                            alert.setTitle("温馨提示");
-                            alert.setMessage("同屏已结束，是否继续浏览？");
-                            alert.setButton(AlertDialog.BUTTON_POSITIVE, "确定", listener);
-                            alert.setButton(AlertDialog.BUTTON_NEGATIVE, "返回上一页", listener);
-                            alert.show();
+                            });
                             break;
                         /**
                          * 动态菜单
