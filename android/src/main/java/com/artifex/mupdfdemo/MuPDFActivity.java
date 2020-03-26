@@ -988,12 +988,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public Object onRetainNonConfigurationInstance()
-    {
-        MuPDFCore mycore = core;
-        core = null;
-        return mycore;
-    }
+//    public Object onRetainNonConfigurationInstance()
+//    {
+//        MuPDFCore mycore = core;
+//        core = null;
+//        return mycore;
+//    }
 
     private void reflowModeSet(boolean reflow)
     {
