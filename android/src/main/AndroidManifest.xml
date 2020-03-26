@@ -6,8 +6,11 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:hardwareAccelerated="true">
-        <activity android:name="com.artifex.mupdfdemo.MuPDFActivity"></activity>
-        <activity android:name="com.artifex.mupdfdemo.OutlineActivity"></activity>
-        <activity android:name="com.artifex.mupdfdemo.PrintDialogActivity"></activity>
+        <activity android:name="com.artifex.mupdfdemo.MuPDFActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+        </activity>
+        <activity android:name="com.artifex.mupdfdemo.OutlineActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+        </activity>
+        <activity android:name="com.artifex.mupdfdemo.PrintDialogActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+        </activity>
     </application>
 </manifest>
