@@ -121,14 +121,14 @@ export function downloadFileFetch(params,callback,errorBack){
             .then(async (resp) => {
                 DeviceEventEmitter.removeAllListeners('fetch_download');
                 let fileSize = await RNFetchBlob.fs.stat(resp.path());
-                if (fileSize.size != totalSize || fileSize.size < 2000) {
-                    Toast.offline('服务器繁忙，请重试！');
+                if (fileSize.size != totalSize || (resp.respInfo&&resp.respInfo.status !== 200)) {
+                    Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"信息有误"));
                     await deleteLocationFile(resp.path());
-                    errorBack('文件错误')
+                    errorBack(resp.respInfo.status)
                 }else {
-                    Progress.setLoading(0);
                     callback(resp.path())
                 }
+                Progress.setLoading(0);
             })
             .catch((err) => {
                 _isInMuPdf = false;
