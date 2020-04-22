@@ -14,6 +14,7 @@ let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次
  * @param {String} params.title                 文件名称
  * @param {String} params.fileOtherRecordStr    文件批注数据
  * @param {String} params.md5                   文件md5用于对比新老文件
+ * @param {Number} params.page                  初始页码（没有的话会默认mupdf cache page）
  * @param {Boolean} params.cache                文件是否允许被缓存
  * @param {Array} params.cacheList              缓存列表
  * @param {Array} params.menus                  MuPdf内按钮菜单
@@ -70,7 +71,8 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
                 fileName:_fileName,
                 cloudData:_annotations.cloudData,
                 menus:JSON.stringify(_params.menus)||"[{name:\"批注\"}]",
-                theme:_params.theme||""
+                theme:_params.theme||"",
+                page:_params.page >= 0 ? _params.page : undefined
             }).then(res=>{
                 Progress.setLoading(0);
                 DeviceEventEmitter.removeAllListeners('MUPDF_Event_Manager');
