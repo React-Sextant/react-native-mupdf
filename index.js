@@ -102,7 +102,7 @@ export function finishPDFActivity(){
     }
 }
 export function sendData(args){
-    if(_isInMuPdf){
+    if(_isInMuPdf && typeof args === "string"){
         MuPDF.sendData(args)
     }
 }
@@ -124,7 +124,7 @@ export function downloadFileFetch(params,callback,errorBack){
                 DeviceEventEmitter.removeAllListeners('fetch_download');
                 let fileSize = await RNFetchBlob.fs.stat(resp.path());
                 if (fileSize.size != totalSize || (resp.respInfo&&resp.respInfo.status !== 200)) {
-                    Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"信息有误"));
+                    Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"文件信息有误"));
                     await deleteLocationFile(resp.path());
                     errorBack(resp.respInfo.status)
                 }else {
