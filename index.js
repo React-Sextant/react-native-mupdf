@@ -117,6 +117,7 @@ export function downloadFileFetch(params,callback,errorBack){
             appendExt: params.url.indexOf(".tif")>-1?'tif':'pdf'
         }).fetch('GET', params.url,params.headers);
         task.progress((received, total) => {
+            Toast.hide();
             totalSize = total;
             Progress.setLoading(Number(received / total).toFixed(2)*1);
         })
