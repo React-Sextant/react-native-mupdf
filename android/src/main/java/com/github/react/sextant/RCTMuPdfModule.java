@@ -252,7 +252,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                         "{" +
                                 "\"type\":\"update_cloud_data\", " +
                                 "\"page\":"+page + "," +
-                                "\"data\":"+stringCloudData(data).replace("\n","").replace("\r","") +
+                                "\"data\":"+stringCloudData(data) +
                                 "}"
                 );
     }

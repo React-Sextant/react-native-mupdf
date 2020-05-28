@@ -169,97 +169,102 @@ export function deleteLocationFile(path){
 let _page = 0;
 let _forbidden = false;
 export function handleListenMuPDF(msg,params){
-    let data = JSON.parse(msg);
-    if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
-        if(Array.isArray(annotations[data.page])){
-            annotations[data.page].push(data)
-        }else {
-            annotations[data.page] = [data]
-        }
-    }else if(data.type === "delete_annotation"){
-        if(Array.isArray(annotations[data.page])){
-            annotations[data.page].splice(data.annot_index-1,1);
-        }
-    }else if(data.type === "update_page"){
-        _page = data.page;
-
-        if(_forbidden){
-            if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
-                annotations[_page].forEach((a,i)=>{
-                    setTimeout(()=>{
-                        sendData(JSON.stringify({
-                            type:"delete_annotation",
-                            annot_index:0,
-                            page:_page
-                        }))
-                    },40*i)
-                });
-                annotations2[data.page] = annotations[_page];
-                annotations[_page] = [];
+    try{
+        msg = msg.replace(/\n/g,"\\n").replace(/\r/g,"\\r");
+        let data = JSON.parse(msg);
+        if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
+            if(Array.isArray(annotations[data.page])){
+                annotations[data.page].push(data)
+            }else {
+                annotations[data.page] = [data]
             }
-        }else {
-            if(Array.isArray(annotations2[data.page])&&annotations2[_page].length>0){
-                annotations2[data.page].forEach((a,i)=>{
-                    setTimeout(()=>{
-                        sendData(JSON.stringify(a))
-                    },40*i)
-                });
-                annotations2[data.page] = [];
+        }else if(data.type === "delete_annotation"){
+            if(Array.isArray(annotations[data.page])){
+                annotations[data.page].splice(data.annot_index-1,1);
             }
-        }
+        }else if(data.type === "update_page"){
+            _page = data.page;
 
-
-    }else if(data.type === "dynamic_menus_button"){
-        if(data.name === "隐藏批注"){
-            _forbidden = true;
-
-            sendData(JSON.stringify({
-                ...data,
-                menus:"[{name:\"显示批注\"}]"
-            }));
-
-            if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
-                annotations[_page].forEach((a,i)=>{
-                    setTimeout(()=>{
-                        sendData(JSON.stringify({
-                            type:"delete_annotation",
-                            annot_index:0,
-                            page:_page
-                        }))
-                    },30*i)
-                });
-                annotations2[_page] = annotations[_page];
-                annotations[_page] = [];
+            if(_forbidden){
+                if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
+                    annotations[_page].forEach((a,i)=>{
+                        setTimeout(()=>{
+                            sendData(JSON.stringify({
+                                type:"delete_annotation",
+                                annot_index:0,
+                                page:_page
+                            }))
+                        },40*i)
+                    });
+                    annotations2[data.page] = annotations[_page];
+                    annotations[_page] = [];
+                }
+            }else {
+                if(Array.isArray(annotations2[data.page])&&annotations2[_page].length>0){
+                    annotations2[data.page].forEach((a,i)=>{
+                        setTimeout(()=>{
+                            sendData(JSON.stringify(a))
+                        },40*i)
+                    });
+                    annotations2[data.page] = [];
+                }
             }
 
-        }else if(data.name === "显示批注"){
-            _forbidden = false;
 
-            sendData(JSON.stringify({
-                ...data,
-                menus:"[{name:\"批注\"},{name:\"隐藏批注\"}]"
-            }));
+        }else if(data.type === "dynamic_menus_button"){
+            if(data.name === "隐藏批注"){
+                _forbidden = true;
 
-            if(Array.isArray(annotations2[_page])&&annotations2[_page].length>0){
-                annotations2[_page].forEach((a,i)=>{
-                    setTimeout(()=>{
-                        sendData(JSON.stringify(a))
-                    },30*i)
-                });
-                annotations2[_page] = [];
+                sendData(JSON.stringify({
+                    ...data,
+                    menus:"[{name:\"显示批注\"}]"
+                }));
+
+                if(Array.isArray(annotations[_page])&&annotations[_page].length>0){
+                    annotations[_page].forEach((a,i)=>{
+                        setTimeout(()=>{
+                            sendData(JSON.stringify({
+                                type:"delete_annotation",
+                                annot_index:0,
+                                page:_page
+                            }))
+                        },30*i)
+                    });
+                    annotations2[_page] = annotations[_page];
+                    annotations[_page] = [];
+                }
+
+            }else if(data.name === "显示批注"){
+                _forbidden = false;
+
+                sendData(JSON.stringify({
+                    ...data,
+                    menus:"[{name:\"批注\"},{name:\"隐藏批注\"}]"
+                }));
+
+                if(Array.isArray(annotations2[_page])&&annotations2[_page].length>0){
+                    annotations2[_page].forEach((a,i)=>{
+                        setTimeout(()=>{
+                            sendData(JSON.stringify(a))
+                        },30*i)
+                    });
+                    annotations2[_page] = [];
+                }
+            }
+        }else if(data.type === "on_load_complete"){
+            if(typeof params.onLoadComplete === 'function'){
+                setTimeout(()=>{
+                    params.onLoadComplete()
+                },500)
+            }
+        }else if(data.type === "on_finish_activity_hook"){
+            if(typeof params.onFinishActivityHook === 'function'){
+                params.onFinishActivityHook()
+            }else {
+                finishPDFActivity()
             }
         }
-    }else if(data.type === "on_load_complete"){
-        if(typeof params.onLoadComplete === 'function'){
-            setTimeout(()=>{
-                params.onLoadComplete()
-            },500)
-        }
-    }else if(data.type === "on_finish_activity_hook"){
-        if(typeof params.onFinishActivityHook === 'function'){
-            params.onFinishActivityHook()
-        }else {
-            finishPDFActivity()
-        }
+    }catch (e) {
+
     }
 }
