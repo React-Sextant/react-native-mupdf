@@ -1,4 +1,4 @@
-import {NativeModules,DeviceEventEmitter,AsyncStorage} from 'react-native';
+import {NativeModules, DeviceEventEmitter, AsyncStorage, NetInfo} from 'react-native';
 import Toast from "antd-mobile/lib/toast";
 import RNFetchBlob from 'rn-fetch-blob'
 import Progress from 'react-sextant/lib/root-view/progress'
@@ -111,6 +111,7 @@ export function sendData(args){
  * **/
 export function downloadFileFetch(params,callback,errorBack){
     try{
+        NetInfo.isConnected.addEventListener('connectionChange', handleConnectivityChange);
         let totalSize = 0;
         let task = RNFetchBlob.config({
             fileCache: true,
@@ -122,7 +123,6 @@ export function downloadFileFetch(params,callback,errorBack){
             Progress.setLoading(Number(received / total).toFixed(2)*1);
         })
             .then(async (resp) => {
-                DeviceEventEmitter.removeAllListeners('fetch_download');
                 let fileSize = await RNFetchBlob.fs.stat(resp.path());
                 if (fileSize.size != totalSize || (resp.respInfo&&resp.respInfo.status !== 200)) {
                     Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"文件信息有误"));
@@ -131,12 +131,10 @@ export function downloadFileFetch(params,callback,errorBack){
                 }else {
                     callback(resp.path())
                 }
-                Progress.setLoading(0);
+                catchError();
             })
             .catch((err) => {
-                _isInMuPdf = false;
-                DeviceEventEmitter.removeAllListeners('fetch_download');
-                errorBack(err)
+                catchError(errorBack,err)
             });
 
 
@@ -144,16 +142,19 @@ export function downloadFileFetch(params,callback,errorBack){
         DeviceEventEmitter.addListener('fetch_download',()=>{
             if(task&&task.cancel){
                 task.cancel(()=>{
-                    _isInMuPdf = false;
-                    DeviceEventEmitter.removeAllListeners('fetch_download');
-                    errorBack("主动结束下载")
+                    catchError(errorBack,"主动结束下载")
                 })
             }
         });
+
+        //检测当前网络
+        NetInfo.getConnectionInfo().then((connectionInfo) => {
+            if(connectionInfo.type==='none'){
+                handleConnectivityChange()
+            }
+        })
     }catch (e) {
-        _isInMuPdf = false;
-        DeviceEventEmitter.removeAllListeners('fetch_download');
-        errorBack(e)
+        catchError(errorBack,e)
     }
 }
 
@@ -266,5 +267,21 @@ export function handleListenMuPDF(msg,params){
         }
     }catch (e) {
 
+    }
+}
+
+function catchError(errorBack,err){
+    Progress.setLoading(0);
+    NetInfo.isConnected.removeEventListener('connectionChange', handleConnectivityChange);
+    DeviceEventEmitter.removeAllListeners('fetch_download');
+    if(typeof errorBack === "function"){
+        _isInMuPdf = false;
+        errorBack(err)
+    }
+}
+
+function handleConnectivityChange(){
+    if(DeviceEventEmitter.listeners("fetch_download").length>0){
+        DeviceEventEmitter.emit("fetch_download");
     }
 }
