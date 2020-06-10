@@ -112,19 +112,17 @@ export function sendData(args){
 export function downloadFileFetch(params,callback,errorBack){
     try{
         NetInfo.isConnected.addEventListener('connectionChange', handleConnectivityChange);
-        let totalSize = 0;
+        Progress.setLoading(0.01);
         let task = RNFetchBlob.config({
             fileCache: true,
             appendExt: params.url.indexOf(".tif")>-1?'tif':'pdf'
         }).fetch('GET', params.url,params.headers);
         task.progress((received, total) => {
             Toast.hide();
-            totalSize = total;
             Progress.setLoading(Number(received / total).toFixed(2)*1);
         })
             .then(async (resp) => {
-                let fileSize = await RNFetchBlob.fs.stat(resp.path());
-                if (fileSize.size != totalSize || (resp.respInfo&&resp.respInfo.status !== 200)) {
+                if (resp.respInfo&&resp.respInfo.status !== 200) {
                     Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"文件信息有误"));
                     await deleteLocationFile(resp.path());
                     errorBack(resp.respInfo.status)

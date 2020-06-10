@@ -1,6 +1,6 @@
 {
   "name": "react-native-mupdf",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "summary": "A react native PDF view component",
   "description": "react-native-mupdf UI manager",
   "main": "index.js",
