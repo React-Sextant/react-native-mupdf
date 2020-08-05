@@ -857,6 +857,18 @@ public abstract class PageView extends ViewGroup {
 
             CancellableTaskDefinition<Void, Void> task;
 
+            try {
+                if(mDrawing == null){
+                    int mPatchAreaHeight = patchArea.bottom - patchArea.top;
+                    int mPatchAreaWidth = patchArea.right - patchArea.left;
+                    mPatchBm = Bitmap.createBitmap(mPatchAreaWidth, mPatchAreaHeight, Bitmap.Config.ARGB_8888);
+                    cancelDraw();
+                }
+            } catch (OutOfMemoryError e) {
+                Log.e(TAG, e.getMessage(), e);
+                flagHQ = false;
+            }
+
             if (completeRedraw)
                 task = getDrawPageTask(mPatchBm, patchViewSize.x, patchViewSize.y,
                         patchArea.left, patchArea.top,

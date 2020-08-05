@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -1039,6 +1040,13 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         if (mReflow)
             outState.putBoolean("ReflowMode", true);
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //UNDO: 横竖屏时pdf scale重置
+    }
+
 
     @Override
     protected void onPause() {
