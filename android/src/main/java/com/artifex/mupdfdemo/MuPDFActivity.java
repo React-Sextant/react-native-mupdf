@@ -799,7 +799,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE)
-                    search(1);
+                    onSearchSubmit(v);
                 return false;
             }
         });
@@ -807,7 +807,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mSearchText.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
-                    search(1);
+                    onSearchSubmit(v);
                 return false;
             }
         });
@@ -1044,7 +1044,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        //UNDO: 横竖屏时pdf scale重置
+        mDocView.refresh(false);
     }
 
 
