@@ -55,6 +55,11 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 
 	@Override
+	public Annotation.Type getAnnotationType() {
+		return null;
+	}
+
+	@Override
 	public View getCustomerView() {
 		return null;
 	}
@@ -134,6 +139,9 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 	public boolean saveDraw(int page, PointF[][] arcs) {
 		return false;
+	}
+
+	public void setDraw(PointF[][] path) {
 	}
 
 	public void setSearchBoxes(RectF[] searchBoxes) {

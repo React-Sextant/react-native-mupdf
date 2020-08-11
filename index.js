@@ -171,7 +171,14 @@ export function handleListenMuPDF(msg,params){
     try{
         msg = msg.replace(/\n/g,"\\n").replace(/\r/g,"\\r");
         let data = JSON.parse(msg);
-        if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
+        if(data.type === "move_annotation"){
+            if(Array.isArray(annotations[data.page]) && annotations[data.page][data.annot_index]){
+                sendData(JSON.stringify({
+                    ...annotations[data.page][data.annot_index],
+                    type:"move_annotation"
+                }))
+            }
+        }else if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
             if(Array.isArray(annotations[data.page])){
                 annotations[data.page].push(data)
             }else {
@@ -179,7 +186,7 @@ export function handleListenMuPDF(msg,params){
             }
         }else if(data.type === "delete_annotation"){
             if(Array.isArray(annotations[data.page])){
-                annotations[data.page].splice(data.annot_index-1,1);
+                annotations[data.page].splice(data.annot_index,1);
             }
         }else if(data.type === "update_page"){
             _page = data.page;

@@ -4,11 +4,13 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 enum Hit {Nothing, Widget, Annotation, FreeText};
 
 public interface MuPDFView {
+	public Annotation.Type getAnnotationType();
 	public View getCustomerView();
 	public void setPage(int page, PointF size);
 	public void setScale(float scale);
@@ -32,6 +34,7 @@ public interface MuPDFView {
 	public void cancelDraw();
 	public boolean saveDraw();
 	public boolean saveDraw(int page, PointF[][] arcs);
+	public void setDraw(PointF[][] path);
 	public void setChangeReporter(Runnable reporter);
 	public void update();
 	public void updateHq(boolean update);

@@ -27,13 +27,11 @@ import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import com.github.react.sextant.R;
-import com.github.react.sextant.RCTMuPdfModule;
-
-import static android.util.TypedValue.complexToDimensionPixelSize;
 
 // Make our ImageViews opaque to optimize redraw
 class OpaqueImageView extends ImageView {
@@ -141,7 +139,8 @@ public abstract class PageView extends ViewGroup {
     protected LinkInfo mLinks[];
     private RectF mSelectBox;
     private TextWord mText[][];
-    private RectF mItemSelectBox;
+    protected RectF mItemSelectBox;
+    protected Annotation.Type mAnnotationType;
     protected ArrayList<ArrayList<PointF>> mDrawing;
     private View mSearchView;
     public View mCustomerView;
@@ -646,6 +645,14 @@ public abstract class PageView extends ViewGroup {
         return path;
     }
 
+    protected void setDraw(PointF[][] arcs){
+        mDrawing = new ArrayList<ArrayList<PointF>>();
+        for (int i = 0; i < arcs.length; i++) {
+            ArrayList<PointF> arc = new ArrayList<PointF>(Arrays.asList(arcs[i]));
+            mDrawing.add(arc);
+        }
+    }
+
     protected void processSelectedText(TextProcessor tp) {
         (new TextSelector(mText, mSelectBox)).select(tp);
     }
@@ -666,6 +673,13 @@ public abstract class PageView extends ViewGroup {
 
         if (mCustomerView != null)
             mCustomerView.invalidate();
+    }
+
+    public void setItemSelectBox(Annotation annotation){
+        if(annotation != null){
+            mAnnotationType = annotation.type;
+        }
+        setItemSelectBox((RectF) annotation);
     }
 
     public View getCustomerView(){

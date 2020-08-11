@@ -52,6 +52,7 @@ import android.widget.ViewAnimator;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
@@ -71,7 +72,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private LinearLayout dynamicMenus;
 
     /* The core rendering instance */
-    enum TopBarMode {Main, Search, Accept};
+    enum TopBarMode {Main, Search, Accept, Move}
 
     private final int    OUTLINE_REQUEST=0;
     private final int    PRINT_REQUEST=1;
@@ -361,6 +362,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     RCTMuPdfModule.sendPageChangeEvent(i);
                 }
 
+                onCancelSelectedAnnotation();
+
                 super.onMoveToChild(i);
             }
 
@@ -394,6 +397,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 if (mTopBarMode != TopBarMode.Main) {
                     mTopBarMode = TopBarMode.Main;
                 }
+                searchModeOff();
             }
 
             /**
@@ -531,6 +535,28 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 }
 
 
+                            }
+                            break;
+                        /**
+                         * 移动标注
+                         *
+                         * @key type: "move_annotation"
+                         * @key path: PointF[]
+                         * **/
+                        case "move_annotation":
+                            JsonArray jsonArray3 = jsonObject.get("path").getAsJsonArray();
+                            PointF[][] p3=new PointF[jsonArray3.size()][];
+                            for(int i=0;i<jsonArray3.size();i++){
+                                JsonArray two = jsonArray3.get(i).getAsJsonArray();
+                                PointF [] points=new PointF[two.size()];
+                                for(int j=0;j<two.size();j++){
+                                    points[j] = new PointF(two.get(j).getAsJsonArray().get(0).getAsFloat(),two.get(j).getAsJsonArray().get(1).getAsFloat());
+                                }
+                                p3[i] = points;
+                            }
+
+                            if (pageView != null){
+                                pageView.setDraw(p3);
                             }
                             break;
                         /**
@@ -691,9 +717,28 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     }else {
                         annotationselectmenu.setY(docRelY-annotationselectmenu.getMeasuredHeight());
                     }
+
+                    // TODO: FreeText也需要可移动
+                    if( mTopBarMode != TopBarMode.Move && mDocView.getMode() != MuPDFReaderView.Mode.Move && pageView.getAnnotationType() != null && pageView.getAnnotationType() == Annotation.Type.INK){
+                        RCTMuPdfModule.sendIndexSelectedAnnotationEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex());
+                    }
+
                 }else {
                     annotationselectmenu.setVisibility(View.INVISIBLE);
                 }
+            }
+
+            @Override
+            public void touchMoveForAnnotation() {
+                if(mTopBarMode == TopBarMode.Main){
+                    LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
+                    LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
+                    cancel.setVisibility(View.VISIBLE);
+                    save.setVisibility(View.VISIBLE);
+                    mDocView.setMode(MuPDFReaderView.Mode.Move);
+                    mTopBarMode = TopBarMode.Move;
+                }
+
             }
 
             @Override
@@ -1137,6 +1182,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             mSearchText.requestFocus();
             showKeyboard();
             mSearchBar.setVisibility(View.VISIBLE);
+            onCancelSelectedAnnotation();
         }
     }
 
@@ -1571,6 +1617,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             pageView.deselectText();
 
         hidePopMenu();
+        onCancelSelectedAnnotation();
     }
 
     /******** mupdf_pop_hit.xml ********/
@@ -1580,8 +1627,52 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * **/
     public void onDeleteSelectedAnnotation(View v){
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-        if (pageView != null)
+        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+        mTopBarMode = TopBarMode.Main;
+        if (pageView != null){
             pageView.deleteSelectedAnnotation();
+            pageView.cancelDraw();
+        }
+    }
+
+    /**
+     * 重新保存移动后的批注
+     * **/
+    public void onSaveSelectedAnnotation(View v){
+
+        LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
+        LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
+        cancel.setVisibility(View.GONE);
+        save.setVisibility(View.GONE);
+
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+        mTopBarMode = TopBarMode.Main;
+        if (pageView != null){
+            pageView.deleteSelectedAnnotation();
+            onAnnotationSave(v);
+        }
+    }
+
+    /**
+     * 取消保存移动后的批注
+     * **/
+    public void onCancelSelectedAnnotation(View v){
+        onCancelSelectedAnnotation();
+    }
+    public void onCancelSelectedAnnotation(){
+        LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
+        LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
+        cancel.setVisibility(View.GONE);
+        save.setVisibility(View.GONE);
+
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+        mTopBarMode = TopBarMode.Main;
+        if (pageView != null){
+            pageView.deselectAnnotation();
+            pageView.cancelDraw();
+        }
     }
 
     /**

@@ -2,7 +2,9 @@ package com.artifex.mupdfdemo;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
@@ -18,6 +20,7 @@ import android.widget.Scroller;
 import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -554,6 +557,35 @@ public class ReaderView
             int displacementY = (int) Math.abs(mLastTouchY - upY);
             movementEnd = (displacementX > 10) || (displacementY > 10);
         }
+
+        /**
+		 * 移动批注(仅INK类型)
+		 * **/
+		if (event.getActionMasked() == MotionEvent.ACTION_MOVE && currentPage != null && currentPage.mItemSelectBox != null && currentPage.mAnnotationType == Annotation.Type.INK) {
+			float upX = MotionEventCompat.getX(event, ident);
+			float upY = MotionEventCompat.getY(event, ident);
+			float displacementX =  mLastTouchX - upX;
+			float displacementY =  mLastTouchY - upY;
+
+			eventCallback.touchMoveForAnnotation();
+			if(currentPage.mDrawing!=null){
+				for(int i=0;i<currentPage.mDrawing.size();i++){
+					for(int j=0;j<currentPage.mDrawing.get(i).size();j++){
+						currentPage.mDrawing.get(i).get(j).x -= displacementX;
+						currentPage.mDrawing.get(i).get(j).y -= displacementY;
+					}
+				}
+			}
+
+			currentPage.setItemSelectBox(new RectF(
+					currentPage.mItemSelectBox.left-displacementX,
+					currentPage.mItemSelectBox.top-displacementY,
+					currentPage.mItemSelectBox.right-displacementX,
+					currentPage.mItemSelectBox.bottom-displacementY
+			));
+			mLastTouchX = MotionEventCompat.getX(event, ident);
+			mLastTouchY = MotionEventCompat.getY(event, ident);
+		}
 
         processTouchEvent(event, movementEnd);
 

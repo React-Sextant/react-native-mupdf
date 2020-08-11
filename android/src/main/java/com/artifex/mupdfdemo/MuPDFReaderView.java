@@ -15,7 +15,7 @@ import android.view.WindowManager;
 import java.util.Date;
 
 public class MuPDFReaderView extends ReaderView {
-	enum Mode {Viewing, Selecting, Drawing, Freetexting}
+	enum Mode {Viewing, Selecting, Drawing, Freetexting, Move}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
@@ -40,6 +40,10 @@ public class MuPDFReaderView extends ReaderView {
 
 	public void setMode(Mode m) {
 		mMode = m;
+	}
+
+	public Mode getMode() {
+		return mMode;
 	}
 
 	private void setup()
@@ -166,6 +170,7 @@ public class MuPDFReaderView extends ReaderView {
 		tapDisabled = true;
 		switch (mMode) {
 			case Freetexting:
+			case Move:
 				return false;
 			default:
 				return super.onScaleBegin(d);
@@ -207,7 +212,7 @@ public class MuPDFReaderView extends ReaderView {
 					isLongPressed = false;
 					break;
 			}
-		}else if(mMode != Mode.Drawing){
+		}else if(mMode != Mode.Drawing & mMode != Mode.Move){
 
 			// We need this check to avoid refreshing the screen after a "tap" or "double tap". We only want to refresh the PDF after a pan, pinch or drag.
 			int ident = MotionEventCompat.getActionIndex(event);

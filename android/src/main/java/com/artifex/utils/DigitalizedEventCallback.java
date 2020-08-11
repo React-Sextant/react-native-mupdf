@@ -16,5 +16,6 @@ public interface DigitalizedEventCallback {
     public void error(String message);
 
     public void touchMoveOnPdfPosition(RectF rect, float scale);
+    public void touchMoveForAnnotation();
     public void singleTapOnHit(RectF rect, float scale);
 }

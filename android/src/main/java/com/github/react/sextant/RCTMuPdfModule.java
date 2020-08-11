@@ -205,6 +205,20 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * 将当前所选批注索引发送给Javascript
+     * **/
+    public static void sendIndexSelectedAnnotationEvent(int page, int annot_index){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"move_annotation\", " +
+                                "\"page\":"+page + "," +
+                                "\"annot_index\":"+annot_index +
+                                "}"
+                );
+    }
+
+    /**
      * 将动态菜单点击事件发送给Javascript
      * **/
     public static void sendDynamicMenusButtonEvent(String name, String menus){

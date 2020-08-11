@@ -338,9 +338,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
 				mSelectedFreetextIndex = t;
-				RectF rect = new RectF();
-				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
-				setItemSelectBox(rect);
+				setItemSelectBox(new Annotation((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"),Annotation.Type.FREETEXT.ordinal()));
 				return Hit.FreeText;
 			}
 		}
@@ -627,6 +625,11 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		setItemSelectBox(null);
 	}
 
+	@Override
+	public void setDraw(PointF[][] arcs) {
+		super.setDraw(arcs);
+	}
+
 	public boolean saveDraw() {
 		PointF[][] path = getDraw();
 
@@ -757,6 +760,11 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		};
 
 		mLoadAnnotations.execute();
+	}
+
+	@Override
+	public Annotation.Type getAnnotationType() {
+		return mAnnotationType;
 	}
 
 	@Override
