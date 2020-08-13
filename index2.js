@@ -110,10 +110,9 @@ export function sendData(args){
 /**
  * 下载文件
  * **/
-let mupdf_unsubscribe = undefined;
 export function downloadFileFetch(params,callback,errorBack){
     try{
-        mupdf_unsubscribe = NetInfo.addEventListener(handleConnectivityChange);
+        NetInfo.isConnected.addEventListener('connectionChange', handleConnectivityChange);
         Progress.setLoading(0.01);
         let task = RNFetchBlob.config({
             fileCache: true,
@@ -148,7 +147,7 @@ export function downloadFileFetch(params,callback,errorBack){
         });
 
         //检测当前网络
-        NetInfo.fetch().then((connectionInfo) => {
+        NetInfo.getConnectionInfo().then((connectionInfo) => {
             if(connectionInfo.type==='none'){
                 handleConnectivityChange()
             }
@@ -173,7 +172,14 @@ export function handleListenMuPDF(msg,params){
     try{
         msg = msg.replace(/\n/g,"\\n").replace(/\r/g,"\\r");
         let data = JSON.parse(msg);
-        if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
+        if(data.type === "move_annotation"){
+            if(Array.isArray(annotations[data.page]) && annotations[data.page][data.annot_index]){
+                sendData(JSON.stringify({
+                    ...annotations[data.page][data.annot_index],
+                    type:"move_annotation"
+                }))
+            }
+        }else if(data.type === "add_annotation" || data.type === "add_markup_annotation"){
             if(Array.isArray(annotations[data.page])){
                 annotations[data.page].push(data)
             }else {
@@ -181,7 +187,7 @@ export function handleListenMuPDF(msg,params){
             }
         }else if(data.type === "delete_annotation"){
             if(Array.isArray(annotations[data.page])){
-                annotations[data.page].splice(data.annot_index-1,1);
+                annotations[data.page].splice(data.annot_index,1);
             }
         }else if(data.type === "update_page"){
             _page = data.page;
@@ -272,7 +278,7 @@ export function handleListenMuPDF(msg,params){
 
 function catchError(errorBack,err){
     Progress.setLoading(0);
-    typeof mupdf_unsubscribe === "function"&&mupdf_unsubscribe()
+    NetInfo.isConnected.removeEventListener('connectionChange', handleConnectivityChange);
     DeviceEventEmitter.removeAllListeners('fetch_download');
     if(typeof errorBack === "function"){
         _isInMuPdf = false;
