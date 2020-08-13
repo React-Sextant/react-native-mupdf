@@ -60,7 +60,7 @@ export async function openMuPDF2(params){
 
 export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
     if(_isInMuPdf){
-        return false;
+        return new Promise(() => {})
     }else {
         _isInMuPdf = true;
         global.annotations = {};    //当前pdf产生的临时数据
