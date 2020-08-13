@@ -110,9 +110,10 @@ export function sendData(args){
 /**
  * 下载文件
  * **/
+let unsubscribe;
 export function downloadFileFetch(params,callback,errorBack){
     try{
-        NetInfo.isConnected.addEventListener('connectionChange', handleConnectivityChange);
+        unsubscribe = NetInfo.addEventListener(handleConnectivityChange);
         Progress.setLoading(0.01);
         let task = RNFetchBlob.config({
             fileCache: true,
@@ -147,8 +148,8 @@ export function downloadFileFetch(params,callback,errorBack){
         });
 
         //检测当前网络
-        NetInfo.getConnectionInfo().then((connectionInfo) => {
-            if(connectionInfo.type==='none'){
+        NetInfo.fetch().then(state => {
+            if(state.type==='none'){
                 handleConnectivityChange()
             }
         })
@@ -278,7 +279,7 @@ export function handleListenMuPDF(msg,params){
 
 function catchError(errorBack,err){
     Progress.setLoading(0);
-    NetInfo.isConnected.removeEventListener('connectionChange', handleConnectivityChange);
+    typeof unsubscribe === "function"&&unsubscribe();
     DeviceEventEmitter.removeAllListeners('fetch_download');
     if(typeof errorBack === "function"){
         _isInMuPdf = false;
