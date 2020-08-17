@@ -30,7 +30,7 @@ import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
 
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
-    private final int REQUEST_ECODE_SCAN=20191017;
+    private final int REQUEST_ECODE_SCAN=30725;
     private Promise mPromise;
     public static boolean error;    //打开文件是否报错
     private static ReactApplicationContext mContext;
