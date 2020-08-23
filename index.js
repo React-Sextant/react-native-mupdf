@@ -2,6 +2,7 @@ import {NativeModules, DeviceEventEmitter, AsyncStorage, NetInfo} from 'react-na
 import Toast from "antd-mobile/lib/toast";
 import RNFetchBlob from 'rn-fetch-blob'
 import Progress from 'react-sextant/lib/root-view/progress'
+import {annotationParse} from './parse'
 
 const { MuPDF } = NativeModules;
 
@@ -63,13 +64,13 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
     }else {
         _isInMuPdf = true;
         global.annotations = {};    //当前pdf产生的临时数据
-        global.annotations2 = _annotations.annotations ? _annotations.annotations : _annotations;   //服务器拉取的数据
+        global.annotations2 = annotationParse(_annotations).annotations ? annotationParse(_annotations).annotations : annotationParse(_annotations);   //服务器拉取的数据
         DeviceEventEmitter.addListener('MUPDF_Event_Manager',(msg)=>handleListenMuPDF(msg,_params),this);
         return new Promise((resolve,reject) => {
             MuPDF.open({
                 filePath:_filePath,
                 fileName:_fileName,
-                cloudData:_annotations.cloudData,
+                cloudData:annotationParse(_annotations).cloudData,
                 menus:JSON.stringify(_params.menus)||"[{name:\"批注\"}]",
                 theme:_params.theme||"",
                 page:_params.page >= 0 ? _params.page : undefined
