@@ -50,4 +50,12 @@ public class CloudData {
     public void remove(int i){
         RCTMuPdfModule.updateCloudData((int)mFreetext.remove(i).get("page"), sCloudData);
     }
+
+    public HashMap get(int i){
+        return mFreetext.get(i);
+    }
+
+    public void set(int i,HashMap map){
+        mFreetext.set(i,map);
+    }
 }

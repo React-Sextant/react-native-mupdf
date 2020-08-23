@@ -718,7 +718,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                         annotationselectmenu.setY(docRelY-annotationselectmenu.getMeasuredHeight());
                     }
 
-                    // TODO: FreeText也需要可移动
                     if( mTopBarMode != TopBarMode.Move && mDocView.getMode() != MuPDFReaderView.Mode.Move && pageView.getAnnotationType() != null && pageView.getAnnotationType() == Annotation.Type.INK){
                         RCTMuPdfModule.sendIndexSelectedAnnotationEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex());
                     }
@@ -1648,9 +1647,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
         mTopBarMode = TopBarMode.Main;
-        if (pageView != null){
-            pageView.deleteSelectedAnnotation();
-            onAnnotationSave(v);
+        if (pageView != null && pageView.getAnnotationType()!=null){
+            if(pageView.getAnnotationType() == Annotation.Type.FREETEXT){
+                onCancelSelectedAnnotation();
+            }else {
+                pageView.deleteSelectedAnnotation();
+                onAnnotationSave(v);
+            }
+
         }
     }
 

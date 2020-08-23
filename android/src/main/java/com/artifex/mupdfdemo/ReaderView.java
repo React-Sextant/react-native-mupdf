@@ -22,6 +22,7 @@ import com.artifex.utils.PdfBitmap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -70,7 +71,7 @@ public class ReaderView
 	private int               mScrollerLastX;
 	private int               mScrollerLastY;
 
-    private PageView currentPage;
+    private MuPDFPageView currentPage;
     private DigitalizedEventCallback eventCallback;
 
     private float             mLastTouchX;
@@ -558,23 +559,35 @@ public class ReaderView
             movementEnd = (displacementX > 10) || (displacementY > 10);
         }
 
-        /**
-		 * 移动批注(仅INK类型)
-		 * **/
-		if (event.getActionMasked() == MotionEvent.ACTION_MOVE && currentPage != null && currentPage.mItemSelectBox != null && currentPage.mAnnotationType == Annotation.Type.INK) {
+
+		if (event.getActionMasked() == MotionEvent.ACTION_MOVE && currentPage != null && currentPage.mItemSelectBox != null) {
 			float upX = MotionEventCompat.getX(event, ident);
 			float upY = MotionEventCompat.getY(event, ident);
 			float displacementX =  mLastTouchX - upX;
 			float displacementY =  mLastTouchY - upY;
 
 			eventCallback.touchMoveForAnnotation();
-			if(currentPage.mDrawing!=null){
-				for(int i=0;i<currentPage.mDrawing.size();i++){
-					for(int j=0;j<currentPage.mDrawing.get(i).size();j++){
-						currentPage.mDrawing.get(i).get(j).x -= displacementX;
-						currentPage.mDrawing.get(i).get(j).y -= displacementY;
+
+			/**
+			 * 移动批注(仅INK类型)
+			 * **/
+			if(currentPage.mAnnotationType == Annotation.Type.INK){
+				if(currentPage.mDrawing!=null){
+					for(int i=0;i<currentPage.mDrawing.size();i++){
+						for(int j=0;j<currentPage.mDrawing.get(i).size();j++){
+							currentPage.mDrawing.get(i).get(j).x -= displacementX;
+							currentPage.mDrawing.get(i).get(j).y -= displacementY;
+						}
 					}
 				}
+			/**
+			 * 文字批注(仅FREETEXT类型)
+			 * **/
+			}else if(currentPage.mAnnotationType == Annotation.Type.FREETEXT){
+				HashMap map = currentPage.mCloudData.get(currentPage.getFreetextIndex());
+				map.put("x",(float)map.get("x") - displacementX);
+				map.put("y",(float)map.get("y") - displacementY);
+				currentPage.mCloudData.set(currentPage.getFreetextIndex(),map);
 			}
 
 			currentPage.setItemSelectBox(new RectF(
@@ -726,7 +739,7 @@ public class ReaderView
 		int cvLeft, cvRight, cvTop, cvBottom;
 		boolean notPresent = (mChildViews.get(mCurrent) == null);
 		cv = getOrCreateChild(mCurrent);
-        currentPage = (PageView) cv;
+        currentPage = (MuPDFPageView) cv;
 		currentPage.setEventCallback(eventCallback);
 
         currentPage.setParentSize(new Point(right-left, bottom-top));
