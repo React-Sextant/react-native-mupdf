@@ -33,6 +33,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private final int REQUEST_ECODE_SCAN=30725;
     private Promise mPromise;
     public static boolean error;    //打开文件是否报错
+    public static boolean _isInMuPdf;    //是否已经进入
     private static ReactApplicationContext mContext;
     private CloudData mCloudData = CloudData.get();
 
@@ -46,7 +47,7 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
         @Override
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-
+            _isInMuPdf=false;
             if (requestCode == REQUEST_ECODE_SCAN && mPromise != null) {
                 if(error){
                     mPromise.reject("文件打开失败");

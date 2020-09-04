@@ -238,6 +238,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     {
         super.onCreate(savedInstanceState);
 
+        RCTMuPdfModule._isInMuPdf = true;
+
         /**
          * Keep awake
          * **/
@@ -592,7 +594,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 @Override
                                 public void run() {
 
-                                    finish();
+                                    if(RCTMuPdfModule._isInMuPdf){
+                                        finish();
+                                    }
 
                                 }
                             });
