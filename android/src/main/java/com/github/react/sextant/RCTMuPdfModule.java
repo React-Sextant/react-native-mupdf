@@ -47,8 +47,8 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
         @Override
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-            _isInMuPdf=false;
             if (requestCode == REQUEST_ECODE_SCAN && mPromise != null) {
+                _isInMuPdf=false;
                 if(error){
                     mPromise.reject("文件打开失败");
                 }else {
