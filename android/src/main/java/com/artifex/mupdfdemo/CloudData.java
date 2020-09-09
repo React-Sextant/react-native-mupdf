@@ -57,5 +57,6 @@ public class CloudData {
 
     public void set(int i,HashMap map){
         mFreetext.set(i,map);
+        RCTMuPdfModule.updateCloudData((int)map.get("page"), sCloudData);
     }
 }
