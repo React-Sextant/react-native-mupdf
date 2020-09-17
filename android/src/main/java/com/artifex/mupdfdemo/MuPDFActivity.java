@@ -78,6 +78,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private final int    PRINT_REQUEST=1;
     private final int    FILEPICK_REQUEST=2;
     private MuPDFCore    core;
+    private String       mBackName;
     private String       mFileName;
     private String       mFilePath;
     private int          mPage;
@@ -88,6 +89,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private EditText     mFreeTextView;
     private HashMap      mTempMap;   //编辑文本的缓存字典
     private TextView     mFilenameView;
+    private TextView     mBackButton;
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
     private TextView     mPageNumberView;
@@ -265,6 +267,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
          * **/
         if (core == null) {
             Intent intent = getIntent();
+            mBackName = intent.getStringExtra("back");
             mFileName = intent.getStringExtra("fileName");
             mFilePath = intent.getStringExtra("filePath");
             SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
@@ -775,6 +778,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         // Set the file-name text
         mFilenameView.setText(mFileName);
+        mBackButton.setText(mBackName);
 
         // Activate the seekbar
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -1257,6 +1261,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
         mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
         mFilenameView = (TextView)mButtonsView.findViewById(R.id.idFileName);
+        mBackButton = (TextView)mButtonsView.findViewById(R.id.idBackButton);
         mTopBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.idTopBar);
         mSearchBar = (LinearLayout) mButtonsView.findViewById(R.id.idSearchBar);
         mSearchBack = (ImageButton)mButtonsView.findViewById(R.id.searchBack);

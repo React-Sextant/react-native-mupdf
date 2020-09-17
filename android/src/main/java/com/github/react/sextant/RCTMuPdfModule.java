@@ -101,6 +101,11 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
             intent.putExtra("theme", map.getString("theme"));
         }
 
+        // 返回按钮
+        if(map.hasKey("back")){
+            intent.putExtra("back", map.getString("back"));
+        }
+
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
 
