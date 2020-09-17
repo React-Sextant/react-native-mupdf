@@ -23,6 +23,7 @@
 	<string name="draw_freetext">自定义文本批注</string>
 	<string name="edit_annotations">编辑批注</string>
 	<string name="enter_password">输入密码</string>
+	<string name="enter_page">输入页码跳转</string>
 	<string name="entering_reflow_mode">输入重排模式</string>
 	<string name="fill_out_text_field">填充文本字段</string>
 	<string name="format_currently_not_supported">当前不支持此格式</string>

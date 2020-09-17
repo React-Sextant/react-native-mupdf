@@ -2,6 +2,7 @@ package com.artifex.mupdfdemo;
 
 import com.artifex.mupdfdemo.ReaderView.ViewMapper;
 import com.artifex.utils.DigitalizedEventCallback;
+import com.artifex.utils.PageLimitFilter;
 import com.artifex.utils.SharedPreferencesUtil;
 import com.artifex.utils.ThreadPerTaskExecutor;
 import com.facebook.react.ReactActivity;
@@ -30,6 +31,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
@@ -42,7 +44,6 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,9 +51,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
@@ -1701,5 +1699,45 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         int b = Color.blue(color);
         newColor = Color.argb(alpha, r, g, b);
         return newColor;
+    }
+
+    /**
+     * 点击页码info输入页码跳转
+     * **/
+    public void onPageNumberClick(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        showInfo((pageView.getPage()+1)+"/"+core.countPages());
+
+        mPasswordView = new EditText(this);
+        mPasswordView.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
+        mPasswordView.setFilters(new InputFilter[] {new PageLimitFilter(core.countPages())});
+        mPasswordView.setHint("请输入1到"+core.countPages()+"页码");
+
+        AlertDialog alert = mAlertBuilder.create();
+        alert.setTitle(R.string.enter_page);
+        alert.setView(mPasswordView);
+        alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.okay),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                mDocView.setDisplayedViewIndex(Integer.parseInt(mPasswordView.getText().toString())-1);
+                                mPasswordView = null;
+                            }
+                        });
+
+                    }
+                });
+        alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        mPasswordView = null;
+                    }
+                });
+        alert.show();
     }
 }
