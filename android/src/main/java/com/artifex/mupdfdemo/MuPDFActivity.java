@@ -792,45 +792,10 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             }
         });
 
-        // Activate the search-preparing button
-//        mSearchButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                searchModeOn();
-//            }
-//        });
-
-        // Activate the reflow button
-//        mReflowButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                toggleReflow();
-//            }
-//        });
-
-        if (core.fileFormat().startsWith("PDF") && core.isUnencryptedPDF() && !core.wasOpenedFromBuffer())
-        {
-//            mAnnotButton.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    mTopBarMode = TopBarMode.Annot;
-//
-//                }
-//            });
-        }
-        else
-        {
-//            mAnnotButton.setVisibility(View.GONE);
-        }
-
-//        mSearchBack.setEnabled(false);
-//        mSearchFwd.setEnabled(false);
-//        mSearchBack.setColorFilter(Color.argb(255, 128, 128, 128));
-//        mSearchFwd.setColorFilter(Color.argb(255, 128, 128, 128));
 
         mSearchText.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
-                boolean haveText = s.toString().length() > 0;
-//                setButtonEnabled(mSearchBack, haveText);
-//                setButtonEnabled(mSearchFwd, haveText);
                 mSearchSubmit.setVisibility(View.VISIBLE);
                 mSearchBack.setVisibility(View.GONE);
                 mSearchFwd.setVisibility(View.GONE);
@@ -898,12 +863,10 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     startActivityForResult(intent, OUTLINE_REQUEST);
                 }
             });
-//            mOutlineButton.setVisibility(View.GONE);
         }
 
         // Reenstate last state if it was recorded
         SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-//        mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
         mDocView.setDisplayedViewIndex(mPage);
 
         /**
@@ -915,15 +878,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         /**
          * 处理横竖屏时数据丢失问题
          * **/
-        if(savedInstanceState == null||!savedInstanceState.getBoolean("ButtonsHidden", false))
+        if(savedInstanceState == null||!savedInstanceState.getBoolean("ButtonsHidden", false)){
             mButtonsVisible = true;
             hideButtons();
+        }
+
 
         if(savedInstanceState != null && savedInstanceState.getBoolean("SearchMode", false))
             searchModeOn();
-
-        if(savedInstanceState != null && savedInstanceState.getBoolean("ReflowMode", false))
-            reflowModeSet(true);
 
         // Stick the document view and the buttons overlay into a parent view
         RelativeLayout layout = new RelativeLayout(this);
@@ -947,6 +909,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 slideDownToHide(floatingActionButtonSwitcher);
             }
         });
+
+        /**
+         * 横屏时默认上下滑动
+         * **/
+        setHorizontalScrolling();
     }
 
     /**
@@ -1039,31 +1006,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-//    public Object onRetainNonConfigurationInstance()
-//    {
-//        MuPDFCore mycore = core;
-//        core = null;
-//        return mycore;
-//    }
-
-    private void reflowModeSet(boolean reflow)
-    {
-//        mReflow = reflow;
-//        mDocView.setAdapter(mReflow ? new MuPDFReflowAdapter(this, core) : new MuPDFPageAdapter(this, this, core));
-//        mReflowButton.setColorFilter(mReflow ? Color.argb(0xFF, 172, 114, 37) : Color.argb(0xFF, 255, 255, 255));
-//        setButtonEnabled(mAnnotButton, !reflow);
-//        setButtonEnabled(mSearchButton, !reflow);
-//        if (reflow) setLinkHighlight(false);
-//        setButtonEnabled(mLinkButton, !reflow);
-//        setButtonEnabled(mMoreButton, !reflow);
-//        mDocView.refresh(mReflow);
-    }
-
-    private void toggleReflow() {
-        reflowModeSet(!mReflow);
-        showInfo(mReflow ? getString(R.string.entering_reflow_mode) : getString(R.string.leaving_reflow_mode));
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -1094,6 +1036,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
+        setHorizontalScrolling();
+
         mDocView.refresh(false);
     }
 
@@ -1471,8 +1416,17 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             mDocView.setHorizontalScrolling(true);
             showInfo(getString(R.string.page_turn_horizontal));
         }
+    }
 
-
+    public void setHorizontalScrolling(){
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // code for portrait mode
+            mDocView.setHorizontalScrolling(true);
+        } else {
+            // code for landscape mode
+            mDocView.setHorizontalScrolling(false);
+        }
     }
 
     /**
