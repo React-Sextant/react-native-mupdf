@@ -627,6 +627,8 @@ public abstract class PageView extends ViewGroup {
         mDrawing = null;
         if (mSearchView != null)
             mSearchView.invalidate();
+        if (mCustomerView != null)
+            mCustomerView.bringToFront();
     }
 
     /**
