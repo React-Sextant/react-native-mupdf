@@ -68,6 +68,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private FloatingActionsMenu floatingActionsMenu;
     private ViewAnimator floatingActionButtonSwitcher;
     private LinearLayout dynamicMenus;
+    private LinearLayout idMuPDFPopHitSave;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept, Move}
@@ -596,6 +597,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 public void run() {
 
                                     if(RCTMuPdfModule._isInMuPdf){
+                                        onCancelSelectedAnnotation();
                                         finish();
                                     }
 
@@ -735,10 +737,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             @Override
             public void touchMoveForAnnotation() {
                 if(mTopBarMode == TopBarMode.Main){
-                    LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
-                    LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
-                    cancel.setVisibility(View.VISIBLE);
-                    save.setVisibility(View.VISIBLE);
+                    MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                    if (pageView != null && idMuPDFPopHitSave.getVisibility() == View.GONE)
+                        pageView.deleteSelectedAnnotation(pageView.getPage(),pageView.getSelectedAnnotationIndex());
+
+                    idMuPDFPopHitSave.setVisibility(View.VISIBLE);
                     mDocView.setMode(MuPDFReaderView.Mode.Move);
                     mTopBarMode = TopBarMode.Move;
                 }
@@ -1227,6 +1230,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         floatingActionButtonSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.floatingActionButtonSwitcher);
         floatingActionsMenu = (FloatingActionsMenu)mButtonsView.findViewById(R.id.floatingActionsMenu);
 
+        idMuPDFPopHitSave = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
+
         hidePopMenu();
 
     }
@@ -1590,7 +1595,10 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
         mTopBarMode = TopBarMode.Main;
         if (pageView != null){
-            pageView.deleteSelectedAnnotation();
+            if (idMuPDFPopHitSave.getVisibility() != View.VISIBLE) {
+                pageView.deleteSelectedAnnotation();
+            }
+            pageView.deselectAnnotation();
             pageView.cancelDraw();
         }
     }
@@ -1600,10 +1608,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * **/
     public void onSaveSelectedAnnotation(View v){
 
-        LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
-        LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
-        cancel.setVisibility(View.GONE);
-        save.setVisibility(View.GONE);
+        idMuPDFPopHitSave.setVisibility(View.GONE);
 
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
@@ -1612,29 +1617,26 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             if(pageView.getAnnotationType() == Annotation.Type.FREETEXT){
                 onCancelSelectedAnnotation();
             }else {
-                pageView.deleteSelectedAnnotation();
                 onAnnotationSave(v);
             }
-
+            pageView.deselectAnnotation();
+            pageView.cancelDraw();
         }
     }
 
-    /**
-     * 取消保存移动后的批注
-     * **/
-    public void onCancelSelectedAnnotation(View v){
-        onCancelSelectedAnnotation();
-    }
-    public void onCancelSelectedAnnotation(){
-        LinearLayout cancel = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitCancel);
-        LinearLayout save = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
-        cancel.setVisibility(View.GONE);
-        save.setVisibility(View.GONE);
 
+    /**
+     * 取消批注被选框
+     * 当批注移动后，需要保存移动后的批注
+     * **/
+    public void onCancelSelectedAnnotation(){
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
         mTopBarMode = TopBarMode.Main;
         if (pageView != null){
+            if (idMuPDFPopHitSave.getVisibility() == View.VISIBLE) {
+                onSaveSelectedAnnotation(idMuPDFPopHitSave);
+            }
             pageView.deselectAnnotation();
             pageView.cancelDraw();
         }

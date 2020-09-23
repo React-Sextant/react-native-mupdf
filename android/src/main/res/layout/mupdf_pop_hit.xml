@@ -32,27 +32,6 @@
                 android:textSize="15dp" />
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/idMuPDFPopHitCancel"
-            android:onClick="onCancelSelectedAnnotation"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:paddingHorizontal="5dp"
-            android:layout_marginLeft="11dp"
-            android:paddingBottom="13dp"
-            android:paddingTop="13dp"
-            android:visibility="gone"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
-                android:text="@string/cancel"
-                android:textColor="#ffffff"
-                android:textSize="15dp" />
-        </LinearLayout>
-        <LinearLayout
             android:id="@+id/idMuPDFPopHitSave"
             android:onClick="onSaveSelectedAnnotation"
             android:layout_width="wrap_content"
