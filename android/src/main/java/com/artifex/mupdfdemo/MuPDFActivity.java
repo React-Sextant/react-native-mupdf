@@ -725,7 +725,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                         annotationselectmenu.setY(docRelY-annotationselectmenu.getMeasuredHeight());
                     }
 
-                    if( mTopBarMode != TopBarMode.Move && mDocView.getMode() != MuPDFReaderView.Mode.Move && pageView.getAnnotationType() != null && pageView.getAnnotationType() == Annotation.Type.INK){
+                    if( mTopBarMode != TopBarMode.Move && mDocView.getMode() != MuPDFReaderView.Mode.Move && pageView.getAnnotationType() == Annotation.Type.INK){
                         RCTMuPdfModule.sendIndexSelectedAnnotationEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex());
                     }
 
@@ -738,7 +738,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             public void touchMoveForAnnotation() {
                 if(mTopBarMode == TopBarMode.Main){
                     MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-                    if (pageView != null && idMuPDFPopHitSave.getVisibility() == View.GONE)
+                    if (pageView != null && idMuPDFPopHitSave.getVisibility() == View.GONE && pageView.getAnnotationType() == Annotation.Type.INK)
                         pageView.deleteSelectedAnnotation(pageView.getPage(),pageView.getSelectedAnnotationIndex());
 
                     idMuPDFPopHitSave.setVisibility(View.VISIBLE);
@@ -1591,11 +1591,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 删除所选批注
      * **/
     public void onDeleteSelectedAnnotation(View v){
+
+        idMuPDFPopHitSave.setVisibility(View.GONE);
+
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
         mTopBarMode = TopBarMode.Main;
         if (pageView != null){
-            if (idMuPDFPopHitSave.getVisibility() != View.VISIBLE) {
+            if (idMuPDFPopHitSave.getVisibility() != View.VISIBLE || pageView.getAnnotationType() == Annotation.Type.FREETEXT) {
                 pageView.deleteSelectedAnnotation();
             }
             pageView.deselectAnnotation();

@@ -560,7 +560,7 @@ public class ReaderView
         }
 
 
-		if (event.getActionMasked() == MotionEvent.ACTION_MOVE && currentPage != null && currentPage.mItemSelectBox != null) {
+		if (event.getActionMasked() == MotionEvent.ACTION_MOVE && currentPage != null && currentPage.mItemSelectBox != null && (currentPage.mAnnotationType == Annotation.Type.INK || currentPage.mAnnotationType == Annotation.Type.FREETEXT)) {
 			float upX = MotionEventCompat.getX(event, ident);
 			float upY = MotionEventCompat.getY(event, ident);
 			float displacementX =  mLastTouchX - upX;
