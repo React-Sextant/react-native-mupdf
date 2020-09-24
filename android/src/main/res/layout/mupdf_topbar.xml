@@ -56,7 +56,7 @@
                 android:textSize="14dp"
                 android:maxLines="1"
                 android:layout_marginRight="90dp"
-                android:layout_marginLeft="90dp"
+                android:layout_marginLeft="100dp"
                 android:ellipsize="end"
                 android:text="暂无文件名"/>
 
