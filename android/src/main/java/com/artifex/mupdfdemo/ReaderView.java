@@ -338,7 +338,10 @@ public class ReaderView
 	public void refresh(boolean reflow) {
 		mReflow = reflow;
 		mReflowChanged = true;
-		mResetLayout = true;
+		/**
+		 * TODO: Mupdf横竖屏切换时 批注无法被选中
+		 * **/
+//		mResetLayout = true;
 
 		mScale = 1.0f;
 		mXScroll = mYScroll = 0;
