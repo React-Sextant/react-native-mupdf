@@ -134,4 +134,9 @@ public class MuPDFPageAdapter extends BaseAdapter {
 		getPdfBitmapList().add(pdfBitmap);
 	}
 
+	public void refresh() {
+		pages.clear();
+		mPageSizes.clear();
+	}
+
 }

@@ -47,7 +47,7 @@ public class ReaderView
 
 	private boolean HORIZONTAL_SCROLLING = true;
 
-	private Adapter           mAdapter;
+	private MuPDFPageAdapter           mAdapter;
 	protected int               mCurrent;    // Adapter's index for the current view
 	private boolean           mResetLayout;
 	protected final SparseArray<View>
@@ -338,14 +338,12 @@ public class ReaderView
 	public void refresh(boolean reflow) {
 		mReflow = reflow;
 		mReflowChanged = true;
-		/**
-		 * TODO: Mupdf横竖屏切换时 批注无法被选中
-		 * **/
-//		mResetLayout = true;
+		mResetLayout = true;
 
 		mScale = 1.0f;
 		mXScroll = mYScroll = 0;
 
+		mAdapter.refresh();
 		requestLayout();
 	}
 
@@ -839,7 +837,7 @@ public class ReaderView
 
 	@Override
 	public void setAdapter(Adapter adapter) {
-		mAdapter = adapter;
+		mAdapter = (MuPDFPageAdapter) adapter;
 
 		requestLayout();
 	}
