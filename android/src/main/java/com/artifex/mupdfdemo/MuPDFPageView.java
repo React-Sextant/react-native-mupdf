@@ -769,8 +769,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 	@Override
 	public void setPage(final int page, PointF size) {
-		loadAnnotations();
-
 		mLoadWidgetAreas = new AsyncTask<Void,Void,RectF[]> () {
 			@Override
 			protected RectF[] doInBackground(Void... arg0) {
@@ -779,6 +777,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			@Override
 			protected void onPostExecute(RectF[] result) {
+				loadAnnotations();
 				mWidgetAreas = result;
 			}
 		};
