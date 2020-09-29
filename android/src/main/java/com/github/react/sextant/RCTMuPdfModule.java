@@ -116,7 +116,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     public static void setUpListener(MyListener Listener) { myListener = Listener; }
     @ReactMethod
     public void sendData(String str){
-        myListener.onEvent(str);
+        if(_isInMuPdf && myListener != null){
+            myListener.onEvent(str);
+        }
     }
 
 

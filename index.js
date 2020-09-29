@@ -26,6 +26,9 @@ let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次
  * **/
 export async function openMuPDF2(params){
     if(_isInMuPdf){
+        setTimeout(()=>{
+            _isInMuPdf = false
+        },2000);
         return false;
     }else {
         Progress.setLoading(0.01);
@@ -60,7 +63,10 @@ export async function openMuPDF2(params){
 
 export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
     if(_isInMuPdf){
-        return false;
+        setTimeout(()=>{
+            _isInMuPdf = false
+        },2000);
+        return new Promise(() => {})
     }else {
         _isInMuPdf = true;
         global.annotations = {};    //当前pdf产生的临时数据
@@ -97,15 +103,17 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
     }
 }
 export function finishPDFActivity(){
-    if(_isInMuPdf){
-        sendData(JSON.stringify({
-            type:"finish_activity"
-        }))
-    }
+    sendData(JSON.stringify({
+        type:"finish_activity"
+    }))
 }
 export function sendData(args){
-    if(_isInMuPdf && typeof args === "string"){
-        MuPDF.sendData(args)
+    try{
+        if(typeof JSON.parse(args) === "object"){
+            MuPDF.sendData(args)
+        }
+    }catch (e) {
+
     }
 }
 /**
