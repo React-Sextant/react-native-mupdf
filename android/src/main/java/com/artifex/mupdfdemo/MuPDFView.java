@@ -31,6 +31,8 @@ public interface MuPDFView {
 	public void deselectAnnotation();
 	public void startDraw(float x, float y);
 	public void continueDraw(float x, float y);
+	public void continueDrawLine(float x, float y);
+	public void stopDraw();
 	public void cancelDraw();
 	public boolean saveDraw();
 	public boolean saveDraw(int page, PointF[][] arcs);

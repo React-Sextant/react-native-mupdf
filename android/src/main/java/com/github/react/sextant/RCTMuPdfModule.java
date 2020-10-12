@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.CloudData;
 import com.artifex.mupdfdemo.MuPDFActivity;
+import com.artifex.mupdfdemo.PageView;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseActivityEventListener;
@@ -104,6 +105,11 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         // 返回按钮
         if(map.hasKey("back")){
             intent.putExtra("back", map.getString("back"));
+        }
+
+        // 批注粗细
+        if(map.hasKey("INK_THICKNESS")){
+            PageView.INK_THICKNESS = (float)map.getInt("INK_THICKNESS");
         }
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);

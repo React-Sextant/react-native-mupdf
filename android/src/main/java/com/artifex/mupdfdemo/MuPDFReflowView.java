@@ -131,6 +131,14 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	public void continueDraw(float x, float y) {
 	}
 
+	@Override
+	public void continueDrawLine(float x, float y) {
+	}
+
+	@Override
+	public void stopDraw() {
+	}
+
 	public void cancelDraw() {
 	}
 

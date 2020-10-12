@@ -106,7 +106,7 @@ public abstract class PageView extends ViewGroup {
     private static final int BOX_COLOR = 0xFF696969;// 选中时边框的颜色
     private static final int INK_COLOR = 0xFFF00000;// 绘制时画笔颜色
     private static final int FREETEXT_COLOR = 0xFFFF0000;// 文本批注字体颜色
-    private static final float INK_THICKNESS = 8.0f;// 绘制时画笔宽
+    public static float INK_THICKNESS = 8.0f;// 绘制时画笔宽
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
     private static final int PROGRESS_DIALOG_DELAY = 200;
 
@@ -621,6 +621,39 @@ public abstract class PageView extends ViewGroup {
             if (mSearchView != null)
                 mSearchView.invalidate();
         }
+    }
+
+    /**
+     * 直线批注
+     * **/
+    public void continueDrawLine(float x, float y){
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+
+        if (mDrawing != null && mDrawing.size() > 0) {
+            ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
+            if(arc.size() > 1){
+                arc.set(1,new PointF(docRelX, docRelY));
+            }else {
+                arc.add(new PointF(docRelX, docRelY));
+            }
+
+            if (mSearchView != null)
+                mSearchView.invalidate();
+        }
+    }
+
+    /**
+     * 单点批注不保存
+     * **/
+    public void stopDraw(){
+        ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
+        if(arc.size() == 1){
+            mDrawing.remove(mDrawing.size() - 1);
+        }
+        if (mSearchView != null)
+            mSearchView.invalidate();
     }
 
     public void cancelDraw() {

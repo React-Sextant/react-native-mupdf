@@ -16,9 +16,11 @@ import java.util.Date;
 
 public class MuPDFReaderView extends ReaderView {
 	enum Mode {Viewing, Selecting, Drawing, Freetexting, Move}
+	enum DrawingMode {DrawPencil, DrawLine, DrawRect, DrawCircle}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
+	private DrawingMode mDrawingMode = DrawingMode.DrawPencil;
 	private boolean tapDisabled = false;
 	private boolean isLongPressed = false;//Continue onScroll event after onLongPress 长按事件之后继续其他事件
 	private int tapPageMargin;
@@ -44,6 +46,10 @@ public class MuPDFReaderView extends ReaderView {
 
 	public Mode getMode() {
 		return mMode;
+	}
+
+	public void setDrawingMode(DrawingMode m) {
+		mDrawingMode = m;
 	}
 
 	private void setup()
@@ -274,7 +280,12 @@ public class MuPDFReaderView extends ReaderView {
 				MuPDFView pageView = (MuPDFView)getDisplayedView();
 				if (pageView != null)
 				{
-					pageView.continueDraw(x, y);
+					if(mDrawingMode == DrawingMode.DrawPencil){
+						pageView.continueDraw(x, y);
+					}else if(mDrawingMode == DrawingMode.DrawLine){
+						pageView.continueDrawLine(x, y);
+					}
+
 				}
 				mX = x;
 				mY = y;
@@ -283,6 +294,13 @@ public class MuPDFReaderView extends ReaderView {
 	}
 
 	private void touch_up() {
+		if ( mMode == Mode.Drawing ) {
+			MuPDFView pageView = (MuPDFView)getDisplayedView();
+			if (pageView != null)
+			{
+				pageView.stopDraw();
+			}
+		}
 
 	}
 

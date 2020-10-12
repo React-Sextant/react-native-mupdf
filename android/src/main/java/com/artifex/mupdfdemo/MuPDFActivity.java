@@ -1387,7 +1387,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * **/
 
     /**
-     * 批注
+     * 手写批注
      * **/
     public void onPizhuClick(View v){
         onCancelSave(v);
@@ -1396,7 +1396,21 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         mTopBarMode = TopBarMode.Accept;
         mDocView.setMode(MuPDFReaderView.Mode.Drawing);
+        mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
         showInfo(getString(R.string.draw_annotation));
+    }
+
+    /**
+     * UNDO: 多种批注
+     * **/
+    public void onMultiplePizhuClick(View v){
+        onCancelSave(v);
+        hideButtons();
+//        slideUpToVisible(mAcceptSwitcher);
+//
+//        mTopBarMode = TopBarMode.Accept;
+//        mDocView.setMode(MuPDFReaderView.Mode.Drawing);
+//        mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
     }
 
     /**
