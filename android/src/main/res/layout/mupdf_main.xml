@@ -8,6 +8,8 @@
 
     <include layout="@layout/mupdf_bottombar" />
 
+    <include layout="@layout/mupdf_bottombar_multiple" />
+
     <include layout="@layout/mupdf_accept" />
 
     <include layout="@layout/mupdf_pop_menu" />

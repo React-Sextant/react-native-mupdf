@@ -60,6 +60,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private LinearLayout mSearchBar;
     private ViewAnimator mBottomBarSwitcher;
     private ViewAnimator mAcceptSwitcher;
+    private ViewAnimator mMultipleSwitcher;
     private Vibrator vibrator;
     private RelativeLayout bookselecttextup;
     private RelativeLayout bookselecttextdown;
@@ -1109,6 +1110,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             mButtonsVisible = false;
             hideKeyboard();
             slideDownToHide(mBottomBarSwitcher);
+            slideDownToHide(mMultipleSwitcher);
             mPageNumberView.setVisibility(View.INVISIBLE);
         }
 
@@ -1215,9 +1217,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mSearchText = (EditText)mButtonsView.findViewById(R.id.searchText);
         mSearchSubmit = (TextView) mButtonsView.findViewById(R.id.searchSubmit);
         mAcceptSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.annotationConfirm);
+        mMultipleSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.annotationMultiple);
         mOutlineButton = (LinearLayout) mButtonsView.findViewById(R.id.outlineButton);
         mInfoView.setVisibility(View.INVISIBLE);
-        mAcceptSwitcher.setVisibility(View.INVISIBLE);
+        mAcceptSwitcher.setVisibility(View.GONE);
+        mMultipleSwitcher.setVisibility(View.GONE);
 
         bookselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.bookselectmenu);//主菜单
         bookselecttextup = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextup);//上箭头
@@ -1322,7 +1326,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     /************ Animate Tools ************/
     //向上滑动以显示
     public void slideUpToVisible(final ViewAnimator v){
-        v.setVisibility(View.INVISIBLE);
+        v.setVisibility(View.GONE);
         Animation anim = new TranslateAnimation(0,0, v.getHeight(),0);
         anim.setDuration(200);
         anim.setAnimationListener(new Animation.AnimationListener() {
@@ -1336,7 +1340,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     }
     //向上滑动以隐藏
     public void slideUpToHide(final ViewAnimator v){
-        if(v.getVisibility() == View.INVISIBLE){
+        if(v.getVisibility() == View.GONE){
             return;
         }
         Animation anim = new TranslateAnimation(0,0,0, -v.getHeight());
@@ -1345,7 +1349,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             public void onAnimationStart(Animation animation) {}
             public void onAnimationRepeat(Animation animation) {}
             public void onAnimationEnd(Animation animation) {
-                v.setVisibility(View.INVISIBLE);
+                v.setVisibility(View.GONE);
             }
         });
         v.startAnimation(anim);
@@ -1396,21 +1400,36 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         mTopBarMode = TopBarMode.Accept;
         mDocView.setMode(MuPDFReaderView.Mode.Drawing);
-        mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
+        if(v.getTag() != null){
+            switch (v.getTag().toString()){
+                case "onPizhuClickLine":
+                    mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawLine);
+                    break;
+                case "onPizhuClickRectangle":
+                    mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawRect);
+                    break;
+                case "onPizhuClickEllipse":
+                    mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawCircle);
+                    break;
+                default:
+                    mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
+                    break;
+            }
+        }else {
+            mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
+        }
+
         showInfo(getString(R.string.draw_annotation));
     }
 
     /**
-     * UNDO: 多种批注
+     * 打开多种批注菜单
      * **/
     public void onMultiplePizhuClick(View v){
         onCancelSave(v);
         hideButtons();
-//        slideUpToVisible(mAcceptSwitcher);
-//
-//        mTopBarMode = TopBarMode.Accept;
-//        mDocView.setMode(MuPDFReaderView.Mode.Drawing);
-//        mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawPencil);
+        slideUpToVisible(mMultipleSwitcher);
+        mButtonsVisible = true;
     }
 
     /**
@@ -1503,6 +1522,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 打开搜索
      * **/
     public void OnOpenSearchButtonClick(View v){
+        hideButtons();
         searchModeOn();
     }
 

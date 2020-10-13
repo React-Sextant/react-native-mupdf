@@ -645,6 +645,65 @@ public abstract class PageView extends ViewGroup {
     }
 
     /**
+     * 矩形批注
+     * **/
+    public void continueDrawRect(float x, float y) {
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+
+        if (mDrawing != null && mDrawing.size() > 0) {
+            ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
+            if(arc.size() == 8){
+                arc.set(1,new PointF(arc.get(0).x, docRelY));
+                arc.set(2,new PointF(arc.get(0).x, docRelY));
+                arc.set(3,new PointF(docRelX, docRelY));
+                arc.set(4,new PointF(docRelX, docRelY));
+                arc.set(5,new PointF(docRelX, arc.get(0).y));
+                arc.set(6,new PointF(docRelX, arc.get(0).y));
+                arc.set(7,new PointF(arc.get(0).x, arc.get(0).y));
+            }else {
+                arc.add(new PointF(arc.get(0).x, docRelY));
+                arc.add(new PointF(arc.get(0).x, docRelY));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF(docRelX, arc.get(0).y));
+                arc.add(new PointF(docRelX, arc.get(0).y));
+                arc.add(new PointF(arc.get(0).x, arc.get(0).y));
+            }
+
+            if (mSearchView != null)
+                mSearchView.invalidate();
+        }
+    }
+
+    /**
+     * 圆形批注
+     * TODO: draw a circle without use canvas.drawCircle()
+     * **/
+    public void continueDrawCircle(float x, float y) {
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+
+        if (mDrawing != null && mDrawing.size() > 0) {
+            ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
+            if(arc.size() == 4){
+                arc.set(1,new PointF(arc.get(0).x, docRelY));
+                arc.set(2,new PointF(docRelX, docRelY));
+                arc.set(3,new PointF(docRelX, arc.get(0).y));
+            }else {
+                arc.add(new PointF(arc.get(0).x, docRelY));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF(docRelX, arc.get(0).y));
+            }
+
+            if (mSearchView != null)
+                mSearchView.invalidate();
+        }
+    }
+
+    /**
      * 单点批注不保存
      * **/
     public void stopDraw(){

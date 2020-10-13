@@ -284,6 +284,10 @@ public class MuPDFReaderView extends ReaderView {
 						pageView.continueDraw(x, y);
 					}else if(mDrawingMode == DrawingMode.DrawLine){
 						pageView.continueDrawLine(x, y);
+					}else if(mDrawingMode == DrawingMode.DrawRect){
+						pageView.continueDrawRect(x, y);
+					}else if(mDrawingMode == DrawingMode.DrawCircle){
+						pageView.continueDrawCircle(x, y);
 					}
 
 				}
