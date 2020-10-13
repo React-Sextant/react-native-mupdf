@@ -75,6 +75,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
         DeviceEventEmitter.addListener('MUPDF_Event_Manager',(msg)=>handleListenMuPDF(msg,_params),this);
         return new Promise((resolve,reject) => {
             MuPDF.open({
+                ..._params,
                 filePath:_filePath,
                 fileName:_fileName,
                 cloudData:annotationParse(_annotations).cloudData,

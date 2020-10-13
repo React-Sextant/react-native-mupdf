@@ -813,11 +813,7 @@ public abstract class PageView extends ViewGroup {
      * 获得画笔粗细
      */
     protected float getInkThickness() {
-        if (CURRENT_SCALE == 0) {
-            return 9.07563f / 2;
-        } else {
-            return (INK_THICKNESS * CURRENT_SCALE) / 2;
-        }
+        return INK_THICKNESS / 2;
     }
 
     /**
