@@ -51,18 +51,18 @@
                     android:onClick="onPizhuClick"
                     android:src="@mipmap/rectangle" />
             </LinearLayout>
-<!--            <LinearLayout-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1">-->
-<!--                <ImageButton-->
-<!--                    android:background="@drawable/button"-->
-<!--                    android:layout_width="fill_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:tag="onPizhuClickEllipse"-->
-<!--                    android:onClick="onPizhuClick"-->
-<!--                    android:src="@mipmap/ellipse" />-->
-<!--            </LinearLayout>-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <ImageButton
+                    android:background="@drawable/button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:tag="onPizhuClickEllipse"
+                    android:onClick="onPizhuClick"
+                    android:src="@mipmap/ellipse" />
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </ViewAnimator>

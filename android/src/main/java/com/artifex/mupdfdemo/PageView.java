@@ -679,8 +679,9 @@ public abstract class PageView extends ViewGroup {
 
     /**
      * 圆形批注
-     * TODO: draw a circle without use canvas.drawCircle()
+     * TODO: 未实现椭圆
      * **/
+    PointF center;
     public void continueDrawCircle(float x, float y) {
         float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
         float docRelX = (x - getLeft()) / scale;
@@ -688,14 +689,31 @@ public abstract class PageView extends ViewGroup {
 
         if (mDrawing != null && mDrawing.size() > 0) {
             ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
-            if(arc.size() == 4){
-                arc.set(1,new PointF(arc.get(0).x, docRelY));
-                arc.set(2,new PointF(docRelX, docRelY));
-                arc.set(3,new PointF(docRelX, arc.get(0).y));
+            // 方案1： 第一个点为最左边的点
+//            PointF center = new PointF((docRelX+arc.get(0).x)/2,(docRelY+arc.get(0).y)/2);
+//
+//            if(arc.size() == 25){
+//                for (int i = 1; i < 25; i++) {
+//                    arc.set(i, new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+//                }
+//            }else {
+//                for (int i = 1; i < 25; i++) {
+//                    arc.add(new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+//                }
+//            }
+
+            // 方案2：第一个点为中心点
+            if(arc.size() == 25){
+                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
+                for (int i = 0; i < 25; i++) {
+                    arc.set(i, new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
+                }
             }else {
-                arc.add(new PointF(arc.get(0).x, docRelY));
-                arc.add(new PointF(docRelX, docRelY));
-                arc.add(new PointF(docRelX, arc.get(0).y));
+                center = arc.get(0);
+                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
+                for (int i = 1; i < 25; i++) {
+                    arc.add(new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
+                }
             }
 
             if (mSearchView != null)
