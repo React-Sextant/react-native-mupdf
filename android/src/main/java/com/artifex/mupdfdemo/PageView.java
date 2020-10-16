@@ -681,7 +681,7 @@ public abstract class PageView extends ViewGroup {
      * 圆形批注
      * TODO: 未实现椭圆
      * **/
-    PointF center;
+//    PointF center;
     public void continueDrawCircle(float x, float y) {
         float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
         float docRelX = (x - getLeft()) / scale;
@@ -690,31 +690,77 @@ public abstract class PageView extends ViewGroup {
         if (mDrawing != null && mDrawing.size() > 0) {
             ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
             // 方案1： 第一个点为最左边的点
-//            PointF center = new PointF((docRelX+arc.get(0).x)/2,(docRelY+arc.get(0).y)/2);
-//
+            PointF center = new PointF((docRelX+arc.get(0).x)/2,(docRelY+arc.get(0).y)/2);
+
+            if(arc.size() == 25){
+                for (int i = 1; i < 25; i++) {
+                    arc.set(i, new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+                }
+            }else {
+                for (int i = 1; i < 25; i++) {
+                    arc.add(new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+                }
+            }
+
+            // 方案2：第一个点为中心点
 //            if(arc.size() == 25){
-//                for (int i = 1; i < 25; i++) {
-//                    arc.set(i, new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+//                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
+//                for (int i = 0; i < 25; i++) {
+//                    arc.set(i, new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
 //                }
 //            }else {
+//                center = arc.get(0);
+//                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
 //                for (int i = 1; i < 25; i++) {
-//                    arc.add(new PointF((float) (arc.get(0).x + (1 - Math.cos(Math.PI / 360 * i * 30)) * (center.x - arc.get(0).x)), (float) (arc.get(0).y + Math.sin(Math.PI / 360 * i * 30) * (center.x - arc.get(0).x))));
+//                    arc.add(new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
 //                }
 //            }
 
-            // 方案2：第一个点为中心点
-            if(arc.size() == 25){
-                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
-                for (int i = 0; i < 25; i++) {
-                    arc.set(i, new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
-                }
-            }else {
-                center = arc.get(0);
-                PointF radius = new PointF(Math.abs(docRelX-center.x),Math.abs(docRelY-center.y));
-                for (int i = 1; i < 25; i++) {
-                    arc.add(new PointF((float) (center.x-radius.x * Math.cos(Math.PI / 360 * i * 30)),(float) (center.y+radius.x * Math.sin(Math.PI / 360 * i * 30))));
-                }
-            }
+            //方案3：两点确定一个矩形，根据矩形来画圆。一共12个点
+//            if(arc.size() == 13){
+//                arc.set(0,new PointF((center.x+docRelX)/2,center.y));
+//
+//                arc.set(1,new PointF((3*center.x+docRelX)/4,(7*center.y+docRelY)/8));
+//                arc.set(2,new PointF((7*center.x+docRelX)/8,(3*center.y+docRelY)/4));
+//
+//                arc.set(3,new PointF(center.x,(center.y+docRelY)/2));
+//
+//                arc.set(4,new PointF((7*center.x+docRelX)/8,(center.y+3*docRelY)/4));
+//                arc.set(5,new PointF((3*center.x+docRelX)/4,(center.y+7*docRelY)/8));
+//
+//                arc.set(6,new PointF((center.x+docRelX)/2,docRelY));
+//
+//                arc.set(7,new PointF((center.x+3*docRelX)/4,(center.y+7*docRelY)/8));
+//                arc.set(8,new PointF((center.x+7*docRelX)/8,(center.y+3*docRelY)/4));
+//
+//                arc.set(9,new PointF(docRelX,(center.y+docRelY)/2));
+//
+//                arc.set(10,new PointF((center.x+7*docRelX)/8,(3*center.y+docRelY)/4));
+//                arc.set(11,new PointF((center.x+3*docRelX)/4,(7*center.y+docRelY)/8));
+//
+//                arc.set(12,new PointF((center.x+docRelX)/2,center.y));
+//            }else {
+//                center = arc.get(0);
+//                arc.add(new PointF((center.x+docRelX)/2,center.y));
+//
+//                arc.add(new PointF((3*center.x+docRelX)/4,(7*center.y+docRelY)/8));
+//                arc.add(new PointF((7*center.x+docRelX)/8,(3*center.y+docRelY)/4));
+//
+//                arc.add(new PointF(center.x,(center.y+docRelY)/2));
+//
+//                arc.add(new PointF((7*center.x+docRelX)/8,(center.y+3*docRelY)/4));
+//                arc.add(new PointF((3*center.x+docRelX)/4,(center.y+7*docRelY)/8));
+//
+//                arc.add(new PointF((center.x+docRelX)/2,docRelY));
+//
+//                arc.add(new PointF((center.x+3*docRelX)/4,(center.y+7*docRelY)/8));
+//                arc.add(new PointF((center.x+7*docRelX)/8,(center.y+3*docRelY)/4));
+//
+//                arc.add(new PointF(docRelX,(center.y+docRelY)/2));
+//
+//                arc.add(new PointF((center.x+7*docRelX)/8,(3*center.y+docRelY)/4));
+//                arc.add(new PointF((center.x+3*docRelX)/4,(7*center.y+docRelY)/8));
+//            }
 
             if (mSearchView != null)
                 mSearchView.invalidate();
