@@ -32,7 +32,7 @@ export async function openMuPDF2(params){
         },2000);
         return false;
     }else {
-        Progress.setLoading(0.01);
+        Progress.setLoading(0.001);
         let cache_list = params.cacheList || JSON.parse(await AsyncStorage.getItem('mupdf_file_data_path')||"[]");
         let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
         if(index>-1) {
@@ -127,6 +127,7 @@ export function downloadFileFetch(params,callback,errorBack){
         unsubscribe = NetInfo.addEventListener(handleConnectivityChange);
         Progress.setLoading(0.001);
         let task = RNFetchBlob.config({
+            timeout:15000,
             fileCache: true,
             appendExt: params.url.indexOf(".tif")>-1?'tif':'pdf'
         }).fetch('GET', params.url,params.headers);
