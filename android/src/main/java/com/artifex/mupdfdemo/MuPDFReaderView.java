@@ -194,15 +194,33 @@ public class MuPDFReaderView extends ReaderView {
 		{
 			float x = event.getX();
 			float y = event.getY();
+			int toolType=event.getToolType(0);
 			switch (event.getAction())
 			{
 				case MotionEvent.ACTION_DOWN:
+					/**
+					 * 笔触与手触事件
+					 * 场景1: only finger 设为默认
+					 * 场景2: stylus first , finger after（系统自动优化）
+					 * 场景3: finger first , stylus after
+					 *  - 利用时间差判断，短时间内finger的操作需要被撤销
+					 *  - finger还在就开始stylus（系统自动优化）
+					 * **/
+					if(toolType == MotionEvent.TOOL_TYPE_STYLUS && touchDuration > 0 && new Date().getTime() - touchDuration < 150){
+						touch_undo();
+					}
+
 					touch_start(x, y);
 					break;
 				case MotionEvent.ACTION_MOVE:
 					touch_move(x, y);
 					break;
 				case MotionEvent.ACTION_UP:
+					if(toolType == MotionEvent.TOOL_TYPE_FINGER){
+						touchDuration = new Date().getTime();
+					}else {
+						touchDuration = 0;
+					}
 					touch_up();
 					break;
 			}
@@ -306,6 +324,16 @@ public class MuPDFReaderView extends ReaderView {
 			}
 		}
 
+	}
+
+	private void touch_undo() {
+		if ( mMode == Mode.Drawing ) {
+			MuPDFView pageView = (MuPDFView)getDisplayedView();
+			if (pageView != null)
+			{
+				pageView.undoDraw();
+			}
+		}
 	}
 
 	protected void onChildSetup(int i, View v) {

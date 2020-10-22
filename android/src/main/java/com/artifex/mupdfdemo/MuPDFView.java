@@ -35,6 +35,7 @@ public interface MuPDFView {
 	public void continueDrawRect(float x, float y);
 	public void continueDrawCircle(float x, float y);
 	public void stopDraw();
+	public void undoDraw();
 	public void cancelDraw();
 	public boolean saveDraw();
 	public boolean saveDraw(int page, PointF[][] arcs);

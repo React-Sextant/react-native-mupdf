@@ -779,6 +779,19 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
+    /**
+     * 回退上一步
+     * **/
+    public void undoDraw() {
+        if(mDrawing.size() > 0){
+            mDrawing.remove(mDrawing.size() - 1);
+
+            if (mSearchView != null)
+                mSearchView.invalidate();
+        }
+
+    }
+
     public void cancelDraw() {
         mDrawing = null;
         if (mSearchView != null)
