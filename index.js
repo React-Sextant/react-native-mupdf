@@ -123,7 +123,7 @@ export function sendData(args){
 export function downloadFileFetch(params,callback,errorBack){
     try{
         NetInfo.isConnected.addEventListener('connectionChange', handleConnectivityChange);
-        Progress.setLoading(0.01);
+        Progress.setLoading(0.001);
         let task = RNFetchBlob.config({
             fileCache: true,
             appendExt: params.url.indexOf(".tif")>-1?'tif':'pdf'
