@@ -41,7 +41,12 @@ public class MuPDFReaderView extends ReaderView {
 	}
 
 	public void setMode(Mode m) {
-		mMode = m;
+		if(mMode == Mode.Freetexting && m != Mode.Freetexting){
+			mMode = m;
+			onFreetextAdd(-1,-1);
+		}else {
+			mMode = m;
+		}
 	}
 
 	public Mode getMode() {

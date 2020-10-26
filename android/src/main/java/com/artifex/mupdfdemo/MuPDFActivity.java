@@ -415,7 +415,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             protected void onFreetextAdd(float x, float y) {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 //再次点击画布时取消编辑并保存已键入的值
-                if(mFreeTextView.getVisibility() == View.VISIBLE){
+                //x=-1&&y=1 fix:文本批注时点击其他按钮不会自动保存bug
+                if(mFreeTextView.getVisibility() == View.VISIBLE || (x == -1 && y == -1)){
                     mDocView.setMode(Mode.Viewing);
                     mFreeTextView.setVisibility(View.INVISIBLE);
                     annotationselectmenu.setVisibility(View.INVISIBLE);
@@ -981,6 +982,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     }
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
+                            mDocView.setMode(MuPDFReaderView.Mode.Viewing);
                             RCTMuPdfModule.sendDynamicMenusButtonEvent(jsonObject.get("name").getAsString(),menus);
                         }
                     });
@@ -1111,7 +1113,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             hideKeyboard();
             slideDownToHide(mBottomBarSwitcher);
             slideDownToHide(mMultipleSwitcher);
-            mPageNumberView.setVisibility(View.INVISIBLE);
+            mPageNumberView.setVisibility(View.GONE);
         }
 
         searchModeOff();
