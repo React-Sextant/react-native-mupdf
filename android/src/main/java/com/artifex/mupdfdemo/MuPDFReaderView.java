@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class MuPDFReaderView extends ReaderView {
 	enum Mode {Viewing, Selecting, Drawing, Freetexting, Move}
-	enum DrawingMode {DrawPencil, DrawLine, DrawRect, DrawCircle}
+	enum DrawingMode {DrawPencil, DrawLine, DrawArrow, DrawRect, DrawCircle}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
@@ -205,7 +205,7 @@ public class MuPDFReaderView extends ReaderView {
 					 *  - 利用时间差判断，短时间内finger的操作需要被撤销
 					 *  - finger还在就开始stylus（系统自动优化）
 					 * **/
-					if(toolType == MotionEvent.TOOL_TYPE_STYLUS && touchDuration > 0 && new Date().getTime() - touchDuration < 150){
+					if(toolType == MotionEvent.TOOL_TYPE_STYLUS && touchDuration > 0 && new Date().getTime() - touchDuration < 300){
 						touch_undo();
 					}
 
@@ -301,6 +301,8 @@ public class MuPDFReaderView extends ReaderView {
 						pageView.continueDraw(x, y);
 					}else if(mDrawingMode == DrawingMode.DrawLine){
 						pageView.continueDrawLine(x, y);
+					}else if(mDrawingMode == DrawingMode.DrawArrow){
+						pageView.continueDrawArrow(x, y);
 					}else if(mDrawingMode == DrawingMode.DrawRect){
 						pageView.continueDrawRect(x, y);
 					}else if(mDrawingMode == DrawingMode.DrawCircle){

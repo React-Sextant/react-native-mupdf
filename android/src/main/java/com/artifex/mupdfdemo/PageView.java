@@ -106,7 +106,7 @@ public abstract class PageView extends ViewGroup {
     private static final int BOX_COLOR = 0xFF696969;// 选中时边框的颜色
     private static final int INK_COLOR = 0xFFF00000;// 绘制时画笔颜色
     private static final int FREETEXT_COLOR = 0xFFFF0000;// 文本批注字体颜色
-    public static float INK_THICKNESS = 8.0f;// 绘制时画笔宽
+    public static float INK_THICKNESS = 4.0f;// 绘制时画笔宽
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
     private static final int PROGRESS_DIALOG_DELAY = 200;
 
@@ -633,9 +633,58 @@ public abstract class PageView extends ViewGroup {
 
         if (mDrawing != null && mDrawing.size() > 0) {
             ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
-            if(arc.size() > 1){
+            if(arc.size() == 2){
                 arc.set(1,new PointF(docRelX, docRelY));
             }else {
+                arc.add(new PointF(docRelX, docRelY));
+            }
+
+            if (mSearchView != null)
+                mSearchView.invalidate();
+        }
+    }
+
+    /**
+     * 箭头批注
+     * **/
+    public void continueDrawArrow(float x, float y){
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+
+        if (mDrawing != null && mDrawing.size() > 0) {
+            ArrayList<PointF> arc = mDrawing.get(mDrawing.size() - 1);
+
+            float fromX = arc.get(0).x;
+            float fromY = arc.get(0).y;
+            float toX = docRelX;
+            float toY = docRelY;
+            int headlen = 60;//自定义箭头线的长度
+            int theta = 35;//自定义箭头线与直线的夹角
+            // 计算各角度和对应的箭头终点坐标
+            double angle = Math.atan2(fromY-toY , fromX-toX) * 180 / Math.PI;
+            double angle1 = (angle + theta) * Math.PI / 180;
+            double angle2 = (angle - theta) * Math.PI / 180;
+            double topX = headlen * Math.cos(angle1);
+            double topY = headlen * Math.sin(angle1);
+            double botX = headlen * Math.cos(angle2);
+            double botY = headlen * Math.sin(angle2);
+
+            if(arc.size() == 8){
+                arc.set(1,new PointF(docRelX, docRelY));
+                arc.set(2,new PointF(docRelX, docRelY));
+                arc.set(3,new PointF((float)(toX+topX), (float)(toY+topY)));
+                arc.set(4,new PointF(docRelX, docRelY));
+                arc.set(5,new PointF(docRelX, docRelY));
+                arc.set(6,new PointF((float)(toX+botX), (float)(toY+botY)));
+                arc.set(7,new PointF(docRelX, docRelY));
+            }else {
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF((float)(toX+topX), (float)(toY+topY)));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF(docRelX, docRelY));
+                arc.add(new PointF((float)(toX+botX), (float)(toY+botY)));
                 arc.add(new PointF(docRelX, docRelY));
             }
 

@@ -1405,6 +1405,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 case "onPizhuClickLine":
                     mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawLine);
                     break;
+                case "onPizhuClickArrow":
+                    mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawArrow);
+                    break;
                 case "onPizhuClickRectangle":
                     mDocView.setDrawingMode(MuPDFReaderView.DrawingMode.DrawRect);
                     break;

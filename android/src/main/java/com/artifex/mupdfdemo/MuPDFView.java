@@ -32,6 +32,7 @@ public interface MuPDFView {
 	public void startDraw(float x, float y);
 	public void continueDraw(float x, float y);
 	public void continueDrawLine(float x, float y);
+	public void continueDrawArrow(float x, float y);
 	public void continueDrawRect(float x, float y);
 	public void continueDrawCircle(float x, float y);
 	public void stopDraw();
