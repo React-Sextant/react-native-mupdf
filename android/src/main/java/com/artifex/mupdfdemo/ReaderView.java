@@ -567,6 +567,10 @@ public class ReaderView
 			float displacementX =  mLastTouchX - upX;
 			float displacementY =  mLastTouchY - upY;
 
+			if((int) Math.abs(displacementX) < 10 && (int) Math.abs(displacementY) < 10){
+				return true;
+			}
+
 			eventCallback.touchMoveForAnnotation();
 
 			/**
