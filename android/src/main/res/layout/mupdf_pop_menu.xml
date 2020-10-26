@@ -86,6 +86,31 @@
                     android:textColor="#ffffff"
                     android:textSize="15dp" />
             </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:onClick="onRemarkSave"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:paddingHorizontal="5dp"
+                android:layout_marginLeft="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/remark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_marginLeft="2dp"
+                    android:text="@string/remark"
+                    android:textColor="#ffffff"
+                    android:textSize="15dp" />
+            </LinearLayout>
             <LinearLayout
                 android:onClick="onSearchTextToBaidu"
                 android:layout_width="wrap_content"

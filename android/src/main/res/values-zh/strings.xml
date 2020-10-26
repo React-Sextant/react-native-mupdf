@@ -48,6 +48,7 @@
 	<string name="print_failed">未能打印</string>
 	<string name="save">保存</string>
 	<string name="search">搜索</string>
+	<string name="remark">备注</string>
 	<string name="search_backwards">向后搜索</string>
 	<string name="search_document">搜索文档</string>
 	<string name="search_forwards">向前搜索</string>

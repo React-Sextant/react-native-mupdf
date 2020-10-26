@@ -1,8 +1,11 @@
+import React from 'react';
 import {NativeModules, DeviceEventEmitter, AsyncStorage, NetInfo} from 'react-native';
 import Toast from "antd-mobile/lib/toast";
 import RNFetchBlob from 'rn-fetch-blob'
 import Progress from 'react-sextant/lib/root-view/progress'
+import RootView from 'react-sextant/lib/root-view/index'
 import {annotationParse} from './parse'
+import Remark from "./component/Remark";
 
 const { MuPDF } = NativeModules;
 
@@ -281,6 +284,8 @@ export function handleListenMuPDF(msg,params){
             }else {
                 finishPDFActivity()
             }
+        }else if(data.type === "add_remark_annotation"){
+            RootView.setView(<Remark />)
         }
     }catch (e) {
 

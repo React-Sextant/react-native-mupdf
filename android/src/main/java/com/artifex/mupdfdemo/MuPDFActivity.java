@@ -463,7 +463,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             @Override
             public void onEvent(String str) {
                 try{
-                    MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                    final MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
                     JsonParser jsonParser = new JsonParser();
                     final JsonObject jsonObject = (JsonObject) jsonParser.parse(str);
 
@@ -617,6 +617,32 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
                                     addDynamicMenus(jsonObject.get("menus").getAsString());
 
+                                }
+                            });
+                            break;
+                        /**
+                         * 提交备注
+                         * **/
+                        case "confirm_remark_annotation":
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    if (pageView != null)
+                                        pageView.markupSelection(Annotation.Type.UNDERLINE,"Remark");
+
+                                }
+                            });
+                            break;
+                        /**
+                         * 取消提交备注
+                         * **/
+                        case "cancel_remark_annotation":
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    onAnnotationCancel(mDocView);
                                 }
                             });
                             break;
@@ -1574,6 +1600,19 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null)
             pageView.markupSelection(Annotation.Type.UNDERLINE);
+
+        hidePopMenu();
+    }
+
+    /**
+     * 批注直接添加备注，默认为下划线
+     * **/
+    public void onRemarkSave(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null){
+            RCTMuPdfModule.sendRemarkEvent(pageView.getPage(),-1);
+//            pageView.markupSelection(Annotation.Type.UNDERLINE,"Remark");
+        }
 
         hidePopMenu();
     }

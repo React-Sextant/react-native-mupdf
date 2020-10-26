@@ -192,6 +192,19 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * 将批注添加备注事件发送给JavaScript
+     * **/
+    public static void sendRemarkEvent(int page, int annotationIndex){
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("MUPDF_Event_Manager",
+                        "{" +
+                                "\"type\":\"add_remark_annotation\", " +
+                                "\"page\":"+page+
+                                "}"
+                );
+    }
+
+    /**
      * 将当前页面改变事件发送给JavaScript
      * **/
     public static void sendPageChangeEvent(int page){

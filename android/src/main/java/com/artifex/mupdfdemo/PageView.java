@@ -474,6 +474,20 @@ public abstract class PageView extends ViewGroup {
                                     canvas.restore();
                                 }
                             }
+                            for(int i = 0; i < mCloudData.getmRemarkList().size(); i++) {
+                                RemarkItem item = mCloudData.getmRemarkList().get(i);
+                                if(item.page == getPage()){
+
+                                    textPaint.setTextSize((float)item.size * scale);
+                                    // 自动换行
+                                    StaticLayout layout = new StaticLayout(item.text, textPaint, (int)((float)item.width * scale * scaledSizeInPixels),
+                                            Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                                    canvas.save();
+                                    canvas.translate((float)item.x * scale, (float)item.y * scale);
+                                    layout.draw(canvas);
+                                    canvas.restore();
+                                }
+                            }
                         }
                     }catch (RuntimeException e){
 

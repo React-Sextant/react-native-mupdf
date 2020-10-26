@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.github.react.sextant.RCTMuPdfModule;
 
@@ -14,6 +15,7 @@ public class CloudData {
 
     private static CloudData sCloudData;
     private ArrayList<HashMap> mFreetext;
+    private ArrayList<RemarkItem> mRemarkList;
 
     /**
      * 创建sCloudData单例
@@ -28,8 +30,10 @@ public class CloudData {
 
     private CloudData(){
         mFreetext = new ArrayList<HashMap>();
+        mRemarkList = new ArrayList<RemarkItem>();
     }
 
+    /************ FreeText ************/
     public void setmFreetext(ArrayList<HashMap> list){
         mFreetext = list;
     }
@@ -58,5 +62,32 @@ public class CloudData {
     public void set(int i,HashMap map){
         mFreetext.set(i,map);
         RCTMuPdfModule.updateCloudData((int)map.get("page"), sCloudData);
+    }
+
+    /************ MarkList ************/
+
+    public ArrayList<RemarkItem> getmRemarkList() {
+        return mRemarkList;
+    }
+    public void add(RemarkItem item){
+        mRemarkList.add(item);
+    }
+
+
+}
+
+class RemarkItem {
+    float x;
+    float y;
+    int page;
+    int index;
+    int size = 40;
+    int width = 40;
+    String text = "\uD83C\uDFF7️";
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "{x:"+x+", y:"+y+", page:"+page+", index:"+index+"}";
     }
 }

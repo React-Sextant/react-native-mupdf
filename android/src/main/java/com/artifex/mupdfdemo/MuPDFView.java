@@ -23,6 +23,7 @@ public interface MuPDFView {
 	public boolean copySelection();
 	public StringBuilder getSelectedString();
 	public boolean markupSelection(Annotation.Type type);
+	public boolean markupSelection(Annotation.Type type, String action);
 	public boolean markupSelection(int page, PointF[] quadPoints, Annotation.Type type);
 	public void deleteSelectedAnnotation();
 	public void deleteSelectedAnnotation(int page, int index);
