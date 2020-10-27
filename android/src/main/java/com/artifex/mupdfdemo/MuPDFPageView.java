@@ -1,5 +1,6 @@
 package com.artifex.mupdfdemo;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,12 +18,14 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import com.github.react.sextant.R;
+import com.github.react.sextant.RCTMuPdfModule;
 
 /* This enum should be kept in line with the cooresponding C enum in mupdf.c */
 enum SignatureState {
@@ -696,6 +699,27 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			mCloudData.add(item);
 		}
 		mCustomerView.invalidate();
+	}
+
+	public String getScreenShot(){
+		if(mEntireBm!=null && mSourceScale > 0){
+			RectF rect = new RectF(
+					mItemSelectBox!=null?mItemSelectBox.left*mSourceScale:mSelectBox!=null?mSelectBox.left*mSourceScale-20:0,
+					mItemSelectBox!=null?mItemSelectBox.top*mSourceScale:mSelectBox!=null?mSelectBox.top*mSourceScale-20:0,
+					mItemSelectBox!=null?mItemSelectBox.right*mSourceScale:mSelectBox!=null?mSelectBox.right*mSourceScale+20:0,
+					mItemSelectBox!=null?mItemSelectBox.bottom*mSourceScale:mSelectBox!=null?mSelectBox.bottom*mSourceScale+20:0
+			);
+			return bitmapToString(Bitmap.createBitmap(mEntireBm,(int)rect.left,(int)rect.top,(int)Math.abs(rect.right-rect.left),(int)Math.abs(rect.top-rect.bottom)));
+		}
+		return "";
+	}
+
+	String bitmapToString(Bitmap bitmap) {
+		if(bitmap == null) return "";
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		byte[] imgBytes = baos.toByteArray();
+		return Base64.encodeToString(imgBytes, Base64.DEFAULT);
 	}
 
 	/**

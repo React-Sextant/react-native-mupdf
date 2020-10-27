@@ -124,7 +124,7 @@ public abstract class PageView extends ViewGroup {
     protected float mSourceScale;
 
     private ImageView mEntire; // Image rendered at minimum zoom
-    private Bitmap mEntireBm; // Bitmap used to draw the entire page at minimum zoom.
+    protected Bitmap mEntireBm; // Bitmap used to draw the entire page at minimum zoom.
     private Matrix mEntireMat;
     private AsyncTask<Void, Void, TextWord[][]> mGetText;
     private AsyncTask<Void, Void, LinkInfo[]> mGetLinkInfo;
@@ -137,7 +137,7 @@ public abstract class PageView extends ViewGroup {
     private CancellableAsyncTask<Void, Void> mDrawPatch;
     private RectF mSearchBoxes[];
     protected LinkInfo mLinks[];
-    private RectF mSelectBox;
+    protected RectF mSelectBox;
     private TextWord mText[][];
     protected RectF mItemSelectBox;
     protected Annotation.Type mAnnotationType;

@@ -66,4 +66,5 @@ public interface MuPDFView {
 	 * 备注
 	 * **/
 	public void addRemark(int index);
+	public String getScreenShot();
 }

@@ -7,6 +7,7 @@ import {sendData} from '../index'
 
 class Remark extends React.Component {
     handlePress=()=>{
+        console.log(this.props.data.base64)
         sendData(JSON.stringify({
             ...this.props.data,
             type:"confirm_remark_annotation"

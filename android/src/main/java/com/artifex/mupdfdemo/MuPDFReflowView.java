@@ -229,6 +229,11 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 
 	@Override
+	public String getScreenShot() {
+		return null;
+	}
+
+	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int x, y;
 		switch(MeasureSpec.getMode(widthMeasureSpec)) {

@@ -1610,7 +1610,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     public void onRemarkSave(View v){
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null){
-            RCTMuPdfModule.sendRemarkEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex());
+            RCTMuPdfModule.sendRemarkEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex(),pageView.getScreenShot());
         }
 
         hidePopMenu();
