@@ -199,7 +199,8 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                 .emit("MUPDF_Event_Manager",
                         "{" +
                                 "\"type\":\"add_remark_annotation\", " +
-                                "\"page\":"+page+
+                                "\"page\":"+page + "," +
+                                "\"index\":"+annotationIndex+
                                 "}"
                 );
     }

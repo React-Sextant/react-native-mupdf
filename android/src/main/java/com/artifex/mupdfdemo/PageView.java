@@ -474,6 +474,8 @@ public abstract class PageView extends ViewGroup {
                                     canvas.restore();
                                 }
                             }
+                        }
+                        if (mCloudData.getmRemarkList().size()>0) {
                             for(int i = 0; i < mCloudData.getmRemarkList().size(); i++) {
                                 RemarkItem item = mCloudData.getmRemarkList().get(i);
                                 if(item.page == getPage()){

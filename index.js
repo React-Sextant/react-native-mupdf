@@ -285,7 +285,7 @@ export function handleListenMuPDF(msg,params){
                 finishPDFActivity()
             }
         }else if(data.type === "add_remark_annotation"){
-            RootView.setView(<Remark />)
+            RootView.setView(<Remark data={data}/>)
         }
     }catch (e) {
 

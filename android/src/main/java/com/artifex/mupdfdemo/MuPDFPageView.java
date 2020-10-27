@@ -544,53 +544,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return true;
 	}
 
-	public boolean markupSelection(final Annotation.Type type, final String action) {
-		final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
-		processSelectedText(new TextProcessor() {
-			RectF rect;
-
-			public void onStartLine() {
-				rect = new RectF();
-			}
-
-			public void onWord(TextWord word) {
-				rect.union(word);
-			}
-
-			public void onEndLine() {
-				if (!rect.isEmpty()) {
-					quadPoints.add(new PointF(rect.left, rect.bottom));
-					quadPoints.add(new PointF(rect.right, rect.bottom));
-					quadPoints.add(new PointF(rect.right, rect.top));
-					quadPoints.add(new PointF(rect.left, rect.top));
-				}
-			}
-		});
-
-		if (quadPoints.size() == 0)
-			return false;
-
-		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
-			@Override
-			protected Void doInBackground(PointF[]... params) {
-				addMarkup(params[0], type);
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void result) {
-				loadAnnotations("Remark",quadPoints);
-				update();
-			}
-		};
-
-		mAddStrikeOut.execute(quadPoints.toArray(new PointF[quadPoints.size()]));
-
-		deselectText();
-
-		return true;
-	}
-
 	public boolean markupSelection(final int page, final PointF[] quadPoints, final Annotation.Type type) {
 
 		mAddStrikeOut = new AsyncTask<PointF[],Void,Void>() {
@@ -670,11 +623,86 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	}
 
 	/**
+	 * 添加备注
+	 * **/
+	public void addRemark(int index){
+		if(index == -1) {
+			final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
+			processSelectedText(new TextProcessor() {
+				RectF rect;
+
+				public void onStartLine() {
+					rect = new RectF();
+				}
+
+				public void onWord(TextWord word) {
+					rect.union(word);
+				}
+
+				public void onEndLine() {
+					if (!rect.isEmpty()) {
+						quadPoints.add(new PointF(rect.left, rect.bottom));
+						quadPoints.add(new PointF(rect.right, rect.bottom));
+						quadPoints.add(new PointF(rect.right, rect.top));
+						quadPoints.add(new PointF(rect.left, rect.top));
+					}
+				}
+			});
+
+			if (quadPoints.size() > 0) {
+				mAddStrikeOut = new AsyncTask<PointF[], Void, Void>() {
+					@Override
+					protected Void doInBackground(PointF[]... params) {
+						addMarkup(params[0], Annotation.Type.UNDERLINE);
+						return null;
+					}
+
+					@Override
+					protected void onPostExecute(Void result) {
+						loadAnnotations(quadPoints);
+						update();
+					}
+				};
+
+				mAddStrikeOut.execute(quadPoints.toArray(new PointF[quadPoints.size()]));
+
+				deselectText();
+			}
+		}else if(mItemSelectBox != null){
+			addRemark(mItemSelectBox.right,mItemSelectBox.top,index);
+			deselectAnnotation();
+		}
+	}
+
+	private void addRemark(float x, float y, int index){
+		boolean execute = true;
+
+		RemarkItem item = new RemarkItem();
+		item.x = x;
+		item.y = y;
+		item.page = mPageNumber;
+		item.index = index;
+
+		for(int i=0;i<mCloudData.getmRemarkList().size();i++) {
+			if(mCloudData.getmRemarkList().get(i).page == mPageNumber && mCloudData.getmRemarkList().get(i).index == index){
+				mCloudData.getmRemarkList().get(i).x = x;
+				mCloudData.getmRemarkList().get(i).y = y;
+				execute = false;
+				break;
+			}
+		}
+
+		if(execute){
+			mCloudData.add(item);
+		}
+		mCustomerView.invalidate();
+	}
+
+	/**
 	 * 删除备注
 	 * **/
 	private void deleteRemark(int page, int annotationIndex){
 		for(int i = 0; i < mCloudData.getmRemarkList().size(); i++) {
-			System.out.println("luokun: "+mCloudData.getmRemarkList().get(i)+" ;annotationIndex:"+annotationIndex);
 			if(mCloudData.getmRemarkList().get(i).page == page &&
 			   mCloudData.getmRemarkList().get(i).index == annotationIndex
 			){
@@ -836,7 +864,8 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		mLoadAnnotations.execute();
 	}
 
-	private void loadAnnotations(final String action,final ArrayList<PointF> quadPoints) {
+	/**添加批注同时添加备注**/
+	private void loadAnnotations(final ArrayList<PointF> quadPoints) {
 		mAnnotations = null;
 		if (mLoadAnnotations != null)
 			mLoadAnnotations.cancel(true);
@@ -849,15 +878,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			@Override
 			protected void onPostExecute(Annotation[] result) {
 				mAnnotations = result;
-				if(action.equals("Remark")){
-					RemarkItem item = new RemarkItem();
-					item.x = quadPoints.get(2).x;
-					item.y = quadPoints.get(2).y;
-					item.page = mPageNumber;
-					item.index = result.length-1;
-					mCloudData.add(item);
-					mCustomerView.invalidate();
-				}
+				addRemark(quadPoints.get(2).x,quadPoints.get(2).y,result.length-1);
 			}
 		};
 

@@ -121,9 +121,6 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	public boolean markupSelection(Annotation.Type type) {
 		return false;
 	}
-	public boolean markupSelection(Annotation.Type type, String action) {
-		return false;
-	}
 	public boolean markupSelection(int page, PointF[] quadPoints, Annotation.Type type){
 		return false;
 	}
@@ -225,6 +222,10 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	@Override
 	public int getSelectedAnnotationIndex() {
 		return -1;
+	}
+
+	@Override
+	public void addRemark(int index) {
 	}
 
 	@Override

@@ -629,7 +629,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 @Override
                                 public void run() {
                                     if (pageView != null)
-                                        pageView.markupSelection(Annotation.Type.UNDERLINE,"Remark");
+                                        pageView.addRemark(jsonObject.get("index").getAsInt());
 
                                 }
                             });
@@ -1610,8 +1610,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     public void onRemarkSave(View v){
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null){
-            RCTMuPdfModule.sendRemarkEvent(pageView.getPage(),-1);
-//            pageView.markupSelection(Annotation.Type.UNDERLINE,"Remark");
+            RCTMuPdfModule.sendRemarkEvent(pageView.getPage(),pageView.getSelectedAnnotationIndex());
         }
 
         hidePopMenu();
