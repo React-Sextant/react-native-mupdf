@@ -70,6 +70,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private ViewAnimator floatingActionButtonSwitcher;
     private LinearLayout dynamicMenus;
     private LinearLayout idMuPDFPopHitSave;
+    private LinearLayout idMuPDFRemarkSave;
+    private LinearLayout bookselecttextremark;
 
     /* The core rendering instance */
     enum TopBarMode {Main, Search, Accept, Move}
@@ -1254,6 +1256,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         bookselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.bookselectmenu);//主菜单
         bookselecttextup = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextup);//上箭头
         bookselecttextdown = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextdown);//下箭头
+        bookselecttextremark = (LinearLayout)mButtonsView.findViewById(R.id.bookselecttextremark);//备注
+        bookselecttextremark.setVisibility(View.GONE);
 
         annotationselectmenu = (RelativeLayout)mButtonsView.findViewById(R.id.idMuPDFPopHit);//批注外包盒子
         annotationselectmenu.setVisibility(View.INVISIBLE);
@@ -1263,6 +1267,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         floatingActionsMenu = (FloatingActionsMenu)mButtonsView.findViewById(R.id.floatingActionsMenu);
 
         idMuPDFPopHitSave = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFPopHitSave);
+        // 备注功能暂时隐藏
+        idMuPDFRemarkSave = (LinearLayout)annotationselectmenu.findViewById(R.id.idMuPDFRemarkSave);
+        idMuPDFRemarkSave.setVisibility(View.GONE);
 
         hidePopMenu();
 
