@@ -1,18 +1,69 @@
 /* 备注 */
 
 import React from 'react'
-import {View,Modal,Text,ScrollView,StyleSheet,TextInput,TouchableOpacity} from 'react-native'
+import {View,Modal,Dimensions,Image,Text,ScrollView,StyleSheet,TextInput,TouchableOpacity} from 'react-native'
+import {RootView} from 'react-sextant'
 import Icon from 'react-native-vector-icons/AntDesign'
+import {sendData} from '../index'
+
 class Remark extends React.Component {
     state={
-        isFocused:true
+        isFocused:false,
+        visible:true,
+        value:"",
+        width:Dimensions.get("window").width-80,
+        height:100,
+        data:[0]
     };
+
+    componentWillMount() {
+        Image.getSize("data:image/png;base64,"+this.props.data.base64, (width, height) => {
+            this.setState({ height: height * (this.state.width / width) });
+        });
+        Dimensions.addEventListener('change', this.onConfigurationChanged);
+    }
+
+    componentWillUnmount() {
+        Dimensions.removeEventListener('change',this.onConfigurationChanged);
+    }
+
+    onConfigurationChanged=(e)=>{
+        const { width,height } = e.window;
+        this.setState(function(preState){
+            return {width:width-80}
+        },()=>{
+            Image.getSize("data:image/png;base64,"+this.props.data.base64, (width, height) => {
+                this.setState({ height: height * (this.state.width / width) });
+            });
+        })
+    }
+
     handlePress=()=>{
-        this.refs._modal.close()
+        sendData(JSON.stringify({
+            ...this.props.data,
+            type:"confirm_remark_annotation"
+        }));
     }
 
     handleCancel=()=>{
-        this.refs._modal.close()
+        sendData(JSON.stringify({
+            type:"cancel_remark_annotation"
+        }));
+        this.setState({visible:false},()=>{
+            RootView.hide()
+        })
+    }
+
+    submit=()=>{
+        this.setState(function(preState){
+            if(preState.value){
+                this.handlePress();
+                return {data:[...preState.data,preState.value]}
+            }
+        },()=>{
+            this.setState({value:""});
+            this.refs._TextInput&&this.refs._TextInput.blur()
+        })
     }
 
     onFocus=()=>{
@@ -23,59 +74,77 @@ class Remark extends React.Component {
         this.setState({isFocused:false})
     };
 
+    onChangeText=(text)=>{
+        this.setState({value:text})
+    }
+
     render(){
-        const {isFocused} = this.state;
+        const {isFocused,value,height,width,data} = this.state;
         return (
-            <Modal visible={this.props.visible} transparent={true} ref={"_modal"} >
+            <Modal visible={this.state.visible} transparent={true} >
                 <View style={styles.bg}/>
-                <ScrollView>
-                    {[0,1,3,2,2,2].map(a=>{
+                <ScrollView style={{marginTop:75}}>
+                    <View style={[styles.card,{backgroundColor:'#FFFFFF'}]}>
+                        <Image style={{ width,height:Math.min(height,110),alignSelf:'center' }} resizeMode={"contain"} source={{uri:"data:image/png;base64,"+this.props.data.base64}}/>
+                    </View>
+                    {data.map(a=>{
                         return (
                             <View style={styles.card} key={a}>
                                 <Text style={styles.time}>
                                     2020年10月27日
                                 </Text>
                                 <Text style={styles.p}>
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
-                                    这是一段测试备注{"\n"}
+                                    {a?a:"这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}\n" +
+                                        "                                    这是一段测试备注{\"\\n\"}"}
+
                                 </Text>
                             </View>
                         )
                     })}
                     <View style={{height:100}}/>
                 </ScrollView>
-                <View style={[styles.footer,!isFocused&&{padding:20}]}>
-                    {!isFocused&&
-                    <TouchableOpacity style={styles.close}>
-                        <Icon name={'close'} color={'#FFFFFF'} size={20}/>
-                    </TouchableOpacity>
-                    }
-                    <View style={isFocused?styles.footer_box:styles.footer_box2}>
-                        {isFocused &&
-                        <View style={{alignSelf: 'flex-start'}}>
-                            <Text style={{fontSize: 25, color: '#FFFFFF'}}>🏷️</Text>
-                        </View>
-                        }
-                        <TextInput style={isFocused?styles.input:styles.input2}
-                                   multiline
-                                   onFocus={this.onFocus}
-                                   onBlur={this.onBlur}
-                                   placeholder='备注'
-                                   placeholderTextColor="#999999"
-                                   underlineColorAndroid={isFocused?"#FFFFFF":"transparent"}
-                        />
-                        {isFocused &&
-                        <TouchableOpacity style={{padding: 10}}>
-                            <Text style={[styles.time, {fontSize: 20,}]}>发表</Text>
+
+                {!isFocused ?
+                    <View style={[styles.footer, {padding: 20}]}>
+                        <TouchableOpacity style={styles.close} onPress={this.handleCancel}>
+                            <Icon name={'close'} color={'#FFFFFF'} size={20}/>
                         </TouchableOpacity>
-                        }
+                        <TouchableOpacity style={styles.footer_box2} onPress={this.onFocus}>
+                            <View style={styles.input2}>
+                                <Text style={{color:'#FFFFFF'}} numberOfLines={1}>
+                                    {this.state.value||"备注"}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
-                </View>
+                    :
+                    <View style={styles.footer}>
+                        <View style={styles.footer_box}>
+                            <View style={{alignSelf: 'flex-start'}}>
+                                <Text style={{fontSize: 25, color: '#FFFFFF'}}>🏷️</Text>
+                            </View>
+                            <TextInput style={styles.input}
+                                       ref={"_TextInput"}
+                                       multiline
+                                       autoFocus
+                                       value={value}
+                                       onBlur={this.onBlur}
+                                       onChangeText={this.onChangeText}
+                                       placeholder='备注'
+                                       placeholderTextColor="#999999"
+                                       underlineColorAndroid={"#FFFFFF"}
+                            />
+                            <TouchableOpacity style={{padding: 10}} onPress={this.submit}>
+                                <Text style={[styles.time, {fontSize: 20,}]}>发表</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                }
             </Modal>
         )
     }
@@ -87,7 +156,7 @@ const styles = StyleSheet.create({
         width:'100%',
         height:'100%',
         backgroundColor: '#000000',
-        opacity:0.3,
+        opacity:0.5,
     },
     card:{
         marginHorizontal:40,
@@ -95,6 +164,10 @@ const styles = StyleSheet.create({
         padding:20,
         borderRadius:10,
         backgroundColor:'#474747'
+    },
+    img:{
+        width:'100%',
+        height:150
     },
     time:{
         color:'#CCCCCC'
@@ -110,7 +183,7 @@ const styles = StyleSheet.create({
     },
     input2:{
         flex:1,
-        color:'#FFFFFF',
+        justifyContent:'center',
         marginHorizontal:20,
         backgroundColor:'#474747',
         borderRadius: 50,
