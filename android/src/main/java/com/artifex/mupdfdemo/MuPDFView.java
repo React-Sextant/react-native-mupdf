@@ -1,5 +1,6 @@
 package com.artifex.mupdfdemo;
 
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.View;
@@ -67,4 +68,5 @@ public interface MuPDFView {
 	 * **/
 	public void addRemark(int index);
 	public String getScreenShot();
+	public Bitmap getBitmap();
 }

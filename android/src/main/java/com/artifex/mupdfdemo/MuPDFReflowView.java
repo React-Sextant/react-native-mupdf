@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -230,6 +231,11 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 
 	@Override
 	public String getScreenShot() {
+		return null;
+	}
+
+	@Override
+	public Bitmap getBitmap() {
 		return null;
 	}
 

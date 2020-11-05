@@ -714,6 +714,10 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		return "";
 	}
 
+	public Bitmap getBitmap(){
+		return mEntireBm;
+	}
+
 	String bitmapToString(Bitmap bitmap) {
 		if(bitmap == null) return "";
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
