@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/mupdf_topbar" />
+    <include layout="@layout/mupdf_topbar" android:id="@+id/idMuPDFTopBar" />
 
     <include layout="@layout/mupdf_bottombar" />
 
@@ -14,7 +14,20 @@
 
     <include layout="@layout/mupdf_pop_menu" />
 
-    <include android:id="@+id/idMuPDFPopHit" layout="@layout/mupdf_pop_hit" />
+    <include layout="@layout/mupdf_pop_hit" android:id="@+id/idMuPDFPopHit" />
+
+    <!--当前同屏信息-->
+    <TextView
+        android:id="@+id/sameScreenInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/idMuPDFTopBar"
+        android:layout_centerHorizontal="true"
+        android:paddingVertical="5dp"
+        android:paddingHorizontal="20dp"
+        android:background="#E76460"
+        android:textColor="#FFFFFF"
+        android:visibility="invisible"/>
 
     <!--当前操作信息-->
     <TextView

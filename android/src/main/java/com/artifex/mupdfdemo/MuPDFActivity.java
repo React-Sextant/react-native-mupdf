@@ -108,6 +108,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
     private TextView     mPageNumberView;
+    private TextView     mSameScreenInfo;
     private TextView     mInfoView;
     private ViewAnimator mTopBarSwitcher;
     private TopBarMode   mTopBarMode = TopBarMode.Main;
@@ -661,6 +662,19 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                 }
                             });
                             break;
+                        /**
+                         * 当前同屏信息
+                         * **/
+                        case "same_screen_info":
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    mSameScreenInfo.setText(jsonObject.get("current_controller").getAsString());
+                                    mSameScreenInfo.setVisibility(View.VISIBLE);
+                                }
+                            });
+                            break;
                     }
 
                 }catch (Exception e) {
@@ -998,12 +1012,16 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                 dmButton.setColorPressed(getColorWithAlpha(Color.parseColor(getIntent().getStringExtra("theme")),0.5f));
             }
 
+            // 添加 color 属性
+            if(jsonObject.has("color")){
+                dmText.setTextColor(Color.parseColor(jsonObject.get("color").getAsString()));
+            }
+
             // 添加 backgroundColor 属性
             if(jsonObject.has("backgroundColor")){
                 dmButton.setColorNormal(Color.parseColor(jsonObject.get("backgroundColor").getAsString()));
                 dmButton.setColorPressed(getColorWithAlpha(Color.parseColor(jsonObject.get("backgroundColor").getAsString()),0.5f));
             }
-
 
             // name 属性判断
             switch (jsonObject.get("name").getAsString()) {
@@ -1024,7 +1042,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             mDocView.setMode(MuPDFReaderView.Mode.Viewing);
-                            RCTMuPdfModule.sendDynamicMenusButtonEvent(jsonObject.get("name").getAsString(),menus);
+                            RCTMuPdfModule.sendDynamicMenusButtonEvent(jsonObject.get("name").getAsString(),jsonObject.toString(),menus);
                         }
                     });
                     break;
@@ -1254,6 +1272,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
         mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
+        mSameScreenInfo = (TextView)mButtonsView.findViewById(R.id.sameScreenInfo);
         mFilenameView = (TextView)mButtonsView.findViewById(R.id.idFileName);
         mBackButton = (TextView)mButtonsView.findViewById(R.id.idBackButton);
         mTopBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.idTopBar);
