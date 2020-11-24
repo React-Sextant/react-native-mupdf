@@ -15,7 +15,7 @@ import android.view.WindowManager;
 import java.util.Date;
 
 public class MuPDFReaderView extends ReaderView {
-	enum Mode {Viewing, Selecting, Drawing, Freetexting, Move}
+	enum Mode {Viewing, Selecting, Drawing, Freetexting, Move, Disabled} //Move批注移动状态 Disabled禁止所有操作
 	enum DrawingMode {DrawPencil, DrawLine, DrawArrow, DrawRect, DrawCircle}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
@@ -193,7 +193,9 @@ public class MuPDFReaderView extends ReaderView {
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
-
+		if( mMode == Mode.Disabled ){
+			return false;
+		}
 		if ( mMode == Mode.Drawing )
 		{
 			float x = event.getX();

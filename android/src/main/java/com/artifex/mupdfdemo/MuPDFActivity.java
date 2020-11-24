@@ -670,8 +670,16 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
                                 @Override
                                 public void run() {
-                                    mSameScreenInfo.setText(jsonObject.get("current_controller").getAsString());
-                                    mSameScreenInfo.setVisibility(View.VISIBLE);
+                                    if(jsonObject.get("current_controller").getAsString().length() > 0){
+                                        mSameScreenInfo.setText(jsonObject.get("current_controller").getAsString());
+                                        mSameScreenInfo.setVisibility(View.VISIBLE);
+                                    }
+
+                                    if(jsonObject.get("disabled").getAsBoolean()){
+                                        mDocView.setMode(MuPDFReaderView.Mode.Disabled);
+                                    }else if(mDocView.getMode() == MuPDFReaderView.Mode.Disabled){
+                                        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+                                    }
                                 }
                             });
                             break;
@@ -1464,6 +1472,9 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 手写批注
      * **/
     public void onPizhuClick(View v){
+        if(mDocView.getMode() == MuPDFReaderView.Mode.Disabled){
+            return;
+        }
         onCancelSave(v);
         hideButtons();
         slideUpToVisible(mAcceptSwitcher);
@@ -1595,8 +1606,10 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
      * 打开搜索
      * **/
     public void OnOpenSearchButtonClick(View v){
-        hideButtons();
-        searchModeOn();
+        if(mDocView.getMode() != MuPDFReaderView.Mode.Disabled){
+            hideButtons();
+            searchModeOn();
+        }
     }
 
     /**
