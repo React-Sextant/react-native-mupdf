@@ -670,12 +670,12 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
                                 @Override
                                 public void run() {
-                                    if(jsonObject.get("current_controller").getAsString().length() > 0){
+                                    if(jsonObject.has("current_controller")){
                                         mSameScreenInfo.setText(jsonObject.get("current_controller").getAsString());
                                         mSameScreenInfo.setVisibility(View.VISIBLE);
                                     }
 
-                                    if(jsonObject.get("disabled").getAsBoolean()){
+                                    if(jsonObject.has("disabled")&&jsonObject.get("disabled").getAsBoolean()){
                                         mDocView.setMode(MuPDFReaderView.Mode.Disabled);
                                     }else if(mDocView.getMode() == MuPDFReaderView.Mode.Disabled){
                                         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
@@ -1049,7 +1049,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     }
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            mDocView.setMode(MuPDFReaderView.Mode.Viewing);
                             RCTMuPdfModule.sendDynamicMenusButtonEvent(jsonObject.get("name").getAsString(),jsonObject.toString(),menus);
                         }
                     });
