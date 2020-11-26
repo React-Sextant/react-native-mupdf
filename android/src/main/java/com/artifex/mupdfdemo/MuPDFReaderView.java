@@ -193,7 +193,7 @@ public class MuPDFReaderView extends ReaderView {
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
-		if( mMode == Mode.Disabled ){
+		if( MuPDFActivity.SameScreenDisabled ){
 			return false;
 		}
 		if ( mMode == Mode.Drawing )

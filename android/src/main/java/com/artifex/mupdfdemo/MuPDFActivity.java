@@ -127,6 +127,8 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
     private AlertDialog mAlertDialog;
     private FilePicker mFilePicker;
 
+    static boolean SameScreenDisabled = false;
+
     private CloudData mCloudData = CloudData.get();
 
     public void createAlertWaiter() {
@@ -678,9 +680,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                                     }
 
                                     if(jsonObject.has("disabled")&&jsonObject.get("disabled").getAsBoolean()){
-                                        mDocView.setMode(MuPDFReaderView.Mode.Disabled);
+                                        SameScreenDisabled = true;
+//                                        mDocView.setMode(MuPDFReaderView.Mode.Disabled);
                                     }else if(mDocView.getMode() == MuPDFReaderView.Mode.Disabled){
-                                        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+                                        SameScreenDisabled = false;
+//                                        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
                                     }
                                 }
                             });
