@@ -670,9 +670,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
                                 @Override
                                 public void run() {
-                                    if(jsonObject.has("current_controller")){
+                                    if(jsonObject.has("current_controller")&&jsonObject.get("current_controller").getAsString().length()>0){
                                         mSameScreenInfo.setText(jsonObject.get("current_controller").getAsString());
                                         mSameScreenInfo.setVisibility(View.VISIBLE);
+                                    }else {
+                                        mSameScreenInfo.setVisibility(View.INVISIBLE);
                                     }
 
                                     if(jsonObject.has("disabled")&&jsonObject.get("disabled").getAsBoolean()){
