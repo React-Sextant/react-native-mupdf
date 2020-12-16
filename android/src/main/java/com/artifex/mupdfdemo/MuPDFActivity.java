@@ -1048,6 +1048,24 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                         }
                     });
                     break;
+                case "手写批注":
+                    dmText.setText(" 手写\n 批注");
+                    dmText.setTextSize(16);
+                    dmButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            onFreetextClick(v);
+                        }
+                    });
+                    break;
+                case "文本批注":
+                    dmText.setText(" 文本\n 批注");
+                    dmText.setTextSize(16);
+                    dmButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            onPizhuClick(v);
+                        }
+                    });
+                    break;
                 default:
                     dmText.setText(jsonObject.get("name").getAsString());
                     if(jsonObject.get("name").getAsString().length() == 2){
