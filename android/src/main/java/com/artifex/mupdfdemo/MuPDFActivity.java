@@ -1053,7 +1053,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     dmText.setTextSize(16);
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            onFreetextClick(v);
+                            onPizhuClick(v);
                         }
                     });
                     break;
@@ -1062,7 +1062,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
                     dmText.setTextSize(16);
                     dmButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            onPizhuClick(v);
+                            onFreetextClick(v);
                         }
                     });
                     break;
@@ -1136,6 +1136,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         setHorizontalScrolling();
 
         mDocView.refresh(false);
+
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            //横屏
+            RCTMuPdfModule.sendEvent("{ \"type\":\"orientation\", \"orientation\":\"LANDSCAPE\"}");
+        }else{
+            //竖屏
+            RCTMuPdfModule.sendEvent("{ \"type\":\"orientation\", \"orientation\":\"PORTRAIT\"}");
+        }
     }
 
 
