@@ -259,6 +259,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
         super.onCreate(savedInstanceState);
 
         RCTMuPdfModule._isInMuPdf = true;
+        SameScreenDisabled = false;
 
         /**
          * Keep awake
