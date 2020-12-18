@@ -25,7 +25,9 @@
   "peerDependencies": {
     "antd-mobile": "2.1.8",
     "react-sextant": "git+http://git@gitlab.zhijiasoft.com/luokun/react-sextant.git",
-    "rn-fetch-blob": "git+http://git@gitlab.zhijiasoft.com/luokun/rn-fetch-blob.git",
+    "rn-fetch-blob": "git+http://git@gitlab.zhijiasoft.com/luokun/rn-fetch-blob.git"
+  },
+  "dependencies": {
     "x2js": "3.3.1"
   }
 }
