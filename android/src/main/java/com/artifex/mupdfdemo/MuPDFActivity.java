@@ -948,6 +948,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
          * 首次进入时的操作
          * **/
         if (savedInstanceState == null)
+            mDocView.refresh(true);
             RCTMuPdfModule.sendLoadCompleteEvent();
 
         /**
@@ -1136,7 +1137,7 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         setHorizontalScrolling();
 
-        mDocView.refresh(false);
+        mDocView.refresh(true);
 
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
             //横屏

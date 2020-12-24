@@ -345,6 +345,9 @@ public class ReaderView
 
 		mAdapter.refresh();
 		requestLayout();
+		if (currentPage != null) {
+			currentPage.updateHq(false);
+		}
 	}
 
 	protected void onChildSetup(int i, View v) {}
