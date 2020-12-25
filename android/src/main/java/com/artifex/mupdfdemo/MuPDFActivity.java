@@ -948,7 +948,6 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
          * 首次进入时的操作
          * **/
         if (savedInstanceState == null)
-            mDocView.refresh(true);
             RCTMuPdfModule.sendLoadCompleteEvent();
 
         /**
@@ -1137,14 +1136,14 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
 
         setHorizontalScrolling();
 
-        mDocView.refresh(true);
-
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
             //横屏
             RCTMuPdfModule.sendEvent("{ \"type\":\"orientation\", \"orientation\":\"LANDSCAPE\"}");
+            slideUpToHide(mTopBarSwitcher);
         }else{
             //竖屏
             RCTMuPdfModule.sendEvent("{ \"type\":\"orientation\", \"orientation\":\"PORTRAIT\"}");
+            slideDownToVisible(mTopBarSwitcher);
         }
     }
 
@@ -1207,6 +1206,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             }
             slideUpToVisible(mBottomBarSwitcher);
             mPageNumberView.setVisibility(View.VISIBLE);
+
+            int orientation = this.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                slideDownToVisible(mTopBarSwitcher);
+            }
         }
     }
 
@@ -1217,6 +1221,11 @@ public class MuPDFActivity extends ReactActivity implements FilePicker.FilePicke
             slideDownToHide(mBottomBarSwitcher);
             slideDownToHide(mMultipleSwitcher);
             mPageNumberView.setVisibility(View.GONE);
+
+            int orientation = this.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                slideUpToHide(mTopBarSwitcher);
+            }
         }
 
         searchModeOff();

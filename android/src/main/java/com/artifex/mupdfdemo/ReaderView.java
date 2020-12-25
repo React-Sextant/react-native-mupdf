@@ -343,11 +343,7 @@ public class ReaderView
 		mScale = 1.0f;
 		mXScroll = mYScroll = 0;
 
-		mAdapter.refresh();
 		requestLayout();
-		if (currentPage != null) {
-			currentPage.updateHq(false);
-		}
 	}
 
 	protected void onChildSetup(int i, View v) {}
@@ -889,9 +885,10 @@ public class ReaderView
 
 		if (!mReflow) {
 		// Work out a scale that will fit it to this view
-//		float scale = Math.min((float)getWidth()/(float)v.getMeasuredWidth(),
-//					(float)getHeight()/(float)v.getMeasuredHeight());
-        float scale = (float)getWidth()/(float)v.getMeasuredWidth();
+		// [1225 Refactor]高度优先展示
+		float scale = Math.min((float)getWidth()/(float)v.getMeasuredWidth(),
+					(float)getHeight()/(float)v.getMeasuredHeight());
+//        float scale = (float)getWidth()/(float)v.getMeasuredWidth();
 		// Use the fitting values scaled by our current scale factor
 		v.measure(MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()*scale*mScale),
 				MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()*scale*mScale));
