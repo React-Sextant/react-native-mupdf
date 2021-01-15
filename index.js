@@ -41,7 +41,10 @@ export async function openMuPDF2(params){
             Progress.setLoading(1);
             openMuPDF(cache_list[index].path||cache_list[index].filePath||cache_list[index].localPath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params).then(res=>{
                 typeof params.callback === 'function'&&params.callback(res)
-            }).catch(err=>{
+            }).catch(async err=>{
+                await deleteLocationFile(cache_list[index].path||cache_list[index].filePath||cache_list[index].localPath);
+                cache_list.splice(index,1);
+                AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list));
                 typeof params.onError === 'function'&&params.onError(err)
             })
         }else {
