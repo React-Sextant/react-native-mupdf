@@ -34,7 +34,7 @@ export async function openMuPDF2(params){
     }else {
         Progress.setLoading(0.001);
         let cache_list = params.cacheList || JSON.parse(await AsyncStorage.getItem('mupdf_file_data_path')||"[]");
-        let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url))});
+        let index = cache_list.findIndex(pre=>{return Boolean(pre.md5===(params.md5||params.url) || pre.fileId===(params.md5||params.url))});
         if(index>-1) {
             Progress.setLoading(1);
             openMuPDF(cache_list[index].path||cache_list[index].filePath||cache_list[index].localPath,params.title,JSON.parse(params.fileOtherRecordStr||"{}"),params).then(res=>{
@@ -53,9 +53,12 @@ export async function openMuPDF2(params){
                             filePath:path,
                             md5:(params.md5||params.url)
                         });
-                        AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list));
+                        AsyncStorage.setItem('mupdf_file_data_path',JSON.stringify(cache_list)).then(()=>{
+                            typeof params.callback === 'function'&&params.callback({...res,path})
+                        });
+                    }else {
+                        typeof params.callback === 'function'&&params.callback({...res,path})
                     }
-                    typeof params.callback === 'function'&&params.callback({...res,path})
                 }).catch(async err=>{
                     await deleteLocationFile(path);
                     typeof params.onError === 'function'&&params.onError(err)
@@ -82,7 +85,7 @@ export function openMuPDF(_filePath,_fileName,_annotations,_params={}){
                 filePath:_filePath,
                 fileName:_fileName,
                 cloudData:annotationParse(_annotations).cloudData,
-                menus:JSON.stringify(_params.menus)||"[{name:\"批注\"}]",
+                menus:_params.menus&&JSON.stringify(_params.menus)||"[{name:\"批注\"}]",
                 theme:_params.theme||"",
                 page:_params.page >= 0 ? _params.page : undefined,
                 back:_params.back||"返回"
@@ -142,7 +145,7 @@ export function downloadFileFetch(params,callback,errorBack){
                 if (resp.respInfo&&resp.respInfo.status !== 200) {
                     Toast.offline("文件"+(resp.respInfo?resp.respInfo.status:"文件信息有误"));
                     await deleteLocationFile(resp.path());
-                    errorBack(resp.respInfo.status)
+                    typeof errorBack === 'function'&&errorBack(resp.respInfo.status)
                 }else {
                     callback(resp.path())
                 }
