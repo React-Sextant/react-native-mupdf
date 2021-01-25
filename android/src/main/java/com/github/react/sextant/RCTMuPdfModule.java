@@ -1,10 +1,11 @@
 package com.github.react.sextant;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 
 import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.CloudData;
@@ -13,6 +14,7 @@ import com.artifex.mupdfdemo.PageView;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseActivityEventListener;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -21,18 +23,20 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.artifex.utils.SharedPreferencesUtil.CURRENT_PAGE;
+import static com.artifex.utils.WindowViewManager.createWindowView;
 
 public class RCTMuPdfModule extends ReactContextBaseJavaModule {
 
     private final int REQUEST_ECODE_SCAN=30725;
+    private final int SYSTEM_OVERLAY_WINDOW=30726;
     private Promise mPromise;
+    private Callback mCallback;
     public static boolean error;    //打开文件是否报错
     public static boolean _isInMuPdf;    //是否已经进入
     private static ReactApplicationContext mContext;
@@ -58,6 +62,9 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
                     mCloudData.clear();
                     mPromise.resolve(map);
                 }
+            }else if(requestCode == SYSTEM_OVERLAY_WINDOW){
+                createWindowView(true); //resultCode=0
+                mCallback.invoke();
             }
         }
     };
@@ -111,6 +118,15 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         if(map.hasKey("INK_THICKNESS")){
             PageView.INK_THICKNESS = (float)map.getInt("INK_THICKNESS");
         }
+
+        // 悬浮窗
+        if(map.hasKey("showWindowView")){
+            createWindowView(map.getBoolean("showWindowView"));
+        }else {
+            createWindowView(false);
+        }
+
+
 
         currentActivity.startActivityForResult(intent, REQUEST_ECODE_SCAN);
     }
@@ -352,6 +368,43 @@ public class RCTMuPdfModule extends ReactContextBaseJavaModule {
         }catch (Exception e){
             return cloudData;
         }
+    }
+
+    /**
+     * 获取悬浮窗权限
+     * **/
+    @ReactMethod
+    public void getWindowOverlayPermission(Callback callback){
+        if (Build.VERSION.SDK_INT >= 23)
+        {
+            Activity currentActivity = getCurrentActivity();
+            if (!Settings.canDrawOverlays(currentActivity))
+            {
+                callback.invoke(false);
+            }
+            else
+            {
+                callback.invoke(true);
+                createWindowView(true);
+            }
+        }
+        else callback.invoke(false);
+    }
+    @ReactMethod
+    public void openWindowOverlayPermission(Callback callback){
+        if (Build.VERSION.SDK_INT >= 23)
+        {
+            Activity currentActivity = getCurrentActivity();
+            if (!Settings.canDrawOverlays(currentActivity))
+            {
+                String ACTION_MANAGE_OVERLAY_PERMISSION = "android.settings.action.MANAGE_OVERLAY_PERMISSION";
+                Intent intent = new Intent(ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + currentActivity.getPackageName()));
+                currentActivity.startActivityForResult(intent, SYSTEM_OVERLAY_WINDOW);
+                mCallback = callback;
+            }
+            else callback.invoke();
+        }
+        else callback.invoke();
     }
 
     @Override

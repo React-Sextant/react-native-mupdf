@@ -1,6 +1,7 @@
 import {NativeModules, DeviceEventEmitter, AsyncStorage} from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
 import Toast from "antd-mobile/lib/toast";
+import Modal from "antd-mobile/lib/modal";
 import RNFetchBlob from 'rn-fetch-blob'
 import Progress from 'react-sextant/lib/root-view/progress'
 import {annotationParse} from './parse'
@@ -20,6 +21,7 @@ let _isInMuPdf = false;        //是否在mupdf插件页内（只允许点一次
  * @param {Boolean} params.cache                文件是否允许被缓存
  * @param {Array} params.cacheList              缓存列表
  * @param {Array} params.menus                  MuPdf内按钮菜单
+ * @param {Boolean} params.showWindowView       是否显示悬浮窗
  * @param {Function} params.callback            成功打开MuPdf并关闭之后额度回调
  * @param {Function} params.onError             失败回调
  * @param {Function} params.onFinishActivityHook 关闭PDF钩子(返回键监听)
@@ -286,6 +288,20 @@ export function handleListenMuPDF(msg,params){
         }else if(data.type === "on_finish_activity_hook"){
             if(typeof params.onFinishActivityHook === 'function'){
                 params.onFinishActivityHook()
+            }else if(params.showWindowView){
+                MuPDF.getWindowOverlayPermission((bool)=>{
+                    if(bool){
+                        finishPDFActivity()
+                    }else {
+                        Modal.alert("悬浮窗","是否以悬浮窗形式保留当前PDF",[
+                            {text:'返回上一页',onPress:finishPDFActivity},
+                            {text:'打开悬浮窗',onPress:()=>{
+                                    MuPDF.openWindowOverlayPermission(finishPDFActivity)
+                                }},
+                        ])
+                    }
+
+                })
             }else {
                 finishPDFActivity()
             }
